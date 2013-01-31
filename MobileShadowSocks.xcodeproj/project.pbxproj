@@ -1,0 +1,327 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4B3A810E16BA4A2C00BE1B4C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B3A810D16BA4A2C00BE1B4C /* UIKit.framework */; };
+		4B3A811016BA4A2C00BE1B4C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B3A810F16BA4A2C00BE1B4C /* Foundation.framework */; };
+		4B3A811216BA4A2C00BE1B4C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B3A811116BA4A2C00BE1B4C /* CoreGraphics.framework */; };
+		4B3A811A16BA4A2C00BE1B4C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811916BA4A2C00BE1B4C /* main.m */; };
+		4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */; };
+		4BF902EE16BA996E00E35F60 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902EB16BA996E00E35F60 /* Icon-72.png */; };
+		4BF902EF16BA996E00E35F60 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902EC16BA996E00E35F60 /* Icon.png */; };
+		4BF902F016BA996E00E35F60 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902ED16BA996E00E35F60 /* Icon@2x.png */; };
+		4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */; };
+		4BF9030916BA9D5D00E35F60 /* empty.pac in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030216BA9D5D00E35F60 /* empty.pac */; };
+		4BF9030A16BA9D5D00E35F60 /* proxy.conf in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030316BA9D5D00E35F60 /* proxy.conf */; };
+		4BF9030B16BA9D5D00E35F60 /* proxy.py in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030416BA9D5D00E35F60 /* proxy.py */; };
+		4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */; };
+		4BF9031516BA9F8D00E35F60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9031316BA9F8D00E35F60 /* Localizable.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4B3A810916BA4A2C00BE1B4C /* MobileShadowSocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileShadowSocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B3A810D16BA4A2C00BE1B4C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		4B3A810F16BA4A2C00BE1B4C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		4B3A811116BA4A2C00BE1B4C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		4B3A811516BA4A2C00BE1B4C /* MobileShadowSocks-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MobileShadowSocks-Info.plist"; sourceTree = "<group>"; };
+		4B3A811916BA4A2C00BE1B4C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B3A811B16BA4A2C00BE1B4C /* MobileShadowSocks-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MobileShadowSocks-Prefix.pch"; sourceTree = "<group>"; };
+		4B3A811C16BA4A2C00BE1B4C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		4B3A812416BA4ABE00BE1B4C /* SettingTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingTableViewController.h; sourceTree = "<group>"; };
+		4BF902EB16BA996E00E35F60 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
+		4BF902EC16BA996E00E35F60 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		4BF902ED16BA996E00E35F60 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = gen_entitlements.py; sourceTree = "<group>"; };
+		4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.linusyang.shadowsocks.plist; sourceTree = "<group>"; };
+		4BF9030216BA9D5D00E35F60 /* empty.pac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = empty.pac; sourceTree = "<group>"; };
+		4BF9030316BA9D5D00E35F60 /* proxy.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = proxy.conf; sourceTree = "<group>"; };
+		4BF9030416BA9D5D00E35F60 /* proxy.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = proxy.py; sourceTree = "<group>"; };
+		4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingTableViewController.m; sourceTree = "<group>"; };
+		4BF9031416BA9F8D00E35F60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4BF9031616BA9F9200E35F60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4B3A810616BA4A2C00BE1B4C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B3A810E16BA4A2C00BE1B4C /* UIKit.framework in Frameworks */,
+				4B3A811016BA4A2C00BE1B4C /* Foundation.framework in Frameworks */,
+				4B3A811216BA4A2C00BE1B4C /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4B3A80FE16BA4A2C00BE1B4C = {
+			isa = PBXGroup;
+			children = (
+				4B3A811316BA4A2C00BE1B4C /* MobileShadowSocks */,
+				4B3A810C16BA4A2C00BE1B4C /* Frameworks */,
+				4B3A810A16BA4A2C00BE1B4C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4B3A810A16BA4A2C00BE1B4C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4B3A810916BA4A2C00BE1B4C /* MobileShadowSocks.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4B3A810C16BA4A2C00BE1B4C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4B3A810D16BA4A2C00BE1B4C /* UIKit.framework */,
+				4B3A810F16BA4A2C00BE1B4C /* Foundation.framework */,
+				4B3A811116BA4A2C00BE1B4C /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4B3A811316BA4A2C00BE1B4C /* MobileShadowSocks */ = {
+			isa = PBXGroup;
+			children = (
+				4B3A811C16BA4A2C00BE1B4C /* AppDelegate.h */,
+				4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */,
+				4B3A812416BA4ABE00BE1B4C /* SettingTableViewController.h */,
+				4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */,
+				4B3A811416BA4A2C00BE1B4C /* Supporting Files */,
+			);
+			path = MobileShadowSocks;
+			sourceTree = "<group>";
+		};
+		4B3A811416BA4A2C00BE1B4C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				4BF9031316BA9F8D00E35F60 /* Localizable.strings */,
+				4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */,
+				4BF9030216BA9D5D00E35F60 /* empty.pac */,
+				4BF9030316BA9D5D00E35F60 /* proxy.conf */,
+				4BF9030416BA9D5D00E35F60 /* proxy.py */,
+				4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */,
+				4BF902EB16BA996E00E35F60 /* Icon-72.png */,
+				4BF902EC16BA996E00E35F60 /* Icon.png */,
+				4BF902ED16BA996E00E35F60 /* Icon@2x.png */,
+				4B3A811516BA4A2C00BE1B4C /* MobileShadowSocks-Info.plist */,
+				4B3A811916BA4A2C00BE1B4C /* main.m */,
+				4B3A811B16BA4A2C00BE1B4C /* MobileShadowSocks-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4B3A810816BA4A2C00BE1B4C /* MobileShadowSocks */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B3A812116BA4A2C00BE1B4C /* Build configuration list for PBXNativeTarget "MobileShadowSocks" */;
+			buildPhases = (
+				4B3A810516BA4A2C00BE1B4C /* Sources */,
+				4B3A810616BA4A2C00BE1B4C /* Frameworks */,
+				4B3A810716BA4A2C00BE1B4C /* Resources */,
+				4B3A812716BA7DFE00BE1B4C /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MobileShadowSocks;
+			productName = MobileShadowSocks;
+			productReference = 4B3A810916BA4A2C00BE1B4C /* MobileShadowSocks.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4B3A810016BA4A2C00BE1B4C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+				ORGANIZATIONNAME = "Linus Yang";
+			};
+			buildConfigurationList = 4B3A810316BA4A2C00BE1B4C /* Build configuration list for PBXProject "MobileShadowSocks" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+			);
+			mainGroup = 4B3A80FE16BA4A2C00BE1B4C;
+			productRefGroup = 4B3A810A16BA4A2C00BE1B4C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4B3A810816BA4A2C00BE1B4C /* MobileShadowSocks */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4B3A810716BA4A2C00BE1B4C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BF902EE16BA996E00E35F60 /* Icon-72.png in Resources */,
+				4BF902EF16BA996E00E35F60 /* Icon.png in Resources */,
+				4BF902F016BA996E00E35F60 /* Icon@2x.png in Resources */,
+				4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */,
+				4BF9030916BA9D5D00E35F60 /* empty.pac in Resources */,
+				4BF9030A16BA9D5D00E35F60 /* proxy.conf in Resources */,
+				4BF9030B16BA9D5D00E35F60 /* proxy.py in Resources */,
+				4BF9031516BA9F8D00E35F60 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4B3A812716BA7DFE00BE1B4C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "#!/bin/bash\nset -e\nexport CODESIGN_ALLOCATE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/codesign_allocate\nif [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\npython ${PROJECT_DIR}/MobileShadowSocks/gen_entitlements.py \"com.linusyang.${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\ncodesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\nrm \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\"\ncd \"${BUILT_PRODUCTS_DIR}\"\nNOWVER=\"0.1.5\"\nNOWBUILD=\"1\"\nrm -rf makedeb\nrm -f *.deb\nmkdir -p makedeb/Applications\ncp -r \"${WRAPPER_NAME}\" makedeb/Applications/\nrm -f makedeb/Applications/MobileShadowSocks.app/CodeResources\nln -s _CodeSignature/CodeResources makedeb/Applications/MobileShadowSocks.app/CodeResources\ncp -f ${PROJECT_DIR}/MobileShadowSocks/sshelper makedeb/Applications/MobileShadowSocks.app/\ncp -f ${PROJECT_DIR}/MobileShadowSocks/shadow makedeb/Applications/MobileShadowSocks.app/\ntar zxf ${PROJECT_DIR}/MobileShadowSocks/auto.tgz -C makedeb/Applications/MobileShadowSocks.app/\nchmod 6755 makedeb/Applications/MobileShadowSocks.app/sshelper\nchmod 755 makedeb/Applications/MobileShadowSocks.app/shadow\nchmod 644 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\nfind . -name .DS_Store | xargs rm -f\nNOWSIZE=(`du -s -k makedeb | grep --color=never -o '[0-9]\\+'`)\nCTRLFILE=\"Package: com.linusyang.shadowsocks\\nPriority: optional\\nSection: Addons\\nInstalled-Size: $NOWSIZE\\nAuthor: Linus Yang <laokongzi@gmail.com>\\nMaintainer: Linus Yang <laokongzi@gmail.com>\\nSponsor: Linus Yang <http://linusyang.com/>\\nArchitecture: iphoneos-arm\\nVersion: $NOWVER-$NOWBUILD\\nDepends: python\\nDescription: ShadowSocks client for iOS\\nName: ShadowSocks\\nHomepage: https://github.com/clowwindy/shadowsocks\\nIcon: file:///Applications/MobileShadowSocks.app/Icon.png\\n\"\nDEBNAME=\"com.linusyang.shadowsocks_$NOWVER-$NOWBUILD\"\nmkdir -p makedeb/DEBIAN\necho -ne $CTRLFILE > makedeb/DEBIAN/control\nsudo chown -R 501:501 makedeb\nsudo chown 0:0 makedeb/Applications\nsudo chown 0:0 makedeb/Applications/MobileShadowSocks.app/sshelper\nsudo chown 0:0 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\n/opt/local/bin/dpkg-deb -b makedeb t.deb\nmv t.deb ~/Downloads/$DEBNAME\"_iphoneos-arm.deb\"\nsudo chown -R 501:20 makedeb\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4B3A810516BA4A2C00BE1B4C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B3A811A16BA4A2C00BE1B4C /* main.m in Sources */,
+				4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */,
+				4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		4BF9031316BA9F8D00E35F60 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4BF9031416BA9F8D00E35F60 /* en */,
+				4BF9031616BA9F9200E35F60 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4B3A811F16BA4A2C00BE1B4C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv7,
+					armv6,
+				);
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4B3A812016BA4A2C00BE1B4C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv7,
+					armv6,
+				);
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4B3A812216BA4A2C00BE1B4C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MobileShadowSocks/MobileShadowSocks-Prefix.pch";
+				INFOPLIST_FILE = "MobileShadowSocks/MobileShadowSocks-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		4B3A812316BA4A2C00BE1B4C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MobileShadowSocks/MobileShadowSocks-Prefix.pch";
+				INFOPLIST_FILE = "MobileShadowSocks/MobileShadowSocks-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4B3A810316BA4A2C00BE1B4C /* Build configuration list for PBXProject "MobileShadowSocks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B3A811F16BA4A2C00BE1B4C /* Debug */,
+				4B3A812016BA4A2C00BE1B4C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B3A812116BA4A2C00BE1B4C /* Build configuration list for PBXNativeTarget "MobileShadowSocks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B3A812216BA4A2C00BE1B4C /* Debug */,
+				4B3A812316BA4A2C00BE1B4C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4B3A810016BA4A2C00BE1B4C /* Project object */;
+}
