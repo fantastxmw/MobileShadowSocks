@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
         case '2':
             return system("launchctl unload -w /Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist");
         case '3':
-            return system("python /Applications/MobileShadowSocks.app/proxy.py");
+            return system("/Applications/MobileShadowSocks.app/python27/bin/python /Applications/MobileShadowSocks.app/proxy.py");
         case '4':
             if (system("chown 501:501 /Applications/MobileShadowSocks.app/proxy.conf") || \
                 system("chmod 644 /Applications/MobileShadowSocks.app/proxy.conf"))
