@@ -20,5 +20,6 @@
 - (void)revertProxySettings;
 - (void)hideKeyboard;
 - (void)setRunningStatus:(BOOL)isRunning;
+- (void)setViewEnabled:(BOOL)isEnabled;
 
 @end

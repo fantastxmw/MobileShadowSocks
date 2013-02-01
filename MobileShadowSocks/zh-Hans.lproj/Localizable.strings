@@ -10,10 +10,10 @@
     OK = "\U597d";
     "Operation failed. Missing necessary files or command utilities.\nPlease check your files and runtime dependency and try again later." = "\U64cd\U4f5c\U5931\U8d25\U3002\U53ef\U80fd\U662f\U7f3a\U5931\U5fc5\U8981\U7684\U547d\U4ee4\Uff0c\U8bf7\U68c0\U67e5\U60a8\U7684\U8fd0\U884c\U65f6\U4f9d\U8d56\U540e\U518d\U8bd5\U3002";
     Password = "\U5bc6\U7801";
-    Port = "\U7aef\U53e3";
+    Port = "\U670d\U52a1\U5668\U7aef\U53e3";
     "Proxy Settings" = "\U4ee3\U7406\U8bbe\U7f6e";
     "RC4 Crypto" = "RC4 \U52a0\U5bc6";
-    Server = "\U670d\U52a1\U7aef\U5730\U5740";
+    Server = "\U670d\U52a1\U5668\U5730\U5740";
     ShadowSocks = ShadowSocks;
     "Split with comma" = "\U5730\U5740\U95f4\U7528\U82f1\U6587\U9017\U53f7\U9694\U5f00";
     Start = "\U542f\U52a8";

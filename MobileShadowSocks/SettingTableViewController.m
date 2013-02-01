@@ -53,6 +53,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
 {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:isRunning];
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(isRunning ? 1 : 0)];
+    [self setViewEnabled:!isRunning];
     if ([[self navigationItem] leftBarButtonItem]) {
         [[[self navigationItem] leftBarButtonItem] setTitle:(isRunning ? NSLocalizedString(@"Stop", nil) : NSLocalizedString(@"Start", nil))];
         [[[self navigationItem] leftBarButtonItem] setStyle:(isRunning ? UIBarButtonItemStyleDone : UIBarButtonItemStyleBordered)];
@@ -168,7 +169,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
 
 - (void)showAbout
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version 0.1.7\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version 0.1.8\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
     [alert show];
     [alert release];
 }
@@ -268,6 +269,19 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]])
             [cell.accessoryView resignFirstResponder];
+    }
+}
+
+- (void)setViewEnabled:(BOOL)isEnabled {
+    for (UITableViewCell *cell in self.tableView.visibleCells) {
+        if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
+            UITextField *textField = (UITextField *) cell.accessoryView;
+            [textField setEnabled:isEnabled];
+        } 
+        else if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+            UISwitch *switcher = (UISwitch *) cell.accessoryView;
+            [switcher setEnabled:isEnabled];
+        }
     }
 }
 
