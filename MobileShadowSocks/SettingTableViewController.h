@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
-    BOOL prefDidChange;
-    CGFloat cellWidth;
+    BOOL _prefDidChange;
+    CGFloat _cellWidth;
 }
 - (void)startProcess;
 - (void)stopProcess;
@@ -19,5 +19,6 @@
 - (void)showRunCmdError;
 - (void)revertProxySettings;
 - (void)hideKeyboard;
+- (void)setRunningStatus:(BOOL)isRunning;
 
 @end
