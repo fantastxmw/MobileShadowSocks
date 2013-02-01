@@ -26,7 +26,6 @@
 #
 
 import os
-import shutil
 import re
 from subprocess import Popen, PIPE, STDOUT, call
 from optparse import OptionParser

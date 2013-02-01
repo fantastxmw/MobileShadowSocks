@@ -7,7 +7,6 @@
 //
 
 #import "SettingTableViewController.h"
-#import <SystemConfiguration/SystemConfiguration.h>
 
 #define DAEMON_IS_RUNNING() (system("test -z \"`launchctl list | grep shadowsocks`\""))
 #define SETNUM 6
