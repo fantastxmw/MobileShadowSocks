@@ -21,14 +21,13 @@ By Linus Yang
 1. After installation, you will find a icon named *Shadow* on your device.
 2. Launch the app and set the preferences.
 3. Tap the **Start** button on the top left of the screen.
-4. Now the shadowsocks service will run in the background **even if you completely exit this app**. Also, **system-wide** proxy settings will be enabled automatically. You don't need to change the proxy settings in the *Settings.app*.     
-(**Note**:The proxy setting will not show in the Settings.app. If you want to check it, call `scutil --proxy` in the terminal.)
+4. Now the shadowsocks service will run in the background **even if you completely exit this app**. Also, **system-wide** proxy settings will be enabled automatically. You don't need to change the proxy settings in the *Settings.app*. (**Note**:The proxy setting will not show in the Settings.app. If you want to check it, call `scutil --proxy` in the terminal.)
 5. If you want to stop the service, just enter the app again and tap the **Stop** button. The proxy settings will also be disabled.
 
 ### Credits
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @clowwindy
 * [Shadowsocks-libev](https://github.com/madeye/shadowsocks-libev) from @madeye
-* App icon from [Tunnelblick](tunnelblick.googlecode.com) (*Too lazy to draw one by myself *:P)
+* App icon from [Tunnelblick](https://tunnelblick.googlecode.com) (*Too lazy to draw one by myself* :P)
 
 ### Note for Developers
 * You have to self-sign a certificate (or use the official one) named *iPhone Developer*.
