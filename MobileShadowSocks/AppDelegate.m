@@ -15,17 +15,17 @@
 - (void)dealloc
 {
     [_window release];
-    [navController release];
-    [tabViewController release];
+    [_navController release];
+    [_tabViewController release];
     [super dealloc];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-    tabViewController = [[SettingTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-    navController = [[UINavigationController alloc] initWithRootViewController:tabViewController];
-    [self.window addSubview:[navController view]];
+    _tabViewController = [[SettingTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    _navController = [[UINavigationController alloc] initWithRootViewController:_tabViewController];
+    [self.window addSubview:[_navController view]];
     [self.window makeKeyAndVisible];
     return YES;
 }

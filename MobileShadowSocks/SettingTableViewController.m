@@ -149,8 +149,8 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
                 if (system("/Applications/MobileShadowSocks.app/sshelper -4"))
                     [self showRunCmdError];
                 else {
-                    return [apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
                     _prefDidChange = NO;
+                    return [apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
                 }
             }
             return NO;

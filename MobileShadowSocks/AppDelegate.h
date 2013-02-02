@@ -10,8 +10,8 @@
 #import "SettingTableViewController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate> {
-    UINavigationController *navController;
-    SettingTableViewController *tabViewController;
+    UINavigationController *_navController;
+    SettingTableViewController *_tabViewController;
 }
 
 @property (strong, nonatomic) UIWindow *window;
