@@ -144,20 +144,15 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
                 [apiPrefContent appendFormat:@"'%@'", [array lastObject]];
         }
         [apiPrefContent appendString:@"]\n"];
-        if (![apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
-            if ([[NSFileManager defaultManager] fileExistsAtPath:prefPath]) {
-                if (system("/Applications/MobileShadowSocks.app/sshelper -4"))
-                    [self showRunCmdError];
-                else {
-                    _prefDidChange = NO;
-                    return [apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-                }
-            }
-            return NO;
+        _prefDidChange = ![apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        if (_prefDidChange) {
+            if (system("/Applications/MobileShadowSocks.app/sshelper -4"))
+                [self showRunCmdError];
+            else
+                _prefDidChange = ![apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
         }
-        _prefDidChange = NO;
     }
-    return YES;
+    return !_prefDidChange;
 }
 
 - (void)showRunCmdError

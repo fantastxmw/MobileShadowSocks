@@ -22,7 +22,8 @@ int main(int argc, char **argv) {
         case '3':
             return system("/Applications/MobileShadowSocks.app/python27/bin/python /Applications/MobileShadowSocks.app/proxy.py");
         case '4':
-            if (system("chown 501:501 /Applications/MobileShadowSocks.app/proxy.conf") || \
+            if (system("touch /Applications/MobileShadowSocks.app/proxy.conf") || \
+                system("chown 501:501 /Applications/MobileShadowSocks.app/proxy.conf") || \
                 system("chmod 644 /Applications/MobileShadowSocks.app/proxy.conf"))
                 exit(1);
             break;
