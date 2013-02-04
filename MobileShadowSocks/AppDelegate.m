@@ -30,4 +30,9 @@
     return YES;
 }
 
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [_tabViewController fixProxy];
+}
+
 @end

@@ -90,7 +90,9 @@ def main():
     parser.add_option("-t", "--http", action="store_true", dest="http", default=False, \
                       help="Enable HTTP & HTTPS proxy.")
     parser.add_option("-p", "--pac", action="store_true", dest="pac", default=False, \
-                      help="Enable PAC proxy.")
+                      help="Enable PAC proxy and run proxy server.")
+    parser.add_option("-n", "--norun", action="store_true", dest="norun", default=False, \
+                      help="Set proxy without starting proxy server.")
     (options, args) = parser.parse_args()
     http_enabled = 0
     pac_enabled = 0
@@ -117,7 +119,7 @@ def main():
         identifiers += get_udid('list State:/Network/Service/[^/]+/DHCP')
         identifiers = list(set(identifiers))
     except:
-        return
+        pass
     for interface in identifiers:
         p = "d.init\n"
         p += get_sc(EXCEPTION_KEY, ' '.join(except_list), options.pac or options.http, '* ')
@@ -135,7 +137,7 @@ def main():
             Popen([SCUTIL_BINARY], stdin=PIPE).communicate(input=p)[0]
         except:
             pass
-    if options.pac:
+    if (not options.norun) and options.pac:
         proxy_run_args = [LOCAL_BINARY, '-s', confs.get('REMOTE_SERVER'), '-p', confs.get('REMOTE_PORT'), '-l', LOCAL_PORT, '-k', confs.get('SOCKS_PASS')]
         if confs.get('USE_RC4'):
             proxy_run_args += ['-m', 'rc4']

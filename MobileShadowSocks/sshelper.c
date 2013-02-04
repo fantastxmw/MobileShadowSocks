@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
     if (argc != 2 || argv[1][0] != '-' || !argv[1][1] || argv[1][2]) {
-        fprintf(stderr, "Usage: %s {-1 | -2 | -3 | -4}\n", argv[0]);
+        fprintf(stderr, "Usage: %s -{1|2|3|4|5}\n", argv[0]);
         exit(1);
     }
     if (system("chown 0:0 /Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist") || \
@@ -27,8 +27,10 @@ int main(int argc, char **argv) {
                 system("chmod 644 /Applications/MobileShadowSocks.app/proxy.conf"))
                 exit(1);
             break;
+        case '5':
+            return system("/Applications/MobileShadowSocks.app/python27/bin/python /Applications/MobileShadowSocks.app/proxy.py -p -n");
         default:
-            fprintf(stderr, "Usage: %s {-1 | -2 | -3 | -4}\n", argv[0]);
+            fprintf(stderr, "Usage: %s -{1|2|3|4|5}\n", argv[0]);
             exit(1);
     }
     return 0;

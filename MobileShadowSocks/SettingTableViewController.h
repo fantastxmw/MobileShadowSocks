@@ -18,8 +18,10 @@
 - (void)showAbout;
 - (void)showRunCmdError;
 - (void)revertProxySettings;
+- (void)doAfterRevert;
 - (void)hideKeyboard;
 - (void)setRunningStatus:(BOOL)isRunning;
 - (void)setViewEnabled:(BOOL)isEnabled;
+- (void)fixProxy;
 
 @end

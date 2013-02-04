@@ -82,14 +82,32 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
 }
 
+- (void)doAfterRevert
+{
+    [self setRunningStatus:NO];
+    [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
+}
+
 - (void)revertProxySettings
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     if (system("/Applications/MobileShadowSocks.app/sshelper -3"))
         [self performSelectorOnMainThread:@selector(showRunCmdError) withObject:nil waitUntilDone:NO];
-    [self setRunningStatus:NO];
-    [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
+    [self performSelectorOnMainThread:@selector(doAfterRevert) withObject:nil waitUntilDone:NO];
     [pool release];
+}
+
+- (void)fixProxy
+{
+    NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
+    BOOL isRunning = DAEMON_IS_RUNNING();
+    BOOL proxyEnabled = [[proxySettings objectForKey:(NSString *) kCFNetworkProxiesProxyAutoConfigEnable] boolValue];
+    if (isRunning != proxyEnabled) {
+        if (isRunning)
+            system("/Applications/MobileShadowSocks.app/sshelper -5");
+        else
+            system("/Applications/MobileShadowSocks.app/sshelper -3");
+    }
 }
 
 - (void)stopProcess
@@ -100,11 +118,8 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
         [self showRunCmdError];
         [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
     }
-    else if (!DAEMON_IS_RUNNING()) {
-        NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(revertProxySettings) object:nil];
-        [thread start];
-        [thread release];
-    }
+    else if (!DAEMON_IS_RUNNING())
+        [NSThread detachNewThreadSelector:@selector(revertProxySettings) toTarget:self withObject:nil];
     else {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Failed to stop ShadowSocks. Please try again.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
         [alert show];
@@ -164,7 +179,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
 
 - (void)showAbout
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version 0.1.8\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version 0.1.9\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
     [alert show];
     [alert release];
 }
