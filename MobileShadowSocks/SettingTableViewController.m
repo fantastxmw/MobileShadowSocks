@@ -24,7 +24,10 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     gestureRecognizer.cancelsTouchesInView = NO;
     [self.tableView addGestureRecognizer:gestureRecognizer];
     [gestureRecognizer release];
-    _prefDidChange = YES;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"PREF_CHANGED"] == nil)
+        _prefDidChange = YES;
+    else
+        _prefDidChange = [[NSUserDefaults standardUserDefaults] boolForKey:@"PREF_CHANGED"];
     _isRunning = NO;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         _cellWidth = 560.0f;
@@ -112,15 +115,14 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     }
 }
 
-- (void)setAutoProxy:(BOOL)isEnabled
+- (BOOL)setAutoProxy:(BOOL)isEnabled
 {
     NSInteger result = 0;
     if (isEnabled)
         result = system("/Applications/MobileShadowSocks.app/sshelper -6");
     else
         result = system("/Applications/MobileShadowSocks.app/sshelper -7");
-    if (result)
-        [self showRunCmdError];
+    return (result ? NO : YES);
 }
 
 - (void)stopProcess
@@ -148,7 +150,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
         NSString *settingStr;
         NSMutableString *apiPrefContent = [NSMutableString stringWithString:@""];
         int i;
-        for (i = 0; i < 5; i++)
+        for (i = 0; i < 4; i++)
             if (i < 3) {
                 settingStr = [[NSUserDefaults standardUserDefaults] stringForKey:prefKeyName[i]];
                 if (settingStr == nil)
@@ -179,6 +181,9 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
             else
                 _prefDidChange = ![apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
         }
+        if (!_prefDidChange)
+            _prefDidChange = ![self setAutoProxy:[[NSUserDefaults standardUserDefaults] boolForKey:prefKeyName[4]]];
+        [[NSUserDefaults standardUserDefaults] setBool:_prefDidChange forKey:@"PREF_CHANGED"];
     }
     return !_prefDidChange;
 }
@@ -286,7 +291,8 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     _prefDidChange = YES;
     [[NSUserDefaults standardUserDefaults] setBool:switchControl.on forKey:prefKeyName[[switchControl tag]]];
     if (_isRunning && [switchControl tag] == 4)
-        [self setAutoProxy:switchControl.on];
+        _prefDidChange = ![self setAutoProxy:switchControl.on];
+    [[NSUserDefaults standardUserDefaults] setBool:_prefDidChange forKey:@"PREF_CHANGED"];
 }
 
 #pragma mark - Text field delegate
@@ -323,6 +329,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     NSString *nowSetting = [textField text];
     if (nowSetting == nil || [nowSetting isEqualToString:@""])
         nowSetting = defaultSetting[[textField tag]];
+    [[NSUserDefaults standardUserDefaults] setBool:_prefDidChange forKey:@"PREF_CHANGED"];
     [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:prefKeyName[[textField tag]]];
 }
 

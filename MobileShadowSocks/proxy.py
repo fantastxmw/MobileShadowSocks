@@ -56,14 +56,12 @@ SCUTIL_BINARY     = 'scutil'
 LOCAL_BINARY      = '/Applications/MobileShadowSocks.app/shadow'
 LOCAL_PORT        = '1983'
 PAC_FILE          = '/Applications/MobileShadowSocks.app/shadow.pac'
-AUTO_PAC_FILE     = '/Applications/MobileShadowSocks.app/auto.pac'
-EMPTY_PAC_FILE    = '/Applications/MobileShadowSocks.app/empty.pac'
 CONF_FILE         = '/Applications/MobileShadowSocks.app/proxy.conf'
 
 class PacHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            if self.path == '/shadow.pac':
+            if self.path == '/shadow.pac' and os.path.exists(PAC_FILE):
                 f = open(PAC_FILE, 'rb')
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
@@ -134,26 +132,16 @@ def main():
             Popen([SCUTIL_BINARY], stdin=PIPE).communicate(input=p)[0]
         except:
             pass
-    if options.pac:
+    if (not options.norun) and options.pac:
+        proxy_run_args = [LOCAL_BINARY, '-s', confs.get('REMOTE_SERVER'), '-p', confs.get('REMOTE_PORT'), '-l', LOCAL_PORT, '-k', confs.get('SOCKS_PASS')]
+        if confs.get('USE_RC4'):
+            proxy_run_args += ['-m', 'rc4']
+        Popen(proxy_run_args)
         try:
-            if os.path.exists(PAC_FILE):
-                os.unlink(PAC_FILE)
-            if confs.get('AUTO_PROXY'):
-                os.symlink(AUTO_PAC_FILE, PAC_FILE)
-            else:
-                os.symlink(EMPTY_PAC_FILE, PAC_FILE)
+            server = HTTPServer(('127.0.0.1', PAC_SERVER_PORT), PacHTTPHandler)
+            server.serve_forever()
         except:
             pass
-        if not options.norun:
-            proxy_run_args = [LOCAL_BINARY, '-s', confs.get('REMOTE_SERVER'), '-p', confs.get('REMOTE_PORT'), '-l', LOCAL_PORT, '-k', confs.get('SOCKS_PASS')]
-            if confs.get('USE_RC4'):
-                proxy_run_args += ['-m', 'rc4']
-            Popen(proxy_run_args)
-            try:
-                server = HTTPServer(('127.0.0.1', PAC_SERVER_PORT), PacHTTPHandler)
-                server.serve_forever()
-            except:
-                pass
 
 if __name__ == '__main__':
     main()

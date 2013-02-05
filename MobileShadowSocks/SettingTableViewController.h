@@ -24,6 +24,6 @@
 - (void)setRunningStatus:(BOOL)isRunning;
 - (void)setViewEnabled:(BOOL)isEnabled;
 - (void)fixProxy;
-- (void)setAutoProxy:(BOOL)isEnabled;
+- (BOOL)setAutoProxy:(BOOL)isEnabled;
 
 @end
