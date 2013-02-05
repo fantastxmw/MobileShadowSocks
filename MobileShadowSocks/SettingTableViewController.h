@@ -10,6 +10,7 @@
 
 @interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
     BOOL _prefDidChange;
+    BOOL _isRunning;
     CGFloat _cellWidth;
 }
 - (void)startProcess;
@@ -23,5 +24,6 @@
 - (void)setRunningStatus:(BOOL)isRunning;
 - (void)setViewEnabled:(BOOL)isEnabled;
 - (void)fixProxy;
+- (void)setAutoProxy:(BOOL)isEnabled;
 
 @end

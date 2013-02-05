@@ -55,7 +55,7 @@ EXCEPTION_VALUE   = ['localhost', '127.0.0.1', '*.local']
 SCUTIL_BINARY     = 'scutil'
 LOCAL_BINARY      = '/Applications/MobileShadowSocks.app/shadow'
 LOCAL_PORT        = '1983'
-PAC_FILE          = '/Applications/MobileShadowSocks.app/empty.pac'
+PAC_FILE          = '/Applications/MobileShadowSocks.app/shadow.pac'
 AUTO_PAC_FILE     = '/Applications/MobileShadowSocks.app/auto.pac'
 EMPTY_PAC_FILE    = '/Applications/MobileShadowSocks.app/empty.pac'
 CONF_FILE         = '/Applications/MobileShadowSocks.app/proxy.conf'
@@ -109,9 +109,6 @@ def main():
         execfile(CONF_FILE, confs)
     if confs.get('EXCEPTION_LIST') != None:
         except_list += confs.get('EXCEPTION_LIST')
-    if confs.get('AUTO_PROXY'):
-        global PAC_FILE
-        PAC_FILE = AUTO_PAC_FILE
     identifiers = []
     try:
         identifiers += get_udid('show com.apple.network.identification')
@@ -137,16 +134,26 @@ def main():
             Popen([SCUTIL_BINARY], stdin=PIPE).communicate(input=p)[0]
         except:
             pass
-    if (not options.norun) and options.pac:
-        proxy_run_args = [LOCAL_BINARY, '-s', confs.get('REMOTE_SERVER'), '-p', confs.get('REMOTE_PORT'), '-l', LOCAL_PORT, '-k', confs.get('SOCKS_PASS')]
-        if confs.get('USE_RC4'):
-            proxy_run_args += ['-m', 'rc4']
-        Popen(proxy_run_args)
+    if options.pac:
         try:
-            server = HTTPServer(('127.0.0.1', PAC_SERVER_PORT), PacHTTPHandler)
-            server.serve_forever()
+            if os.path.exists(PAC_FILE):
+                os.unlink(PAC_FILE)
+            if confs.get('AUTO_PROXY'):
+                os.symlink(AUTO_PAC_FILE, PAC_FILE)
+            else:
+                os.symlink(EMPTY_PAC_FILE, PAC_FILE)
         except:
             pass
+        if not options.norun:
+            proxy_run_args = [LOCAL_BINARY, '-s', confs.get('REMOTE_SERVER'), '-p', confs.get('REMOTE_PORT'), '-l', LOCAL_PORT, '-k', confs.get('SOCKS_PASS')]
+            if confs.get('USE_RC4'):
+                proxy_run_args += ['-m', 'rc4']
+            Popen(proxy_run_args)
+            try:
+                server = HTTPServer(('127.0.0.1', PAC_SERVER_PORT), PacHTTPHandler)
+                server.serve_forever()
+            except:
+                pass
 
 if __name__ == '__main__':
     main()

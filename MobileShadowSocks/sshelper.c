@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
     if (argc != 2 || argv[1][0] != '-' || !argv[1][1] || argv[1][2]) {
-        fprintf(stderr, "Usage: %s -{1|2|3|4|5}\n", argv[0]);
+        fprintf(stderr, "Usage: %s -{1|2|3|4|5|6|7}\n", argv[0]);
         exit(1);
     }
     if (system("chown 0:0 /Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist") || \
@@ -29,8 +29,18 @@ int main(int argc, char **argv) {
             break;
         case '5':
             return system("/Applications/MobileShadowSocks.app/python27/bin/python /Applications/MobileShadowSocks.app/proxy.py -p -n");
+        case '6':
+            if (system("rm -f /Applications/MobileShadowSocks.app/shadow.pac") || \
+                system("ln -s /Applications/MobileShadowSocks.app/auto.pac /Applications/MobileShadowSocks.app/shadow.pac"))
+                exit(1);
+            break;
+        case '7':
+            if (system("rm -f /Applications/MobileShadowSocks.app/shadow.pac") || \
+                system("ln -s /Applications/MobileShadowSocks.app/empty.pac /Applications/MobileShadowSocks.app/shadow.pac"))
+                exit(1);
+            break;
         default:
-            fprintf(stderr, "Usage: %s -{1|2|3|4|5}\n", argv[0]);
+            fprintf(stderr, "Usage: %s -{1|2|3|4|5|6|7}\n", argv[0]);
             exit(1);
     }
     return 0;

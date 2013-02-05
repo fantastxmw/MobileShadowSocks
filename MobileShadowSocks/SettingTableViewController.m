@@ -25,6 +25,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     [self.tableView addGestureRecognizer:gestureRecognizer];
     [gestureRecognizer release];
     _prefDidChange = YES;
+    _isRunning = NO;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         _cellWidth = 560.0f;
     else
@@ -51,6 +52,7 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
 
 - (void)setRunningStatus:(BOOL)isRunning
 {
+    _isRunning = isRunning;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:isRunning];
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(isRunning ? 1 : 0)];
     [self setViewEnabled:!isRunning];
@@ -108,6 +110,17 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
         else
             system("/Applications/MobileShadowSocks.app/sshelper -3");
     }
+}
+
+- (void)setAutoProxy:(BOOL)isEnabled
+{
+    NSInteger result = 0;
+    if (isEnabled)
+        result = system("/Applications/MobileShadowSocks.app/sshelper -6");
+    else
+        result = system("/Applications/MobileShadowSocks.app/sshelper -7");
+    if (result)
+        [self showRunCmdError];
 }
 
 - (void)stopProcess
@@ -272,6 +285,8 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     UISwitch* switchControl = sender;
     _prefDidChange = YES;
     [[NSUserDefaults standardUserDefaults] setBool:switchControl.on forKey:prefKeyName[[switchControl tag]]];
+    if (_isRunning && [switchControl tag] == 4)
+        [self setAutoProxy:switchControl.on];
 }
 
 #pragma mark - Text field delegate
@@ -290,7 +305,8 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
         } 
         else if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            [switcher setEnabled:isEnabled];
+            if ([switcher tag] != 4)
+                [switcher setEnabled:isEnabled];
         }
     }
 }
