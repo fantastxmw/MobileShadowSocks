@@ -91,8 +91,11 @@
 - (NSInteger)runProxySetting:(BOOL)isEnabled
 {
     NSInteger result = 1;
-    NSArray *array = [self runNetworkConfig:SC_IDENTI willGetIdentifiers:YES];
-    if (array) {
+    NSArray *origArray = [self runNetworkConfig:SC_IDENTI willGetIdentifiers:YES];
+    NSArray *array = [NSArray array];
+    if (origArray)
+        array = [[NSSet setWithArray:origArray] allObjects];
+    if ([array count] > 0) {
         result = 0;
         for (NSString *str in array) {
             NSMutableString *command = [NSMutableString stringWithString:@"d.init\n"];

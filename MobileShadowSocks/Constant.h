@@ -10,7 +10,7 @@
 #define MobileShadowSocks_Constant_h
 
 #define APP_VER @"0.2.1"
-#define APP_BUILD @"3"
+#define APP_BUILD @"4"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"
@@ -21,7 +21,7 @@
 
 #define LAUNCH_CTL @"/bin/launchctl"
 #define SC_UTIL @"/usr/sbin/scutil"
-#define SC_IDENTI @"show com.apple.network.identification"
+#define SC_IDENTI @"show com.apple.network.identification\nlist State:/Network/Service/[^/]+/com.apple.CommCenter\nlist State:/Network/Service/[^/]+/DHCP\n"
 
 #define DAEMON_ID @"com.linusyang.shadowsocks"
 #define BUNDLE_PATH @"/Applications/MobileShadowSocks.app"
