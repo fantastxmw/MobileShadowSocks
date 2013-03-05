@@ -115,7 +115,6 @@
                 [command appendString:@"d.add HTTPSEnable # 0\n"];
                 [command appendString:@"d.add ProxyAutoConfigEnable # 1\n"];
                 [command appendFormat:@"d.add ProxyAutoConfigURLString %@\n", _pacUrl];
-                
             }
             else {
                 [command appendString:@"d.add HTTPEnable # 0\n"];

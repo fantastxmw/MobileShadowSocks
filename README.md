@@ -36,4 +36,4 @@ By Linus Yang
 * Since the Xcode project uses the *Run Script* to make Debian package which will call **sudo** to set permissions, You have to run **sudo** command such as `sudo date` once in your Terminal **before building this project**.
 
 ### License
-Licensed under GPLv3
+Licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html)
