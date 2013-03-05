@@ -135,11 +135,12 @@ int main(int argc, const char **argv)
                 autoProxy = [[dict objectForKey:@"AUTO_PROXY"] boolValue];
                 if (autoProxy) {
                     pacFile = (NSString *) [dict objectForKey:@"PAC_FILE"];
-                    NSString *filePath;
-                    if (pacFile && [[NSFileManager defaultManager] fileExistsAtPath:pacFile])
-                        filePath = pacFile;
-                    else
-                        filePath = DEFAULT_PAC;
+                    NSString *filePath = DEFAULT_PAC;
+                    if (pacFile) {
+                        pacFile = [pacFile stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                        if ([[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+                            filePath = pacFile;
+                    }
                     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
                         fprintf(stream, "%s", [[NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil] cStringUsingEncoding:NSUTF8StringEncoding]);
                         sent = YES;
