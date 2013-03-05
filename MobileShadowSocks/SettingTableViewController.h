@@ -17,6 +17,8 @@
     NSArray *_tableSectionTitle;
     NSArray *_tableElements;
     NSInteger _tagNumber;
+    NSInteger _pacFileCellTag;
+    NSInteger _autoProxyCellTag;
     NSMutableArray *_tagKey;
     NSMutableArray *_tagAlwaysEnabled;
 }

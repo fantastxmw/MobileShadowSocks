@@ -8,6 +8,9 @@
 
 #import "SettingTableViewController.h"
 
+#define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
+#define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
+
 @implementation SettingTableViewController
 
 #pragma mark - View lifecycle
@@ -146,10 +149,11 @@
         NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         if ([cellType hasPrefix:CELL_TEXT]) {
             NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
             UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, _cellWidth, 24)];
-            [textField setTextColor:[UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]];
+            [textField setTextColor:kgrayBlueColor];
             [textField setText:currentSetting ? currentSetting : @""];
             [textField setPlaceholder:cellDefaultValue];
             if ([cellType hasSuffix:CELL_NUM])
@@ -163,6 +167,15 @@
             [textField setDelegate:self];
             [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
             [textField setTag:_tagNumber];
+            if ([cellKey isEqualToString:@"PAC_FILE"]) {
+                _pacFileCellTag = _tagNumber;
+                BOOL isEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
+                [textField setEnabled:isEnabled];
+                if (!isEnabled)
+                    [textField setTextColor:kgrayBlueColorDisabled];
+                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [cell setUserInteractionEnabled:isEnabled];
+            }
             [_tagKey addObject:cellKey];
             if ([cellType hasSuffix:CELL_ALWAYS])
                 [_tagAlwaysEnabled addObject:[NSNumber numberWithInt:_tagNumber]];
@@ -176,6 +189,8 @@
             [switcher setOn:switchValue animated:NO];
             [switcher addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
             [switcher setTag:_tagNumber];
+            if ([cellKey isEqualToString:@"AUTO_PROXY"])
+                _autoProxyCellTag = _tagNumber;
             [_tagKey addObject:cellKey];
             if ([cellType hasSuffix:CELL_ALWAYS])
                 [_tagAlwaysEnabled addObject:[NSNumber numberWithInt:_tagNumber]];
@@ -183,7 +198,6 @@
             [cell setAccessoryView:switcher];
             [switcher release];
         }
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     }
     return cell;
 }
@@ -213,37 +227,59 @@
 
 #pragma mark - Switch delegate
 
-- (void)switchChanged:(id)sender {
+- (void)setPacFileCellEnabled:(BOOL)isEnabled
+{
+    for (UITableViewCell *cell in self.tableView.visibleCells) {
+        if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
+            UITextField *textField = (UITextField *) cell.accessoryView;
+            if ([textField tag] == _pacFileCellTag) {
+                [textField setEnabled:isEnabled];
+                [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
+                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [cell setUserInteractionEnabled:isEnabled];
+            }
+        }
+    }
+}
+
+- (void)switchChanged:(id)sender
+{
     UISwitch* switcher = sender;
     NSString *key = (NSString *) [_tagKey objectAtIndex:[switcher tag]];
     [[NSUserDefaults standardUserDefaults] setBool:switcher.on forKey:key];
+    if ([switcher tag] == _autoProxyCellTag)
+        [self setPacFileCellEnabled:switcher.on];
 }
 
 #pragma mark - Text field delegate
 
-- (void)hideKeyboard {
+- (void)hideKeyboard
+{
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]])
             [cell.accessoryView resignFirstResponder];
     }
 }
 
-- (void)setViewEnabled:(BOOL)isEnabled {
+- (void)setViewEnabled:(BOOL)isEnabled
+{
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *) cell.accessoryView;
             if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[textField tag]]] == NSNotFound) {
                 [textField setEnabled:isEnabled];
-                if (isEnabled)
-                    [textField setTextColor:[UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]];
-                else
-                    [textField setTextColor:[UIColor grayColor]];
+                [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
+                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [cell setUserInteractionEnabled:isEnabled];
             }
         } 
         else if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[switcher tag]]] == NSNotFound) 
+            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[switcher tag]]] == NSNotFound) {
                 [switcher setEnabled:isEnabled];
+                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [cell setUserInteractionEnabled:isEnabled];
+            }
         }
     }
 }
