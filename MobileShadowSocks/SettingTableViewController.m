@@ -270,8 +270,11 @@
     if (start) {
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSString *pacFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"];
-        if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
-            [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
+        if (pacFile) {
+            pacFile = [pacFile stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            if (![pacFile isEqualToString:@""] && ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+                [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
+        }
     }
     if ([_utility startStopDaemon:start]) {
         if ([_utility setProxy:start])
