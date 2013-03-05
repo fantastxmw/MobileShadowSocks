@@ -204,6 +204,13 @@
     [alert release];
 }
 
+- (void)showFileNotFound
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) message:NSLocalizedString(@"PAC file not found. Use default instead.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
+    [alert show];
+    [alert release];
+}
+
 #pragma mark - Switch delegate
 
 - (void)switchChanged:(id)sender {
@@ -225,8 +232,13 @@
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *) cell.accessoryView;
-            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[textField tag]]] == NSNotFound) 
+            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[textField tag]]] == NSNotFound) {
                 [textField setEnabled:isEnabled];
+                if (isEnabled)
+                    [textField setTextColor:[UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]];
+                else
+                    [textField setTextColor:[UIColor grayColor]];
+            }
         } 
         else if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
@@ -255,6 +267,12 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     BOOL start = [willStart boolValue];
     BOOL run = NO;
+    if (start) {
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        NSString *pacFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"];
+        if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+            [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
+    }
     if ([_utility startStopDaemon:start]) {
         if ([_utility setProxy:start])
             run = YES;

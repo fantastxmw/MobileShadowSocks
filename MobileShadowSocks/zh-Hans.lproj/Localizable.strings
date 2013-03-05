@@ -7,6 +7,7 @@
     OK = "\U597d";
     "Operation failed.\nPlease try again later." = "\U64cd\U4f5c\U5931\U8d25\Uff0c\U8bf7\U91cd\U8bd5\U3002";
     "PAC File" = "PAC \U6587\U4ef6";
+    "PAC file not found. Use default instead." = "PAC \U6587\U4ef6\U672a\U627e\U5230\Uff0c\U4f7f\U7528\U9ed8\U8ba4\U6587\U4ef6\U3002";
     Password = "\U5bc6\U7801";
     Port = "\U670d\U52a1\U5668\U7aef\U53e3";
     "Proxy Settings" = "\U4ee3\U7406\U8bbe\U7f6e";
@@ -17,4 +18,5 @@
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U53f7\U5206\U9694";
     Start = "\U542f\U52a8";
     Stop = "\U505c\U6b62";
+    Warning = "\U8b66\U544a";
 }
