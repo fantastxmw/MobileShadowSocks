@@ -8,11 +8,6 @@
 
 #import "SettingTableViewController.h"
 
-#define DAEMON_IS_RUNNING() (system("test -z \"`launchctl list | grep shadowsocks`\"") ? YES : NO)
-#define SETNUM 6
-static NSString *defaultSetting[SETNUM] = {@"127.0.0.1", @"8080", @"123456", @"", @"", @""};
-static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCKS_PASS", @"USE_RC4", @"AUTO_PROXY", @"EXCEPTION_LIST"};
-
 @implementation SettingTableViewController
 
 #pragma mark - View lifecycle
@@ -24,11 +19,6 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     gestureRecognizer.cancelsTouchesInView = NO;
     [self.tableView addGestureRecognizer:gestureRecognizer];
     [gestureRecognizer release];
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"PREF_CHANGED"] == nil)
-        _prefDidChange = YES;
-    else
-        _prefDidChange = [[NSUserDefaults standardUserDefaults] boolForKey:@"PREF_CHANGED"];
-    _isRunning = NO;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         _cellWidth = 560.0f;
     else
@@ -40,12 +30,66 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     [[self navigationItem] setTitle:NSLocalizedString(@"ShadowSocks", nil)];
     [leftButton release];
     [aboutButton release];
+    _utility = [[ShadowUtility alloc] initWithDaemonIdentifier:DAEMON_ID];
+    _tagNumber = 0;
+    _tagKey = [[NSMutableArray alloc] init];
+    _tagAlwaysEnabled = [[NSMutableArray alloc] init];
+    _tableSectionNumber = 2;
+    _tableRowNumber = [[NSArray alloc] initWithObjects:
+                       [NSNumber numberWithInt:4], 
+                       [NSNumber numberWithInt:3], 
+                       nil];
+    _tableSectionTitle = [[NSArray alloc] initWithObjects:
+                          NSLocalizedString(@"Server Information", nil), 
+                          NSLocalizedString(@"Proxy Settings", nil), 
+                          nil];
+    _tableElements = [[NSArray alloc] initWithObjects:
+                      [NSArray arrayWithObjects:
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Server", nil), 
+                        @"REMOTE_SERVER", 
+                        @"127.0.0.1", 
+                        CELL_TEXT, nil], 
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Port", nil), 
+                        @"REMOTE_PORT", 
+                        @"8080", 
+                        CELL_TEXT CELL_NUM, nil], 
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Password", nil), 
+                        @"SOCKS_PASS", 
+                        @"123456", 
+                        CELL_TEXT CELL_PASS, nil], 
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"RC4 Crypto", nil), 
+                        @"USE_RC4", 
+                        @"NO", 
+                        CELL_SWITCH, nil], 
+                       nil],
+                      [NSArray arrayWithObjects:
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Auto Proxy", nil), 
+                        @"AUTO_PROXY", 
+                        @"NO", 
+                        CELL_SWITCH CELL_ALWAYS, nil], 
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"PAC File", nil), 
+                        @"PAC_FILE", 
+                        [NSString stringWithFormat:@"%@/auto.pac", [[NSBundle mainBundle] bundlePath]], 
+                        CELL_TEXT CELL_ALWAYS, nil], 
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Exceptions", nil), 
+                        @"EXCEPTION_LIST", 
+                        NSLocalizedString(@"Split with comma", nil), 
+                        CELL_TEXT, nil], 
+                       nil],  
+                      nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self setRunningStatus:DAEMON_IS_RUNNING()];
+    [NSThread detachNewThreadSelector:@selector(threadInitProxyStatus) toTarget:self withObject:nil];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -53,249 +97,123 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
-- (void)setRunningStatus:(BOOL)isRunning
+- (void)dealloc
 {
-    _isRunning = isRunning;
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:isRunning];
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(isRunning ? 1 : 0)];
-    [self setViewEnabled:!isRunning];
-    if ([[self navigationItem] leftBarButtonItem]) {
-        [[[self navigationItem] leftBarButtonItem] setTitle:(isRunning ? NSLocalizedString(@"Stop", nil) : NSLocalizedString(@"Start", nil))];
-        [[[self navigationItem] leftBarButtonItem] setStyle:(isRunning ? UIBarButtonItemStyleDone : UIBarButtonItemStyleBordered)];
-        [[[self navigationItem] leftBarButtonItem] setAction:(isRunning ? @selector(stopProcess) : @selector(startProcess))];
-    }
-}
-
-- (void)startProcess
-{
-    [[[self navigationItem] leftBarButtonItem] setEnabled:NO];
-    [self hideKeyboard];
-    if (![self writeToPref]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Failed to save settings. Please try again.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
-        [alert show];
-        [alert release];
-    }
-    else if (system("/Applications/MobileShadowSocks.app/sshelper -1"))
-        [self showRunCmdError];
-    else if (DAEMON_IS_RUNNING())
-        [self setRunningStatus:YES];
-    else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Failed to start ShadowSocks. Please try again.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
-        [alert show];
-        [alert release];
-    }
-    [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
-}
-
-- (void)doAfterRevert
-{
-    [self setRunningStatus:NO];
-    [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
-}
-
-- (void)revertProxySettings
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    if (system("/Applications/MobileShadowSocks.app/sshelper -3"))
-        [self performSelectorOnMainThread:@selector(showRunCmdError) withObject:nil waitUntilDone:NO];
-    [self performSelectorOnMainThread:@selector(doAfterRevert) withObject:nil waitUntilDone:NO];
-    [pool release];
-}
-
-- (void)fixProxy
-{
-    NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
-    BOOL isRunning = DAEMON_IS_RUNNING();
-    BOOL proxyEnabled = [[proxySettings objectForKey:(NSString *) kCFNetworkProxiesProxyAutoConfigEnable] boolValue];
-    if (isRunning != proxyEnabled) {
-        if (isRunning)
-            system("/Applications/MobileShadowSocks.app/sshelper -5");
-        else
-            system("/Applications/MobileShadowSocks.app/sshelper -3");
-    }
-}
-
-- (BOOL)setAutoProxy:(BOOL)isEnabled
-{
-    NSInteger result = 0;
-    if (isEnabled)
-        result = system("/Applications/MobileShadowSocks.app/sshelper -6");
-    else
-        result = system("/Applications/MobileShadowSocks.app/sshelper -7");
-    return (result ? NO : YES);
-}
-
-- (void)stopProcess
-{
-    [[[self navigationItem] leftBarButtonItem] setEnabled:NO];
-    [self hideKeyboard];
-    if (system("/Applications/MobileShadowSocks.app/sshelper -2")) {
-        [self showRunCmdError];
-        [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
-    }
-    else if (!DAEMON_IS_RUNNING())
-        [NSThread detachNewThreadSelector:@selector(revertProxySettings) toTarget:self withObject:nil];
-    else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Failed to stop ShadowSocks. Please try again.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
-        [alert show];
-        [alert release];
-        [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
-    }
-}
-
-- (BOOL)writeToPref
-{
-    NSString *prefPath = @"/Applications/MobileShadowSocks.app/proxy.conf";
-    if (_prefDidChange || ![[NSFileManager defaultManager] fileExistsAtPath:prefPath]) {
-        NSString *settingStr;
-        NSMutableString *apiPrefContent = [NSMutableString stringWithString:@""];
-        int i;
-        for (i = 0; i < 4; i++)
-            if (i < 3) {
-                settingStr = [[NSUserDefaults standardUserDefaults] stringForKey:prefKeyName[i]];
-                if (settingStr == nil)
-                    settingStr = defaultSetting[i];
-                [apiPrefContent appendFormat:@"%@ = '%@'\n", prefKeyName[i], settingStr];
-            }
-            else {
-                if ([[NSUserDefaults standardUserDefaults] boolForKey:prefKeyName[i]])
-                    [apiPrefContent appendFormat:@"%@ = True\n", prefKeyName[i]];
-                else
-                    [apiPrefContent appendFormat:@"%@ = False\n", prefKeyName[i]];
-            }
-        settingStr = [[NSUserDefaults standardUserDefaults] stringForKey:prefKeyName[5]];
-        [apiPrefContent appendFormat:@"%@ = [", prefKeyName[5]];
-        if (settingStr != nil && ![settingStr isEqualToString:@""]) {
-            NSArray *array = [settingStr componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
-            for (i = 0; i < [array count] - 1; i++)
-                if (![[array objectAtIndex:i] isEqualToString:@""])
-                    [apiPrefContent appendFormat:@"'%@', ", [array objectAtIndex:i]];
-            if ([array count] && ![[array lastObject] isEqualToString:@""])
-                [apiPrefContent appendFormat:@"'%@'", [array lastObject]];
-        }
-        [apiPrefContent appendString:@"]\n"];
-        _prefDidChange = ![apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        if (_prefDidChange) {
-            if (system("/Applications/MobileShadowSocks.app/sshelper -4"))
-                [self showRunCmdError];
-            else
-                _prefDidChange = ![apiPrefContent writeToFile:prefPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        }
-        if (!_prefDidChange)
-            _prefDidChange = ![self setAutoProxy:[[NSUserDefaults standardUserDefaults] boolForKey:prefKeyName[4]]];
-        [[NSUserDefaults standardUserDefaults] setBool:_prefDidChange forKey:@"PREF_CHANGED"];
-    }
-    return !_prefDidChange;
-}
-
-- (void)showRunCmdError
-{
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Operation failed. Missing necessary files or command utilities.\nPlease check your files and runtime dependency and try again later.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
-    [alert show];
-    [alert release];
-}
-
-- (void)showAbout
-{
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version 0.1.9\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
-    [alert show];
-    [alert release];
+    [_utility release];
+    [_tableRowNumber release];
+    [_tableSectionTitle release];
+    [_tableElements release];
+    [_tagKey release];
+    [super dealloc];
 }
 
 #pragma mark - Table view data source
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    return _tableSectionNumber;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return SETNUM;
+    NSNumber *rowNumber = (NSNumber *) [_tableRowNumber objectAtIndex:section];
+    return [rowNumber intValue];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return NSLocalizedString(@"Proxy Settings", nil);
+    return (NSString *) [_tableSectionTitle objectAtIndex:section];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    return [NSString stringWithFormat:@"%@\n© 2013 Linus Yang", NSLocalizedString(@"Localization by Linus Yang", @"Localization Information")];
+    if (section == _tableSectionNumber - 1)
+        return [NSString stringWithFormat:@"%@\n© 2013 Linus Yang", NSLocalizedString(@"Localization by Linus Yang", @"Localization Information")];
+    return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *CellIdentifier = [NSString stringWithFormat:@"Cell-%d", [indexPath row]];
+    NSString *CellIdentifier = [NSString stringWithFormat:@"%d-%d", [indexPath section], [indexPath row]];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-        if ([indexPath row] != 3 && [indexPath row] != 4) {
-            NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:prefKeyName[[indexPath row]]];
+        NSArray *tableSection = [_tableElements objectAtIndex:[indexPath section]];
+        NSArray *tableCell = [tableSection objectAtIndex:[indexPath row]];
+        NSString *cellTitle = (NSString *) [tableCell objectAtIndex:0];
+        NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
+        NSString *cellDefaultValue = (NSString *) [tableCell objectAtIndex:2];
+        NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
+        [[cell textLabel] setText:cellTitle];
+        [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
+        if ([cellType hasPrefix:CELL_TEXT]) {
+            NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
             UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, _cellWidth, 24)];
             [textField setTextColor:[UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]];
             [textField setText:currentSetting ? currentSetting : @""];
-            [textField setPlaceholder:[indexPath row] == 5 ? NSLocalizedString(@"Split with comma", nil) : defaultSetting[[indexPath row]]];
-            if ([indexPath row] == 1)
+            [textField setPlaceholder:cellDefaultValue];
+            if ([cellType hasSuffix:CELL_NUM])
                 [textField setKeyboardType:UIKeyboardTypePhonePad];
-            if ([indexPath row] == 2)
+            if ([cellType hasSuffix:CELL_PASS])
                 [textField setSecureTextEntry:YES];
             [textField setAdjustsFontSizeToFitWidth:YES];
             [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
             [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
             [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
             [textField setDelegate:self];
-            [textField setTag:[indexPath row]];
             [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+            [textField setTag:_tagNumber];
+            [_tagKey addObject:cellKey];
+            if ([cellType hasSuffix:CELL_ALWAYS])
+                [_tagAlwaysEnabled addObject:[NSNumber numberWithInt:_tagNumber]];
+            _tagNumber++;
             [cell setAccessoryView:textField];
             [textField release];
         }
-        else {
-            BOOL useCrypto = [[NSUserDefaults standardUserDefaults] boolForKey:prefKeyName[[indexPath row]]];
-            UISwitch *cryptSwitch = [[UISwitch alloc] initWithFrame:CGRectZero];
-            [cryptSwitch setOn:useCrypto animated:NO];
-            [cryptSwitch setTag:[indexPath row]];
-            [cryptSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
-            [cell setAccessoryView:cryptSwitch];
-            [cryptSwitch release];
+        else if ([cellType hasPrefix:CELL_SWITCH]) {
+            BOOL switchValue = [[NSUserDefaults standardUserDefaults] boolForKey:cellKey];
+            UISwitch *switcher = [[UISwitch alloc] initWithFrame:CGRectZero];
+            [switcher setOn:switchValue animated:NO];
+            [switcher addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+            [switcher setTag:_tagNumber];
+            [_tagKey addObject:cellKey];
+            if ([cellType hasSuffix:CELL_ALWAYS])
+                [_tagAlwaysEnabled addObject:[NSNumber numberWithInt:_tagNumber]];
+            _tagNumber++;
+            [cell setAccessoryView:switcher];
+            [switcher release];
         }
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     }
-    switch ([indexPath row])
-    {
-        case 0:
-            [[cell textLabel] setText:NSLocalizedString(@"Server", nil)];
-            break;
-        case 1:
-            [[cell textLabel] setText:NSLocalizedString(@"Port", nil)];
-            break;
-        case 2:
-            [[cell textLabel] setText:NSLocalizedString(@"Password", nil)];
-            break;
-        case 3:
-            [[cell textLabel] setText:NSLocalizedString(@"RC4 Crypto", nil)];
-            break;
-        case 4:
-            [[cell textLabel] setText:NSLocalizedString(@"Auto Proxy", nil)];
-            break;
-        case 5:
-            [[cell textLabel] setText:NSLocalizedString(@"Exception", nil)];
-            break;
-        default:
-            break;
-    }
-    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     return cell;
 }
 
+#pragma mark - Alert views
+
+- (void)showAbout
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version " APP_VER @"\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
+    [alert show];
+    [alert release];
+}
+
+- (void)showError
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Operation failed.\nPlease try again later.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
+    [alert show];
+    [alert release];
+}
+
+#pragma mark - Switch delegate
+
 - (void)switchChanged:(id)sender {
-    UISwitch* switchControl = sender;
-    _prefDidChange = YES;
-    [[NSUserDefaults standardUserDefaults] setBool:switchControl.on forKey:prefKeyName[[switchControl tag]]];
-    if (_isRunning && [switchControl tag] == 4)
-        _prefDidChange = ![self setAutoProxy:switchControl.on];
-    [[NSUserDefaults standardUserDefaults] setBool:_prefDidChange forKey:@"PREF_CHANGED"];
+    UISwitch* switcher = sender;
+    NSString *key = (NSString *) [_tagKey objectAtIndex:[switcher tag]];
+    [[NSUserDefaults standardUserDefaults] setBool:switcher.on forKey:key];
 }
 
 #pragma mark - Text field delegate
+
 - (void)hideKeyboard {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]])
@@ -307,11 +225,12 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *) cell.accessoryView;
-            [textField setEnabled:isEnabled];
+            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[textField tag]]] == NSNotFound) 
+                [textField setEnabled:isEnabled];
         } 
         else if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            if ([switcher tag] != 4)
+            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[switcher tag]]] == NSNotFound) 
                 [switcher setEnabled:isEnabled];
         }
     }
@@ -325,12 +244,91 @@ static NSString *prefKeyName[SETNUM] = {@"REMOTE_SERVER", @"REMOTE_PORT", @"SOCK
 
 - (void)textFieldDidChange:(UITextField *)textField
 {
-    _prefDidChange = YES;
-    NSString *nowSetting = [textField text];
-    if (nowSetting == nil || [nowSetting isEqualToString:@""])
-        nowSetting = defaultSetting[[textField tag]];
-    [[NSUserDefaults standardUserDefaults] setBool:_prefDidChange forKey:@"PREF_CHANGED"];
-    [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:prefKeyName[[textField tag]]];
+    NSString *key = (NSString *) [_tagKey objectAtIndex:[textField tag]];
+    [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:key];
+}
+
+#pragma mark - Proxy threads
+
+- (void)threadRunProxy:(NSNumber *)willStart
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    BOOL start = [willStart boolValue];
+    BOOL run = NO;
+    if ([_utility startStopDaemon:start]) {
+        if ([_utility setProxy:start])
+            run = YES;
+    }
+    if (!run) {
+        [self performSelectorOnMainThread:@selector(showError) withObject:nil waitUntilDone:YES];
+        start = NO;
+    }
+    [self performSelectorOnMainThread:@selector(doAfterProcess:) withObject:[NSNumber numberWithBool:start] waitUntilDone:NO];
+    [pool release];
+}
+
+- (void)threadFixProxy
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
+    BOOL isRunning = [_utility isRunning];
+    BOOL proxyEnabled = [[proxySettings objectForKey:(NSString *) kCFNetworkProxiesProxyAutoConfigEnable] boolValue];
+    if (isRunning != proxyEnabled)
+        [_utility setProxy:isRunning];
+    [pool release];
+}
+
+- (void)threadInitProxyStatus
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    BOOL isRunning = [_utility isRunning];
+    [self performSelectorOnMainThread:@selector(setRunningStatus:) withObject:[NSNumber numberWithBool:isRunning] waitUntilDone:NO];
+    [pool release];
+}
+
+#pragma mark - Proxy functions
+
+- (void)setRunningStatus:(NSNumber *)running
+{
+    BOOL isRunning = [running boolValue];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:isRunning];
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(isRunning ? 1 : 0)];
+    [self setViewEnabled:!isRunning];
+    if ([[self navigationItem] leftBarButtonItem]) {
+        [[[self navigationItem] leftBarButtonItem] setTitle:(isRunning ? NSLocalizedString(@"Stop", nil) : NSLocalizedString(@"Start", nil))];
+        [[[self navigationItem] leftBarButtonItem] setStyle:(isRunning ? UIBarButtonItemStyleDone : UIBarButtonItemStyleBordered)];
+        [[[self navigationItem] leftBarButtonItem] setAction:(isRunning ? @selector(stopProcess) : @selector(startProcess))];
+    }
+}
+
+- (void)doProcess:(BOOL)start
+{
+    [[[self navigationItem] leftBarButtonItem] setEnabled:NO];
+    [self hideKeyboard];
+    [NSThread detachNewThreadSelector:@selector(threadRunProxy:) 
+                             toTarget:self 
+                           withObject:[NSNumber numberWithBool:start]];
+}
+
+- (void)doAfterProcess:(NSNumber *)isRunning
+{
+    [self setRunningStatus:isRunning];
+    [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
+}
+
+- (void)fixProxy
+{
+    [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
+}
+
+- (void)startProcess
+{
+    [self doProcess:YES];
+}
+
+- (void)stopProcess
+{
+    [self doProcess:NO];
 }
 
 @end

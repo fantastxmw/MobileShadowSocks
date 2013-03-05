@@ -7,23 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ShadowUtility.h"
 
 @interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
-    BOOL _prefDidChange;
-    BOOL _isRunning;
+    ShadowUtility *_utility;
     CGFloat _cellWidth;
+    NSInteger _tableSectionNumber;
+    NSArray *_tableRowNumber;
+    NSArray *_tableSectionTitle;
+    NSArray *_tableElements;
+    NSInteger _tagNumber;
+    NSMutableArray *_tagKey;
+    NSMutableArray *_tagAlwaysEnabled;
 }
-- (void)startProcess;
-- (void)stopProcess;
-- (BOOL)writeToPref;
-- (void)showAbout;
-- (void)showRunCmdError;
-- (void)revertProxySettings;
-- (void)doAfterRevert;
-- (void)hideKeyboard;
-- (void)setRunningStatus:(BOOL)isRunning;
-- (void)setViewEnabled:(BOOL)isEnabled;
+
 - (void)fixProxy;
-- (BOOL)setAutoProxy:(BOOL)isEnabled;
 
 @end

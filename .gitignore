@@ -2,5 +2,4 @@ project.xcworkspace/
 xcuserdata/
 .DS_Store
 *.swp
-*.pyc
-com.linusyang.shadowsocks_*_iphoneos-arm.deb
+release/

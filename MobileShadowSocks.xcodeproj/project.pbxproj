@@ -12,13 +12,12 @@
 		4B3A811216BA4A2C00BE1B4C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B3A811116BA4A2C00BE1B4C /* CoreGraphics.framework */; };
 		4B3A811A16BA4A2C00BE1B4C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811916BA4A2C00BE1B4C /* main.m */; };
 		4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */; };
+		4BBEF10D16E59C470085B831 /* ShadowUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBEF10C16E59C470085B831 /* ShadowUtility.m */; };
 		4BF7CE9616C0775900713EC9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BF7CE9516C0775900713EC9 /* CFNetwork.framework */; };
 		4BF902EE16BA996E00E35F60 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902EB16BA996E00E35F60 /* Icon-72.png */; };
 		4BF902EF16BA996E00E35F60 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902EC16BA996E00E35F60 /* Icon.png */; };
 		4BF902F016BA996E00E35F60 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902ED16BA996E00E35F60 /* Icon@2x.png */; };
 		4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */; };
-		4BF9030916BA9D5D00E35F60 /* empty.pac in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030216BA9D5D00E35F60 /* empty.pac */; };
-		4BF9030B16BA9D5D00E35F60 /* proxy.py in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030416BA9D5D00E35F60 /* proxy.py */; };
 		4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */; };
 		4BF9031516BA9F8D00E35F60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9031316BA9F8D00E35F60 /* Localizable.strings */; };
 /* End PBXBuildFile section */
@@ -34,14 +33,19 @@
 		4B3A811C16BA4A2C00BE1B4C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4B3A812416BA4ABE00BE1B4C /* SettingTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SettingTableViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		4B7C8F3616E5B6F900AA6452 /* launcher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = launcher.m; sourceTree = "<group>"; };
+		4B7C8F3716E5B6F900AA6452 /* LauncherHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LauncherHelper.h; sourceTree = "<group>"; };
+		4B7C8F3816E5B6F900AA6452 /* LauncherHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LauncherHelper.m; sourceTree = "<group>"; };
+		4B95923F16E51A8E00898289 /* Constant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constant.h; sourceTree = "<group>"; };
+		4BB8980116E4827F00B4ACFC /* NSTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
+		4BBEF10B16E59C470085B831 /* ShadowUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShadowUtility.h; sourceTree = "<group>"; };
+		4BBEF10C16E59C470085B831 /* ShadowUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShadowUtility.m; sourceTree = "<group>"; };
 		4BF7CE9516C0775900713EC9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		4BF902EB16BA996E00E35F60 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
 		4BF902EC16BA996E00E35F60 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		4BF902ED16BA996E00E35F60 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = gen_entitlements.py; sourceTree = "<group>"; };
 		4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.linusyang.shadowsocks.plist; sourceTree = "<group>"; };
-		4BF9030216BA9D5D00E35F60 /* empty.pac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = empty.pac; sourceTree = "<group>"; };
-		4BF9030416BA9D5D00E35F60 /* proxy.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = proxy.py; sourceTree = "<group>"; };
 		4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SettingTableViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4BF9031416BA9F8D00E35F60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4BF9031616BA9F9200E35F60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -93,10 +97,17 @@
 		4B3A811316BA4A2C00BE1B4C /* MobileShadowSocks */ = {
 			isa = PBXGroup;
 			children = (
+				4B95923F16E51A8E00898289 /* Constant.h */,
 				4B3A811C16BA4A2C00BE1B4C /* AppDelegate.h */,
 				4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */,
 				4B3A812416BA4ABE00BE1B4C /* SettingTableViewController.h */,
 				4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */,
+				4BB8980116E4827F00B4ACFC /* NSTask.h */,
+				4BBEF10B16E59C470085B831 /* ShadowUtility.h */,
+				4BBEF10C16E59C470085B831 /* ShadowUtility.m */,
+				4B7C8F3616E5B6F900AA6452 /* launcher.m */,
+				4B7C8F3716E5B6F900AA6452 /* LauncherHelper.h */,
+				4B7C8F3816E5B6F900AA6452 /* LauncherHelper.m */,
 				4B3A811416BA4A2C00BE1B4C /* Supporting Files */,
 			);
 			path = MobileShadowSocks;
@@ -107,8 +118,6 @@
 			children = (
 				4BF9031316BA9F8D00E35F60 /* Localizable.strings */,
 				4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */,
-				4BF9030216BA9D5D00E35F60 /* empty.pac */,
-				4BF9030416BA9D5D00E35F60 /* proxy.py */,
 				4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */,
 				4BF902EB16BA996E00E35F60 /* Icon-72.png */,
 				4BF902EC16BA996E00E35F60 /* Icon.png */,
@@ -177,8 +186,6 @@
 				4BF902EF16BA996E00E35F60 /* Icon.png in Resources */,
 				4BF902F016BA996E00E35F60 /* Icon@2x.png in Resources */,
 				4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */,
-				4BF9030916BA9D5D00E35F60 /* empty.pac in Resources */,
-				4BF9030B16BA9D5D00E35F60 /* proxy.py in Resources */,
 				4BF9031516BA9F8D00E35F60 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -197,7 +204,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#!/bin/bash\nset -e\nexport CODESIGN_ALLOCATE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/codesign_allocate\nif [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\npython ${PROJECT_DIR}/MobileShadowSocks/gen_entitlements.py \"com.linusyang.${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\ncodesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\nrm \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\"\ncd \"${BUILT_PRODUCTS_DIR}\"\nNOWVER=\"0.1.9\"\nNOWBUILD=\"4\"\nsudo chown -R 501:20 makedeb\nrm -rf makedeb\nrm -f *.deb\nmkdir -p makedeb/Applications\ncp -r \"${WRAPPER_NAME}\" makedeb/Applications/\nrm -f makedeb/Applications/MobileShadowSocks.app/CodeResources\nln -s _CodeSignature/CodeResources makedeb/Applications/MobileShadowSocks.app/CodeResources\ncp -f ${PROJECT_DIR}/MobileShadowSocks/sshelper makedeb/Applications/MobileShadowSocks.app/\ncp -f ${PROJECT_DIR}/MobileShadowSocks/shadow makedeb/Applications/MobileShadowSocks.app/\ntar zxf ${PROJECT_DIR}/MobileShadowSocks/auto.tgz -C makedeb/Applications/MobileShadowSocks.app/\ntar zxf ${PROJECT_DIR}/MobileShadowSocks/python27.tgz -C makedeb/Applications/MobileShadowSocks.app/\nchmod 6755 makedeb/Applications/MobileShadowSocks.app/sshelper\nchmod 755 makedeb/Applications/MobileShadowSocks.app/shadow\nchmod 755 makedeb/Applications/MobileShadowSocks.app/python27/bin/python\nchmod 644 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\nfind . -name .DS_Store | xargs rm -f\nNOWSIZE=(`du -s -k makedeb | grep --color=never -o '[0-9]\\+'`)\nCTRLFILE=\"Package: com.linusyang.shadowsocks\\nPriority: optional\\nSection: Addons\\nInstalled-Size: $NOWSIZE\\nAuthor: Linus Yang <laokongzi@gmail.com>\\nMaintainer: Linus Yang <laokongzi@gmail.com>\\nSponsor: Linus Yang <http://linusyang.com/>\\nArchitecture: iphoneos-arm\\nVersion: $NOWVER-$NOWBUILD\\nDescription: ShadowSocks client for iOS\\nName: ShadowSocks\\nHomepage: https://github.com/linusyang/MobileShadowSocks\\nIcon: file:///Applications/MobileShadowSocks.app/Icon.png\\n\"\nDEBNAME=\"com.linusyang.shadowsocks_$NOWVER-$NOWBUILD\"\nPRERMFILE=\"\\043\\041\\057bin\\057sh\\012find\\040\\057Applications\\057MobileShadowSocks\\056app\\040\\055delete\\012\"\nmkdir -p makedeb/DEBIAN\necho -ne $CTRLFILE > makedeb/DEBIAN/control\necho -ne $PRERMFILE > makedeb/DEBIAN/prerm\nchmod +x makedeb/DEBIAN/prerm\nsudo chown -R 501:501 makedeb\nsudo chown 0:0 makedeb/Applications\nsudo chown 0:0 makedeb/Applications/MobileShadowSocks.app/sshelper\nsudo chown 0:0 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\n${PROJECT_DIR}/MobileShadowSocks/dpkg-deb -b makedeb t.deb\nmv t.deb ${PROJECT_DIR}/$DEBNAME\"_iphoneos-arm.deb\"\nsudo chown -R 501:20 makedeb\nfi";
+			shellScript = "#!/bin/bash\nset -e\n\nif [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\n\n# Code sign\nexport CODESIGN_ALLOCATE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/codesign_allocate\npython \"${PROJECT_DIR}/MobileShadowSocks/gen_entitlements.py\" \"com.linusyang.${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\ncodesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\nrm -f \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\"\n\n# Version info\nVERINFO=\"${PROJECT_DIR}/MobileShadowSocks/Constant.h\"\nNOWVER=\"$(grep \"APP_VER\" \"${VERINFO}\" | awk '{print $3}' | sed 's/[\"@]//g')\"\nNOWBUILD=\"$(grep \"APP_BUILD\" \"${VERINFO}\" | awk '{print $3}' | sed 's/[\"@]//g')\"\n\n# Clean old build\ncd \"${BUILT_PRODUCTS_DIR}\"\n[ -d makedeb ] && sudo chown -R 501:20 makedeb\nrm -rf makedeb\nrm -f *.deb\nmkdir -p makedeb\n\n# Build launcher\nrm -f _launcher6 _launcher7 launcher\n\"${PLATFORM_DEVELOPER_BIN_DIR}/clang\" -x objective-c -arch armv6 -Os -I\"${PROJECT_DIR}/MobileShadowSocks\" -I\"${SDKROOT}/usr/include\" -L\"${SDKROOT}/usr/lib\" -miphoneos-version-min=3.0 -isysroot \"${SDKROOT}\" -framework Foundation \"${PROJECT_DIR}/MobileShadowSocks/LauncherHelper.m\" \"${PROJECT_DIR}/MobileShadowSocks/launcher.m\" -o _launcher6\n\"${PLATFORM_DEVELOPER_BIN_DIR}/clang\" -x objective-c -arch armv7 -Os -I\"${PROJECT_DIR}/MobileShadowSocks\" -I\"${SDKROOT}/usr/include\" -L\"${SDKROOT}/usr/lib\" -miphoneos-version-min=3.0 -isysroot \"${SDKROOT}\" -framework Foundation \"${PROJECT_DIR}/MobileShadowSocks/LauncherHelper.m\" \"${PROJECT_DIR}/MobileShadowSocks/launcher.m\" -o _launcher7\n\"${PROJECT_DIR}/MobileShadowSocks/ldid\" -S _launcher6\n\"${PROJECT_DIR}/MobileShadowSocks/ldid\" -S _launcher7\n\"${PLATFORM_DEVELOPER_BIN_DIR}/lipo\" -create _launcher6 _launcher7 -output launcher\nrm -f _launcher6 _launcher7\n\n# Prepare binaries\nrm -f auto.pac\ntar zxf \"${PROJECT_DIR}/MobileShadowSocks/auto.tgz\"\nmkdir -p makedeb/Applications\ncp -r \"${WRAPPER_NAME}\" makedeb/Applications/\nrm -f makedeb/Applications/MobileShadowSocks.app/CodeResources\nln -s _CodeSignature/CodeResources makedeb/Applications/MobileShadowSocks.app/CodeResources\ncp -f auto.pac makedeb/Applications/MobileShadowSocks.app/\ncp -f launcher makedeb/Applications/MobileShadowSocks.app/\ncp -f \"${PROJECT_DIR}/MobileShadowSocks/shadow\" makedeb/Applications/MobileShadowSocks.app/\nchmod 6755 makedeb/Applications/MobileShadowSocks.app/launcher\nchmod 755 makedeb/Applications/MobileShadowSocks.app/shadow\n/usr/bin/plutil -convert binary1 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\nchmod 644 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\nchmod 644 makedeb/Applications/MobileShadowSocks.app/auto.pac\n\n# Make package\nfind . -name .DS_Store | xargs rm -f\nNOWSIZE=\"$(du -s -k makedeb | awk '{print $1}')\"\nCTRLFILE=\"Package: com.linusyang.shadowsocks\\nPriority: optional\\nSection: Addons\\nInstalled-Size: $NOWSIZE\\nAuthor: Linus Yang <laokongzi@gmail.com>\\nMaintainer: Linus Yang <laokongzi@gmail.com>\\nSponsor: Linus Yang <http://linusyang.com/>\\nArchitecture: iphoneos-arm\\nVersion: $NOWVER-$NOWBUILD\\nDescription: ShadowSocks client for iOS\\nName: ShadowSocks\\nHomepage: https://github.com/linusyang/MobileShadowSocks\\nIcon: file:///Applications/MobileShadowSocks.app/Icon.png\\nTag: purpose::uikit\\n\"\nDEBNAME=\"com.linusyang.shadowsocks_$NOWVER-$NOWBUILD\"\nPRERMFILE=\"\\043\\041\\057bin\\057sh\\012find\\040\\057Applications\\057MobileShadowSocks\\056app\\040\\055delete\\012\"\nmkdir -p makedeb/DEBIAN\necho -ne ${CTRLFILE} > makedeb/DEBIAN/control\necho -ne ${PRERMFILE} > makedeb/DEBIAN/prerm\nchmod 755 makedeb/DEBIAN/prerm\nsudo chown -R 501:501 makedeb\nsudo chown 0:0 makedeb/Applications\nsudo chown 0:0 makedeb/Applications/MobileShadowSocks.app/launcher\nsudo chown 0:0 makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist\n\"${PROJECT_DIR}/MobileShadowSocks/dpkg-deb\" -b makedeb t.deb\nmkdir -p \"${PROJECT_DIR}/release\"\nmv -f t.deb \"${PROJECT_DIR}/release/${DEBNAME}\"_iphoneos-arm.deb\nsudo chown -R 501:20 makedeb\n\n# Clean\nrm -f launcher auto.pac\nrm -rf makedeb\n\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -209,6 +216,7 @@
 				4B3A811A16BA4A2C00BE1B4C /* main.m in Sources */,
 				4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */,
 				4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */,
+				4BBEF10D16E59C470085B831 /* ShadowUtility.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
