@@ -81,7 +81,7 @@
             [dataString release];
         }
         else
-            result = (NSString *) [NSString stringWithString:@""];
+            result = @"";
         [[outPipe fileHandleForReading] closeFile];
     }
     [task release];
@@ -99,18 +99,19 @@
         result = 0;
         for (NSString *str in array) {
             NSMutableString *command = [NSMutableString stringWithString:@"d.init\n"];
+            NSMutableDictionary *proxySet = [NSMutableDictionary dictionary];
             if (isEnabled) {
+                NSMutableArray *exceptArray = [NSMutableArray array];
                 NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
-                if (dict) {
-                    NSString *excepts = (NSString *) [dict objectForKey:@"EXCEPTION_LIST"];
-                    if (excepts) {
-                        NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
-                        NSMutableArray *array = [NSMutableArray array];
-                        for (NSString *str in origArray)
-                            if (![str isEqualToString:@""])
-                                [array addObject:str];
-                        if ([array count] > 0)
-                            [command appendFormat:@"d.add ExceptionsList * %@\n", [array componentsJoinedByString:@" "]];
+                NSString *excepts = (NSString *) [dict objectForKey:@"EXCEPTION_LIST"];
+                NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
+                if (origArray) {
+                    for (NSString *s in origArray)
+                        if (![s isEqualToString:@""])
+                            [exceptArray addObject:s];
+                    if ([exceptArray count] > 0) {
+                        [command appendFormat:@"d.add ExceptionsList * %@\n", [exceptArray componentsJoinedByString:@" "]];
+                        [proxySet setObject:exceptArray forKey:@"ExceptionsList"];
                     }
                 }
                 [command appendString:@"d.add HTTPEnable # 0\n"];
@@ -118,16 +119,40 @@
                 [command appendString:@"d.add HTTPSEnable # 0\n"];
                 [command appendString:@"d.add ProxyAutoConfigEnable # 1\n"];
                 [command appendFormat:@"d.add ProxyAutoConfigURLString %@\n", _pacUrl];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
+                [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
+                [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
+                [proxySet setObject:_pacUrl forKey:@"ProxyAutoConfigURLString"];
             }
             else {
                 [command appendString:@"d.add HTTPEnable # 0\n"];
                 [command appendString:@"d.add HTTPProxyType # 0\n"];
                 [command appendString:@"d.add HTTPSEnable # 0\n"];
                 [command appendString:@"d.add ProxyAutoConfigEnable # 0\n"];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPProxyType"];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"ProxyAutoConfigEnable"];
             }
             [command appendFormat:@"set Setup:/Network/Service/%@/Proxies\n", str];
             if ([self runNetworkConfig:command willGetIdentifiers:NO] == nil)
                 result = 1;
+            NSMutableDictionary *scRoot = [NSMutableDictionary dictionaryWithContentsOfFile:SC_STORE];
+            NSMutableDictionary *netService = [scRoot objectForKey:@"NetworkServices"];
+            NSMutableDictionary *netInterface = [netService objectForKey:str];
+            [netInterface setObject:proxySet forKey:@"Proxies"];
+            [netService setObject:netInterface forKey:str];
+            [scRoot setObject:netService forKey:@"NetworkServices"];
+            NSOutputStream *plist = [NSOutputStream outputStreamToFileAtPath:SC_STORE append:NO];
+            if (plist && scRoot) {
+                [plist open];
+                NSString *err = nil;
+                CFIndex idx = CFPropertyListWriteToStream(scRoot, (CFWriteStreamRef) plist, kCFPropertyListBinaryFormat_v1_0, (CFStringRef *) &err);
+                if (idx == 0)
+                    result = 1;
+                [plist close];
+            }
         }
     }
     return result;

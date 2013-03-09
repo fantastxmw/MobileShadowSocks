@@ -14,7 +14,7 @@ int main(int argc, const char **argv)
     @autoreleasepool {
         if (argc > 1) {
             if (argc != 2 || argv[1][0] != '-' || !argv[1][1] || argv[1][2]) {
-                fprintf(stderr, "Usage: %s -{r|s|p|n}\n", argv[0]);
+                fprintf(stderr, USAGE_STR, argv[0]);
                 exit(1);
             }
             LauncherHelper *helper = [[LauncherHelper alloc] initWithDaemonIdentifier:DAEMON_ID andPacUrl:[NSString stringWithFormat:@"http://127.0.0.1:%d/shadow.pac", PAC_PORT]];
@@ -33,12 +33,12 @@ int main(int argc, const char **argv)
                     result = [helper runProxySetting:NO];
                     break;
                 default:
-                    fprintf(stderr, "Usage: %s -{r|s|p|n}\n", argv[0]);
+                    fprintf(stderr, USAGE_STR, argv[0]);
                     result = 1;
                     break;
             }
             [helper release];
-            return (int) result;
+            exit(result);
         }
         
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
@@ -94,7 +94,6 @@ int main(int argc, const char **argv)
         int conn;
         int optval = 1;
         FILE *stream;
-        char buf[BUFF_SIZE];
         BOOL autoProxy;
         NSString *pacFile;
         
@@ -105,29 +104,31 @@ int main(int argc, const char **argv)
         sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock < 0) {
             fprintf(stderr, "Error: cannot open socket\n");
-            return 1;
+            exit(1);
         }
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
         if (bind(sock, (struct sockaddr *) &server, sizeof(struct sockaddr)) < 0) {
             fprintf(stderr, "Error: cannot bind port\n");
-            return 1;
+            close(sock);
+            exit(1);
         }
         if (listen(sock, 10) < 0) {
             fprintf(stderr, "Error: cannot listen on port\n");
-            return 1;
+            close(sock);
+            exit(1);
         }
         while (1) {
             conn = accept(sock, (struct sockaddr *) &client, &socksize);
             if (conn < 0) {
                 fprintf(stderr, "Error: cannot accept\n");
-                return 1;
+                close(sock);
+                exit(1);
             }
             if (!(stream = fdopen(conn, "r+"))) {
                 fprintf(stderr, "Error: cannot open stream\n");
-                return 1;
+                close(sock);
+                exit(1);
             }
-            fgets(buf, BUFF_SIZE, stream);
-            buf[BUFF_SIZE - 1] = 0;
             fprintf(stream, HTTP_RESPONSE);
             BOOL sent = NO;
             dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
