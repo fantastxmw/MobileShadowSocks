@@ -9,8 +9,8 @@
 #ifndef MobileShadowSocks_Constant_h
 #define MobileShadowSocks_Constant_h
 
-#define APP_VER @"0.2.1"
-#define APP_BUILD @"5"
+#define APP_VER @"0.2.2"
+#define APP_BUILD @"1"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"
