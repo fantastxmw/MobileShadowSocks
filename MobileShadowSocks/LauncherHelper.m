@@ -169,9 +169,9 @@
         [newAttr setObject:[NSNumber numberWithInt:0] forKey:NSFileOwnerAccountID];
     if (group != 0)
         [newAttr setObject:[NSNumber numberWithInt:0] forKey:NSFileGroupOwnerAccountID];
-    if (permission != 644)
-        [newAttr setObject:[NSNumber numberWithInt:644] forKey:NSFilePosixPermissions];
-    if (owner != 0 || group != 0 || permission != 644)
+    if (permission != 0644)
+        [newAttr setObject:[NSNumber numberWithInt:0644] forKey:NSFilePosixPermissions];
+    if (owner != 0 || group != 0 || permission != 0644)
         [[NSFileManager defaultManager] setAttributes:newAttr ofItemAtPath:_daemonFile error:nil];
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:LAUNCH_CTL];

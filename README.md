@@ -22,7 +22,7 @@ By Linus Yang
 2. Launch the app and set up *server information* and *proxy options*.
 3. Tap the **Start** button on the top left of the screen.
 4. Now the shadowsocks service will run in the background **even if you completely exit this app**. Also, **system-wide** proxy settings will be enabled automatically. You don't need to change the proxy settings in the *Settings.app*.    
-( **Note** : The proxy settings **will not show** in the Preferences. If you want to check it, call `scutil --proxy` in terminal.)
+( **Note** : The proxy settings **will not show** in the *Settings.app*. If you want to check it, call `scutil --proxy` in terminal.)
 5. If you want to stop the service, just enter the app again and tap the **Stop** button, and proxy settings will also be disabled.
 
 ### Credits
@@ -31,8 +31,7 @@ By Linus Yang
 * App icon from [Tunnelblick](https://tunnelblick.googlecode.com) (Too lazy to draw one by myself :P)
 
 ### Note for Developers
-* You have to self-sign a certificate (or use the official one) named *iPhone Developer*.
-* The *Run Script* in project will call **sudo** to set permissions, so you may need to run **sudo** command such as `sudo date` once **before building this project** in the terminal.
+* You have to create a self-signed code-signing certificate named *iPhone Developer* ([turtorial](https://developer.apple.com/library/mac/#documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html)).
 * The final Debian package will be generated under **release** directory in the project directory.
 
 ### License
