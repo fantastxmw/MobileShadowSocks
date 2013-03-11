@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NSTask.h"
+#import "subprocess.h"
 #import "Constant.h"
 
 @interface ShadowUtility : NSObject {

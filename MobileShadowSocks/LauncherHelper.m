@@ -33,34 +33,23 @@
 
 - (id)runNetworkConfig:(NSString *)command willGetIdentifiers:(BOOL)enabled
 {
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:SC_UTIL];
-    NSPipe *inPipe = [NSPipe pipe];
-    NSPipe *outPipe = [NSPipe pipe];
-    NSData *inData = [command dataUsingEncoding:NSUTF8StringEncoding];
-    [task setStandardInput:inPipe];
-    [task setStandardOutput:outPipe];
-    [task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
-    @try {
-        [task launch];
-    }
-    @catch (NSException *e) {
-        [task release];
-        return nil;
-    }
-    [[inPipe fileHandleForWriting] writeData:inData];
-    [[inPipe fileHandleForWriting] closeFile];
-    [task waitUntilExit];
+    const char *args[] = {"scutil", 0};
+    const char *input = [command cStringUsingEncoding:NSUTF8StringEncoding];
+    char *output = 0;
     id result = nil;
-    if ([task terminationStatus] == 0) {
-        NSData *data = [[outPipe fileHandleForReading] readDataToEndOfFile];
-        if ([data length] != 0) {
-            NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    int exit_code = run_process(SC_UTIL_PATH, args, input, &output, 0);
+    if (exit_code == 0) {
+        NSString *dataString = [NSString string];
+        if (output) {
+            dataString = [NSString stringWithCString:output encoding:NSUTF8StringEncoding];
+            free(output);
+        }
+        if ([dataString length] > 0) {
             if (!enabled)
-                result = (NSString *) [NSString stringWithString:dataString];
+                result = dataString;
             else {
-                result = (NSMutableArray *) [NSMutableArray array];
-                const char *s = [dataString UTF8String];
+                result = [NSMutableArray array];
+                const char *s = [dataString cStringUsingEncoding:NSUTF8StringEncoding];
                 int len = (int) ([dataString length] - 35);
                 int i, j;
                 for (i = 0; i < len; i++) {
@@ -78,13 +67,10 @@
                         [result addObject:[dataString substringWithRange:NSMakeRange(i, 36)]];
                 }
             }
-            [dataString release];
         }
         else
             result = @"";
-        [[outPipe fileHandleForReading] closeFile];
     }
-    [task release];
     return result;
 }
 
@@ -173,22 +159,16 @@
         [newAttr setObject:[NSNumber numberWithInt:0644] forKey:NSFilePosixPermissions];
     if (owner != 0 || group != 0 || permission != 0644)
         [[NSFileManager defaultManager] setAttributes:newAttr ofItemAtPath:_daemonFile error:nil];
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:LAUNCH_CTL];
-    [task setArguments:[NSArray arrayWithObjects:(isEnabled ? @"load" : @"unload"), @"-w", _daemonFile, nil]];
-    NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
-    [task setStandardError:nullFileHandle];
-    [task setStandardOutput:nullFileHandle];
-    @try {
-        [task launch];
-    }
-    @catch (NSException *e) {
-        [task release];
-        return 1;
-    }
-    [task waitUntilExit];
-    NSInteger result = [task terminationStatus];
-    [task release];
+    const char *execs = LAUNCH_CTL_PATH;
+    const char *args[5];
+    char *output = 0;
+    args[0] = "launchctl";
+    args[1] = [(isEnabled ? @"load" : @"unload") cStringUsingEncoding:NSUTF8StringEncoding];
+    args[2] = "-w";
+    args[3] = [_daemonFile cStringUsingEncoding:NSUTF8StringEncoding];
+    NSInteger result = run_process(execs, args, 0, &output, 0);
+    if (output)
+        free(output);
     return result;
 }
 

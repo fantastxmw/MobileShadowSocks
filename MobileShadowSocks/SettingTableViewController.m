@@ -10,6 +10,8 @@
 
 #define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
 #define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
+#define kblackColor [UIColor colorWithRed:0 green:0 blue:0 alpha:1.0]
+#define kblackColorDisabled [UIColor colorWithRed:0 green:0 blue:0 alpha:0.439216f]
 
 @implementation SettingTableViewController
 
@@ -149,6 +151,7 @@
         NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
+        [[cell textLabel] setTextColor:kblackColor];
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         if ([cellType hasPrefix:CELL_TEXT]) {
             NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
@@ -171,9 +174,10 @@
                 _pacFileCellTag = _tagNumber;
                 BOOL isEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
                 [textField setEnabled:isEnabled];
-                if (!isEnabled)
+                if (!isEnabled) {
                     [textField setTextColor:kgrayBlueColorDisabled];
-                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                    [[cell textLabel] setTextColor:kblackColorDisabled];
+                }
                 [cell setUserInteractionEnabled:isEnabled];
             }
             [_tagKey addObject:cellKey];
@@ -235,7 +239,7 @@
             if ([textField tag] == _pacFileCellTag) {
                 [textField setEnabled:isEnabled];
                 [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
-                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
                 [cell setUserInteractionEnabled:isEnabled];
             }
         }
@@ -269,7 +273,7 @@
             if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[textField tag]]] == NSNotFound) {
                 [textField setEnabled:isEnabled];
                 [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
-                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
                 [cell setUserInteractionEnabled:isEnabled];
             }
         } 
@@ -277,7 +281,7 @@
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[switcher tag]]] == NSNotFound) {
                 [switcher setEnabled:isEnabled];
-                [[cell textLabel] setAlpha:isEnabled ? 1.0f : 0.439216f];
+                [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
                 [cell setUserInteractionEnabled:isEnabled];
             }
         }

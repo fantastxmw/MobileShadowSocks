@@ -10,10 +10,7 @@
 #import <unistd.h>
 #import <stdio.h>
 #import "Constant.h"
-
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#import "NSTask.h"
-#endif
+#import "subprocess.h"
 
 @interface LauncherHelper : NSObject {
     NSString *_daemonFile;

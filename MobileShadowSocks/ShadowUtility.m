@@ -29,32 +29,16 @@
 
 - (BOOL)isRunning
 {
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:LAUNCH_CTL];
-    [task setArguments:[NSArray arrayWithObjects:@"list", nil]];
-    NSPipe *pipe = [NSPipe pipe];
-    [task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
-    [task setStandardOutput:pipe];
-    @try {
-        [task launch];
-    }
-    @catch (NSException *e) {
-        [task release];
-        return NO;
-    }
-    [task waitUntilExit];
+    const char *args[] = {"launchctl", "list", 0};
+    char *output = 0;
     BOOL result = NO;
-    if ([task terminationStatus] == 0) {
-        NSData *data = [[pipe fileHandleForReading] readDataToEndOfFile];
-        if ([data length] != 0) {
-            NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            if ([dataString rangeOfString:_daemonIdentifier].location != NSNotFound)
-                result = YES;
-            [dataString release];
-        }
-        [[pipe fileHandleForReading] closeFile];
+    int exit_code = run_process(LAUNCH_CTL_PATH, args, 0, &output, 0);
+    if (exit_code == 0 && output) {
+        const char *daemon_id = [_daemonIdentifier cStringUsingEncoding:NSUTF8StringEncoding];
+        if (strstr(output, daemon_id))
+            result = YES;
+        free(output);
     }
-    [task release];
     return result;
 }
 
@@ -62,16 +46,15 @@
 {
     BOOL result = NO;
     if ([[NSFileManager defaultManager] isExecutableFileAtPath:_launcherPath]) {
-        NSTask *task = [[NSTask alloc] init];
-        [task setLaunchPath:_launcherPath];
-        [task setArguments:[NSArray arrayWithObjects:(enabled ? arg1 : arg2), nil]];
-        NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
-        [task setStandardError:nullFileHandle];
-        [task setStandardOutput:nullFileHandle];
-        [task launch];
-        [task waitUntilExit];
-        result = [task terminationStatus] ? NO : YES;
-        [task release];
+        const char *execs = [_launcherPath cStringUsingEncoding:NSUTF8StringEncoding];
+        const char *args[3];
+        char *output = 0;
+        args[0] = "launcher";
+        args[1] = [(enabled ? arg1 : arg2) cStringUsingEncoding:NSUTF8StringEncoding];
+        args[2] = 0;
+        result = run_process(execs, args, 0, &output, 0) ? NO : YES;
+        if (output)
+            free(output);
     }
     return result;
 }

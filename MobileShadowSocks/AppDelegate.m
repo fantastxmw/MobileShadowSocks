@@ -35,4 +35,9 @@
     [_tabViewController fixProxy];
 }
 
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 @end
