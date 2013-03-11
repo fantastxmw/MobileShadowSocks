@@ -216,9 +216,9 @@
     [alert release];
 }
 
-- (void)showError
+- (void)showError:(NSString *)error
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Operation failed.\nPlease try again later.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:error ? error : NSLocalizedString(@"Operation failed.\nPlease try again later.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
     [alert show];
     [alert release];
 }
@@ -325,7 +325,6 @@
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     BOOL start = [willStart boolValue];
-    BOOL run = NO;
     ProxyStatus status = kProxyNone;
     if (start) {
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -339,11 +338,11 @@
         status = isAuto ? kProxyPac : kProxySocks;
     }
     if ([_utility startStopDaemon:start]) {
-        if ([_utility setProxy:status])
-            run = YES;
+        if (![_utility setProxy:status])
+            [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:YES];
     }
-    if (!run) {
-        [self performSelectorOnMainThread:@selector(showError) withObject:nil waitUntilDone:YES];
+    else {
+        [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Cannot start or stop service.", nil) waitUntilDone:YES];
         start = NO;
     }
     [self performSelectorOnMainThread:@selector(doAfterProcess:) withObject:[NSNumber numberWithBool:start] waitUntilDone:NO];
