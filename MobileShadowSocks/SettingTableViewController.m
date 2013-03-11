@@ -35,6 +35,7 @@
     [[self navigationItem] setTitle:NSLocalizedString(@"ShadowSocks", nil)];
     [leftButton release];
     [aboutButton release];
+    _isRunning = NO;
     _utility = [[ShadowUtility alloc] initWithDaemonIdentifier:DAEMON_ID];
     _tagNumber = 0;
     _tagKey = [[NSMutableArray alloc] init];
@@ -246,13 +247,31 @@
     }
 }
 
+- (void)setAutoProxySwitchable
+{
+    for (UITableViewCell *cell in self.tableView.visibleCells) {
+        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+            UISwitch *switcher = (UISwitch *) cell.accessoryView;
+            if ([switcher tag] == _autoProxyCellTag)
+                [switcher setEnabled:YES];
+        }
+    }
+}
+
 - (void)switchChanged:(id)sender
 {
     UISwitch* switcher = sender;
     NSString *key = (NSString *) [_tagKey objectAtIndex:[switcher tag]];
     [[NSUserDefaults standardUserDefaults] setBool:switcher.on forKey:key];
-    if ([switcher tag] == _autoProxyCellTag)
+    if ([switcher tag] == _autoProxyCellTag) {
         [self setPacFileCellEnabled:switcher.on];
+        if (_isRunning) {
+            [switcher setEnabled:NO];
+            [NSThread detachNewThreadSelector:@selector(threadChangeProxyStatus:) 
+                                     toTarget:self 
+                                   withObject:[NSNumber numberWithBool:switcher.on]];
+        }
+    }
 }
 
 #pragma mark - Text field delegate
@@ -307,6 +326,7 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     BOOL start = [willStart boolValue];
     BOOL run = NO;
+    ProxyStatus status = kProxyNone;
     if (start) {
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSString *pacFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"];
@@ -315,9 +335,11 @@
             if (![pacFile isEqualToString:@""] && ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
                 [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
         }
+        BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
+        status = isAuto ? kProxyPac : kProxySocks;
     }
     if ([_utility startStopDaemon:start]) {
-        if ([_utility setProxy:start])
+        if ([_utility setProxy:status])
             run = YES;
     }
     if (!run) {
@@ -333,9 +355,16 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
     BOOL isRunning = [_utility isRunning];
-    BOOL proxyEnabled = [[proxySettings objectForKey:(NSString *) kCFNetworkProxiesProxyAutoConfigEnable] boolValue];
+    BOOL pacEnabled = [[proxySettings objectForKey:(NSString *) kCFNetworkProxiesProxyAutoConfigEnable] boolValue];
+    BOOL socksEnabled = [[proxySettings objectForKey:@"SOCKSEnable"] boolValue];
+    BOOL proxyEnabled = (pacEnabled || socksEnabled) ? YES : NO;
+    ProxyStatus status = kProxyNone;
+    if (isRunning) {
+        BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
+        status = isAuto ? kProxyPac : kProxySocks;
+    }
     if (isRunning != proxyEnabled)
-        [_utility setProxy:isRunning];
+        [_utility setProxy:status];
     [pool release];
 }
 
@@ -347,11 +376,22 @@
     [pool release];
 }
 
+- (void)threadChangeProxyStatus:(NSNumber *)isAutoProxy
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    BOOL isAuto = [isAutoProxy boolValue];
+    ProxyStatus status = isAuto ? kProxyPac : kProxySocks;
+    [_utility setProxy:status];
+    [self performSelectorOnMainThread:@selector(setAutoProxySwitchable) withObject:nil waitUntilDone:NO];
+    [pool release];
+}
+
 #pragma mark - Proxy functions
 
 - (void)setRunningStatus:(NSNumber *)running
 {
     BOOL isRunning = [running boolValue];
+    _isRunning = isRunning;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:isRunning];
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(isRunning ? 1 : 0)];
     [self setViewEnabled:!isRunning];

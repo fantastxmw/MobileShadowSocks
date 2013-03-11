@@ -42,7 +42,7 @@
     return result;
 }
 
-- (BOOL)runLauncher:(BOOL)enabled withFirst:(NSString *)arg1 andSecond:(NSString *)arg2
+- (BOOL)runLauncher:(NSString *)argStr
 {
     BOOL result = NO;
     if ([[NSFileManager defaultManager] isExecutableFileAtPath:_launcherPath]) {
@@ -50,7 +50,7 @@
         const char *args[3];
         char *output = 0;
         args[0] = "launcher";
-        args[1] = [(enabled ? arg1 : arg2) cStringUsingEncoding:NSUTF8StringEncoding];
+        args[1] = [argStr cStringUsingEncoding:NSUTF8StringEncoding];
         args[2] = 0;
         result = run_process(execs, args, 0, &output, 0) ? NO : YES;
         if (output)
@@ -59,14 +59,19 @@
     return result;
 }
 
-- (BOOL)setProxy:(BOOL)isEnabled
+- (BOOL)setProxy:(ProxyStatus)status
 {
-    return [self runLauncher:isEnabled withFirst:@"-p" andSecond:@"-n"];
+    NSString *arg = @"-n";
+    if (status == kProxyPac)
+        arg = @"-p";
+    else if (status == kProxySocks)
+        arg = @"-k";
+    return [self runLauncher:arg];
 }
 
 - (BOOL)startStopDaemon:(BOOL)start
 {
-    BOOL result = [self runLauncher:start withFirst:@"-r" andSecond:@"-s"];
+    BOOL result = [self runLauncher:(start ? @"-r" : @"-s")];
     if (start != [self isRunning])
         result = NO;
     return result;

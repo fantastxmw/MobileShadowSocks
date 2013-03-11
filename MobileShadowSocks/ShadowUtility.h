@@ -10,6 +10,8 @@
 #import "subprocess.h"
 #import "Constant.h"
 
+typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
+
 @interface ShadowUtility : NSObject {
     NSString *_daemonIdentifier;
     NSString *_launcherPath;
@@ -17,7 +19,7 @@
 
 - (id)initWithDaemonIdentifier:(NSString *)identifier;
 - (BOOL)isRunning;
-- (BOOL)setProxy:(BOOL)isEnabled;
+- (BOOL)setProxy:(ProxyStatus)status;
 - (BOOL)startStopDaemon:(BOOL)start;
 
 @end

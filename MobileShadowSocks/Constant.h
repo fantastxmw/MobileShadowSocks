@@ -30,7 +30,7 @@
 #define PAC_PORT 1993
 #define EMPTY_PAC "function FindProxyForURL(url, host) \n{\n  return 'SOCKS 127.0.0.1:%d';\n}\n"
 #define HTTP_RESPONSE "HTTP/1.1 200 OK\nServer: Pac HTTP Server\nContent-Type: text/plain\n\n"
-#define USAGE_STR "Usage: %s [options]\n\nOptions:\n-r\tRun shadowsocks daemon\n-s\tStop shadowsocks daemon\n-p\tEnable proxy settings\n-n\tDisable proxy settings\n"
+#define USAGE_STR "Usage: %s [options]\n\nOptions:\n-r\tRun shadowsocks daemon\n-s\tStop shadowsocks daemon\n-p\tEnable proxy settings\n-n\tDisable proxy settings\n-k\tEnable socks proxy settings\n"
 
 #define LAUNCH_CTL_PATH "/bin/launchctl"
 #define SC_UTIL_PATH "/usr/sbin/scutil"

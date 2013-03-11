@@ -27,10 +27,13 @@ int main(int argc, const char **argv)
                     result = [helper runDaemon:NO];
                     break;
                 case 'p':
-                    result = [helper runProxySetting:YES];
+                    result = [helper runProxySetting:YES usingSocks:NO];
                     break;
                 case 'n':
-                    result = [helper runProxySetting:NO];
+                    result = [helper runProxySetting:NO usingSocks:NO];
+                    break;
+                case 'k':
+                    result = [helper runProxySetting:YES usingSocks:YES];
                     break;
                 default:
                     fprintf(stderr, USAGE_STR, argv[0]);

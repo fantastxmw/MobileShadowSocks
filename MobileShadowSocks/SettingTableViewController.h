@@ -21,6 +21,7 @@
     NSInteger _autoProxyCellTag;
     NSMutableArray *_tagKey;
     NSMutableArray *_tagAlwaysEnabled;
+    BOOL _isRunning;
 }
 
 - (void)fixProxy;

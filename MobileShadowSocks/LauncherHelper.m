@@ -74,7 +74,7 @@
     return result;
 }
 
-- (NSInteger)runProxySetting:(BOOL)isEnabled
+- (NSInteger)runProxySetting:(BOOL)isEnabled usingSocks:(BOOL)socks
 {
     NSInteger result = 1;
     NSArray *origArray = [self runNetworkConfig:SC_IDENTI willGetIdentifiers:YES];
@@ -100,16 +100,26 @@
                         [proxySet setObject:exceptArray forKey:@"ExceptionsList"];
                     }
                 }
-                [command appendString:@"d.add HTTPEnable # 0\n"];
-                [command appendString:@"d.add HTTPProxyType # 2\n"];
-                [command appendString:@"d.add HTTPSEnable # 0\n"];
-                [command appendString:@"d.add ProxyAutoConfigEnable # 1\n"];
-                [command appendFormat:@"d.add ProxyAutoConfigURLString %@\n", _pacUrl];
-                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
-                [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
-                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
-                [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
-                [proxySet setObject:_pacUrl forKey:@"ProxyAutoConfigURLString"];
+                if (socks) {
+                    [command appendString:@"d.add SOCKSEnable # 1\n"];
+                    [command appendString:@"d.add SOCKSProxy 127.0.0.1\n"];
+                    [command appendFormat:@"d.add SOCKSPort # %d\n", LOCAL_PORT];
+                    [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"SOCKSEnable"];
+                    [proxySet setObject:@"127.0.0.1" forKey:@"SOCKSProxy"];
+                    [proxySet setObject:[NSNumber numberWithInt:LOCAL_PORT] forKey:@"SOCKSPort"];
+                }
+                else {
+                    [command appendString:@"d.add HTTPEnable # 0\n"];
+                    [command appendString:@"d.add HTTPProxyType # 2\n"];
+                    [command appendString:@"d.add HTTPSEnable # 0\n"];
+                    [command appendString:@"d.add ProxyAutoConfigEnable # 1\n"];
+                    [command appendFormat:@"d.add ProxyAutoConfigURLString %@\n", _pacUrl];
+                    [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
+                    [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
+                    [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
+                    [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
+                    [proxySet setObject:_pacUrl forKey:@"ProxyAutoConfigURLString"];
+                }
             }
             else {
                 [command appendString:@"d.add HTTPEnable # 0\n"];
