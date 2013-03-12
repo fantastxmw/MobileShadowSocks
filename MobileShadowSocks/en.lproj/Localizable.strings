@@ -5,6 +5,7 @@
     Error = Error;
     Exceptions = Exceptions;
     "Failed to change proxy settings.\nMaybe no network access available." = "Failed to change proxy settings.\nMaybe no network access available.";
+    "Help Page" = "Help Page";
     "Localization by Linus Yang" = "Localization by Linus Yang";
     OK = OK;
     "Operation failed.\nPlease try again later." = "Operation failed.\nPlease try again later.";

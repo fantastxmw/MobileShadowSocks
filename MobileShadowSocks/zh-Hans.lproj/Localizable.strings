@@ -5,6 +5,7 @@
     Error = "\U9519\U8bef";
     Exceptions = "\U6392\U9664\U5217\U8868";
     "Failed to change proxy settings.\nMaybe no network access available." = "\U66f4\U6539\U4ee3\U7406\U8bbe\U7f6e\U5931\U8d25\U3002\n\U53ef\U80fd\U65e0\U7f51\U7edc\U8fde\U63a5\U3002";
+    "Help Page" = "\U5e2e\U52a9\U9875\U9762";
     "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316: Linus Yang";
     OK = "\U597d";
     "Operation failed.\nPlease try again later." = "\U64cd\U4f5c\U5931\U8d25\Uff0c\U8bf7\U91cd\U8bd5\U3002";
