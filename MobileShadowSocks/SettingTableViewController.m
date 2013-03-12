@@ -17,6 +17,14 @@
 
 #pragma mark - View lifecycle
 
+- (id)initWithStyle:(UITableViewStyle)style
+{
+    self = [super initWithStyle:style];
+    if (self)
+        _isLaunched = NO;
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -95,7 +103,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [NSThread detachNewThreadSelector:@selector(threadInitProxyStatus) toTarget:self withObject:nil];
+    _isLaunched = YES;
+    [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -355,26 +364,19 @@
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
-    BOOL isRunning = [_utility isRunning];
     BOOL pacEnabled = [[proxySettings objectForKey:@"ProxyAutoConfigEnable"] boolValue];
     BOOL socksEnabled = [[proxySettings objectForKey:@"SOCKSEnable"] boolValue];
     BOOL proxyEnabled = (pacEnabled || socksEnabled) ? YES : NO;
     ProxyStatus status = kProxyNone;
+    BOOL isRunning = [_utility isRunning];
     if (isRunning) {
         BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
         status = isAuto ? kProxyPac : kProxySocks;
     }
     if (isRunning != proxyEnabled)
         [_utility setProxy:status];
-    [self performSelectorOnMainThread:@selector(setRunningStatus:) withObject:[NSNumber numberWithBool:isRunning] waitUntilDone:NO];
-    [pool release];
-}
-
-- (void)threadInitProxyStatus
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    BOOL isRunning = [_utility isRunning];
-    [self performSelectorOnMainThread:@selector(setRunningStatus:) withObject:[NSNumber numberWithBool:isRunning] waitUntilDone:NO];
+    if (isRunning != _isRunning)
+        [self performSelectorOnMainThread:@selector(setRunningStatus:) withObject:[NSNumber numberWithBool:isRunning] waitUntilDone:NO];
     [pool release];
 }
 
@@ -421,7 +423,8 @@
 
 - (void)fixProxy
 {
-    [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
+    if (_isLaunched)
+        [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
 }
 
 - (void)startProcess

@@ -22,6 +22,7 @@
     NSMutableArray *_tagKey;
     NSMutableArray *_tagAlwaysEnabled;
     BOOL _isRunning;
+    BOOL _isLaunched;
 }
 
 - (void)fixProxy;

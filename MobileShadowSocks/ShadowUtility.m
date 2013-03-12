@@ -52,8 +52,7 @@
         pid = fork();
         if (pid == 0) {
             execv(execs, (char **) args);
-            fprintf(stderr, "Error: cannot run subprocess\n");
-            exit(1);
+            exit(0);
         }
         else if (pid > 0) {
             wait_pid = waitpid(pid, &status, 0);
