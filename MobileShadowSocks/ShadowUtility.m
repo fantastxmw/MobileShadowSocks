@@ -29,52 +29,60 @@
 
 - (BOOL)isRunning
 {
-    const char *args[] = {"launchctl", "list", 0};
-    char *output = 0;
-    BOOL result = NO;
-    int exit_code = run_process(LAUNCH_CTL_PATH, args, 0, &output, 0);
-    if (exit_code == 0 && output) {
-        const char *daemon_id = [_daemonIdentifier cStringUsingEncoding:NSUTF8StringEncoding];
-        if (strstr(output, daemon_id))
-            result = YES;
-        free(output);
-    }
-    return result;
+    CFArrayRef ref = launchctl_list();
+    BOOL ret = NO;
+    for (NSString *str in (NSArray *) ref)
+        if ([str isEqualToString:DAEMON_ID]) {
+            ret = YES;
+            break;
+        }
+    CFRelease(ref);
+    return ret;
 }
 
-- (BOOL)runLauncher:(NSString *)argStr
+- (BOOL)runLauncher:(const char *)arg
 {
     BOOL result = NO;
     if ([[NSFileManager defaultManager] isExecutableFileAtPath:_launcherPath]) {
         const char *execs = [_launcherPath cStringUsingEncoding:NSUTF8StringEncoding];
-        const char *args[3];
-        char *output = 0;
-        args[0] = "launcher";
-        args[1] = [argStr cStringUsingEncoding:NSUTF8StringEncoding];
-        args[2] = 0;
-        result = run_process(execs, args, 0, &output, 0) ? NO : YES;
-        if (output)
-            free(output);
+        const char *args[3] = {"launcher", arg, 0};
+        pid_t pid;
+        pid_t wait_pid;
+        int status = 0;
+        pid = fork();
+        if (pid == 0) {
+            execv(execs, (char **) args);
+            fprintf(stderr, "Error: cannot run subprocess\n");
+            exit(1);
+        }
+        else if (pid > 0) {
+            wait_pid = waitpid(pid, &status, 0);
+            if (wait_pid > 0) {
+                result = YES;
+                if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+                    result = NO;
+            }
+        }
     }
     return result;
 }
 
 - (BOOL)setProxy:(ProxyStatus)status
 {
-    NSString *arg = @"-n";
-    if (status == kProxyPac)
-        arg = @"-p";
-    else if (status == kProxySocks)
-        arg = @"-k";
-    return [self runLauncher:arg];
+    switch (status) {
+        case kProxyPac:
+            return [self runLauncher:"-p"];
+        case kProxySocks:
+            return [self runLauncher:"-k"];
+        default:
+            return [self runLauncher:"-n"];
+    }
+    return NO;
 }
 
 - (BOOL)startStopDaemon:(BOOL)start
 {
-    BOOL result = [self runLauncher:(start ? @"-r" : @"-s")];
-    if (start != [self isRunning])
-        result = NO;
-    return result;
+    return [self runLauncher:(start ? "-r" : "-s")];
 }
 
 @end

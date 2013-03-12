@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "subprocess.h"
 #import "Constant.h"
+#import "launchctl.h"
 
 typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 

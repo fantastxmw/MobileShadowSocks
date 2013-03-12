@@ -342,6 +342,8 @@
             [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:YES];
     }
     else {
+        if (!start)
+            [_utility setProxy:status];
         [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Cannot start or stop service.", nil) waitUntilDone:YES];
         start = NO;
     }
@@ -354,7 +356,7 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
     BOOL isRunning = [_utility isRunning];
-    BOOL pacEnabled = [[proxySettings objectForKey:(NSString *) kCFNetworkProxiesProxyAutoConfigEnable] boolValue];
+    BOOL pacEnabled = [[proxySettings objectForKey:@"ProxyAutoConfigEnable"] boolValue];
     BOOL socksEnabled = [[proxySettings objectForKey:@"SOCKSEnable"] boolValue];
     BOOL proxyEnabled = (pacEnabled || socksEnabled) ? YES : NO;
     ProxyStatus status = kProxyNone;
@@ -364,6 +366,7 @@
     }
     if (isRunning != proxyEnabled)
         [_utility setProxy:status];
+    [self performSelectorOnMainThread:@selector(setRunningStatus:) withObject:[NSNumber numberWithBool:isRunning] waitUntilDone:NO];
     [pool release];
 }
 

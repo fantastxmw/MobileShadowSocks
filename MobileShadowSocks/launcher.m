@@ -7,6 +7,7 @@
 //
 
 #import "LauncherHelper.h"
+#import "build_time.h"
 #import <arpa/inet.h>
 
 int main(int argc, const char **argv)
@@ -14,7 +15,7 @@ int main(int argc, const char **argv)
     @autoreleasepool {
         if (argc > 1) {
             if (argc != 2 || argv[1][0] != '-' || !argv[1][1] || argv[1][2]) {
-                fprintf(stderr, USAGE_STR, argv[0]);
+                fprintf(stderr, USAGE_STR, BUILDTIME, argv[0]);
                 exit(1);
             }
             LauncherHelper *helper = [[LauncherHelper alloc] initWithDaemonIdentifier:DAEMON_ID andPacUrl:[NSString stringWithFormat:@"http://127.0.0.1:%d/shadow.pac", PAC_PORT]];
@@ -36,7 +37,7 @@ int main(int argc, const char **argv)
                     result = [helper runProxySetting:YES usingSocks:YES];
                     break;
                 default:
-                    fprintf(stderr, USAGE_STR, argv[0]);
+                    fprintf(stderr, USAGE_STR, BUILDTIME, argv[0]);
                     result = 1;
                     break;
             }

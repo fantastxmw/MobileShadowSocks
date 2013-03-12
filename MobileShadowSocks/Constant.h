@@ -10,7 +10,7 @@
 #define MobileShadowSocks_Constant_h
 
 #define APP_VER @"0.2.2"
-#define APP_BUILD @"4"
+#define APP_BUILD @"5"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"
@@ -23,16 +23,14 @@
 #define SHADOW_BIN BUNDLE_PATH @"/shadow"
 #define DEFAULT_PAC BUNDLE_PATH @"/auto.pac"
 #define PREF_FILE @"/var/mobile/Library/Preferences/com.linusyang.MobileShadowSocks.plist"
-#define SC_STORE @"/var/preferences/SystemConfiguration/preferences.plist"
-#define SC_IDENTI @"show com.apple.network.identification\nlist State:/Network/Service/[^/]+/com.apple.CommCenter\nlist State:/Network/Service/[^/]+/DHCP\nlist State:/Network/Service/[^/]+/IPv[46]\n"
+
+#define STORE_ID CFSTR("shadow")
+#define SC_IDENTI CFSTR("State:/Network/Service/[^/]+/IPv[46]")
 
 #define LOCAL_PORT 1983
 #define PAC_PORT 1993
 #define EMPTY_PAC "function FindProxyForURL(url, host) \n{\n  return 'SOCKS 127.0.0.1:%d';\n}\n"
 #define HTTP_RESPONSE "HTTP/1.1 200 OK\nServer: Pac HTTP Server\nContent-Type: text/plain\n\n"
-#define USAGE_STR "Usage: %s [options]\n\nOptions:\n-r\tRun shadowsocks daemon\n-s\tStop shadowsocks daemon\n-p\tEnable proxy settings\n-n\tDisable proxy settings\n-k\tEnable socks proxy settings\n"
-
-#define LAUNCH_CTL_PATH "/bin/launchctl"
-#define SC_UTIL_PATH "/usr/sbin/scutil"
+#define USAGE_STR "shadowsocks launcher (build %s)\nUsage: %s [options]\n\nOptions:\n-r\tRun shadowsocks daemon\n-s\tStop shadowsocks daemon\n-p\tEnable proxy settings\n-n\tDisable proxy settings\n-k\tEnable socks proxy settings\n"
 
 #endif
