@@ -10,7 +10,7 @@
     OK = OK;
     "Operation failed.\nPlease try again later." = "Operation failed.\nPlease try again later.";
     "PAC File" = "PAC File";
-    "PAC file not found. Use default instead." = "PAC file not found. Use default instead.";
+    "PAC file not found. Redirect all traffic to proxy." = "PAC file not found. Redirect all traffic to proxy.";
     Password = Password;
     "Please specify file path" = "Please specify file path";
     Port = Port;
