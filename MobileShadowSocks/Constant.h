@@ -20,7 +20,6 @@
 
 #define DAEMON_ID @"com.linusyang.shadowsocks"
 #define BUNDLE_PATH @"/Applications/MobileShadowSocks.app"
-#define DEFAULT_PAC BUNDLE_PATH @"/auto.pac"
 #define PREF_FILE @"/var/mobile/Library/Preferences/com.linusyang.MobileShadowSocks.plist"
 
 #define STORE_ID CFSTR("shadow")

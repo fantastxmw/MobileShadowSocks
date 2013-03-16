@@ -140,7 +140,6 @@
     char buf[BUFF_SIZE];
     FILE *stream;
     BOOL autoProxy;
-    NSString *pacFile;
     
     memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
@@ -190,14 +189,8 @@
         if (dict) {
             autoProxy = [[dict objectForKey:@"AUTO_PROXY"] boolValue];
             if (autoProxy) {
-                pacFile = (NSString *) [dict objectForKey:@"PAC_FILE"];
-                NSString *filePath = DEFAULT_PAC;
-                if (pacFile) {
-                    pacFile = [pacFile stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-                    if ([[NSFileManager defaultManager] fileExistsAtPath:pacFile])
-                        filePath = pacFile;
-                }
-                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+                NSString *filePath = [(NSString *) [dict objectForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                if (filePath && [[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
                     fprintf(stream, "%s", [[NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil] cStringUsingEncoding:NSUTF8StringEncoding]);
                     sent = YES;
                 }

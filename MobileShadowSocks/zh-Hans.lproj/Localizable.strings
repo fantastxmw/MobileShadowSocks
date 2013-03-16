@@ -12,6 +12,7 @@
     "PAC File" = "PAC \U6587\U4ef6";
     "PAC file not found. Use default instead." = "PAC \U6587\U4ef6\U672a\U627e\U5230\Uff0c\U4f7f\U7528\U9ed8\U8ba4\U6587\U4ef6\U3002";
     Password = "\U5bc6\U7801";
+    "Please specify file path" = "\U8bf7\U6307\U5b9a\U6587\U4ef6\U8def\U5f84";
     Port = "\U670d\U52a1\U5668\U7aef\U53e3";
     "Proxy Settings" = "\U4ee3\U7406\U8bbe\U7f6e";
     "RC4 Crypto" = "\U4f7f\U7528 RC4 \U52a0\U5bc6";

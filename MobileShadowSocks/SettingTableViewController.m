@@ -89,7 +89,7 @@
                        [NSArray arrayWithObjects:
                         NSLocalizedString(@"PAC File", nil), 
                         @"PAC_FILE", 
-                        [NSString stringWithFormat:@"%@/auto.pac", [[NSBundle mainBundle] bundlePath]], 
+                        NSLocalizedString(@"Please specify file path", nil), 
                         CELL_TEXT CELL_ALWAYS, nil], 
                        [NSArray arrayWithObjects:
                         NSLocalizedString(@"Exceptions", nil), 
@@ -343,12 +343,9 @@
     ProxyStatus status = kProxyNone;
     if (start) {
         [[NSUserDefaults standardUserDefaults] synchronize];
-        NSString *pacFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"];
-        if (pacFile) {
-            pacFile = [pacFile stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            if (![pacFile isEqualToString:@""] && ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
-                [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
-        }
+        NSString *pacFile = [[[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+            [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
         BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
         status = isAuto ? kProxyPac : kProxySocks;
     }

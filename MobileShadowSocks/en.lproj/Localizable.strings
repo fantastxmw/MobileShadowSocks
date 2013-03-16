@@ -12,6 +12,7 @@
     "PAC File" = "PAC File";
     "PAC file not found. Use default instead." = "PAC file not found. Use default instead.";
     Password = Password;
+    "Please specify file path" = "Please specify file path";
     Port = Port;
     "Proxy Settings" = "Proxy Settings";
     "RC4 Crypto" = "RC4 Crypto";
