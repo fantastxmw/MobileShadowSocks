@@ -7,6 +7,7 @@
 //
 
 #import "LauncherHelper.h"
+#import <arpa/inet.h>
 
 @implementation LauncherHelper
 
@@ -125,6 +126,91 @@
     else
         result = launchctl_unload_path((CFStringRef) _daemonFile, true);
     return result;
+}
+
++ (void)runPacServer
+{
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    struct sockaddr_in client;
+    struct sockaddr_in server;
+    socklen_t socksize = sizeof(struct sockaddr_in);
+    int sock;
+    int conn;
+    int optval = 1;
+    char buf[BUFF_SIZE];
+    FILE *stream;
+    BOOL autoProxy;
+    NSString *pacFile;
+    
+    memset(&server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server.sin_port = htons(PAC_PORT);
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        fprintf(stderr, "Error: cannot open socket\n");
+        [pool release];
+        return;
+    }
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
+    if (bind(sock, (struct sockaddr *) &server, sizeof(struct sockaddr)) < 0) {
+        fprintf(stderr, "Error: cannot bind port\n");
+        close(sock);
+        [pool release];
+        return;
+    }
+    if (listen(sock, SOMAXCONN) < 0) {
+        fprintf(stderr, "Error: cannot listen on port\n");
+        close(sock);
+        [pool release];
+        return;
+    }
+    while (1) {
+        if ([[NSThread currentThread] isCancelled])
+            break;
+        conn = accept(sock, (struct sockaddr *) &client, &socksize);
+        if (conn < 0) {
+            fprintf(stderr, "Error: cannot accept\n");
+            close(sock);
+            [pool release];
+            return;
+        }
+        if (!(stream = fdopen(conn, "r+"))) {
+            fprintf(stderr, "Error: cannot open stream\n");
+            close(sock);
+            [pool release];
+            return;
+        }
+        do {
+            fgets(buf, BUFF_SIZE, stream);
+        } while (strcmp(buf, "\r\n") && strcmp(buf, "\n"));
+        fprintf(stream, HTTP_RESPONSE);
+        BOOL sent = NO;
+        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
+        if (dict) {
+            autoProxy = [[dict objectForKey:@"AUTO_PROXY"] boolValue];
+            if (autoProxy) {
+                pacFile = (NSString *) [dict objectForKey:@"PAC_FILE"];
+                NSString *filePath = DEFAULT_PAC;
+                if (pacFile) {
+                    pacFile = [pacFile stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                    if ([[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+                        filePath = pacFile;
+                }
+                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+                    fprintf(stream, "%s", [[NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil] cStringUsingEncoding:NSUTF8StringEncoding]);
+                    sent = YES;
+                }
+            }
+        }
+        if (!sent)
+            fprintf(stream, EMPTY_PAC, LOCAL_PORT);
+        fflush(stream);
+        fclose(stream);
+        close(conn);
+    }
+    close(sock);
+    [pool release];
 }
 
 @end

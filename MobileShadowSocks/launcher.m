@@ -8,7 +8,7 @@
 
 #import "LauncherHelper.h"
 #import "build_time.h"
-#import <arpa/inet.h>
+#import "libshadow/local.h"
 
 int main(int argc, const char **argv)
 {
@@ -44,13 +44,12 @@ int main(int argc, const char **argv)
             [helper release];
             exit(result);
         }
-        
-        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
-        if (dict && [[NSFileManager defaultManager] isExecutableFileAtPath:SHADOW_BIN]) {
-            NSString *remoteServer = (NSString *) [dict objectForKey:@"REMOTE_SERVER"];
-            NSString *remotePort = (NSString *) [dict objectForKey:@"REMOTE_PORT"];
-            NSString *socksPass = (NSString *) [dict objectForKey:@"SOCKS_PASS"];
-            BOOL useCrypto = [[dict objectForKey:@"USE_RC4"] boolValue];
+        NSDictionary *prefDict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
+        if (prefDict) {
+            NSString *remoteServer = (NSString *) [prefDict objectForKey:@"REMOTE_SERVER"];
+            NSString *remotePort = (NSString *) [prefDict objectForKey:@"REMOTE_PORT"];
+            NSString *socksPass = (NSString *) [prefDict objectForKey:@"SOCKS_PASS"];
+            BOOL useCrypto = [[prefDict objectForKey:@"USE_RC4"] boolValue];
             NSMutableArray *arguments = [NSMutableArray array];
             [arguments addObject:@"-s"];
             if (remoteServer)
@@ -73,92 +72,14 @@ int main(int argc, const char **argv)
                 [arguments addObject:@"-m"];
                 [arguments addObject:@"rc4"];
             }
-            const char *executable = [SHADOW_BIN cStringUsingEncoding:NSUTF8StringEncoding];
-            int ac = (int) [arguments count];
-            const char *args[ac + 2];
-            int i;
-            pid_t pid;
-            args[0] = [[SHADOW_BIN lastPathComponent] cStringUsingEncoding:NSUTF8StringEncoding];
-            for (i = 0; i < ac; i++) {
-                NSString *arg = (NSString *) [arguments objectAtIndex:i];
-                args[i + 1] = [arg cStringUsingEncoding:NSUTF8StringEncoding];
-            }
-            args[ac + 1] = 0;
-            pid = fork();
-            if (pid == 0) {
-                execv(executable, (char **) args);
-                exit(0);
-            }
+            int argc = (int) [arguments count];
+            const char *argv[argc + 1];
+            argv[0] = "launcher";
+            for (int i = 0; i < argc; i++)
+                argv[i + 1] = [(NSString *) [arguments objectAtIndex:i] cStringUsingEncoding:NSUTF8StringEncoding];
+            [NSThread detachNewThreadSelector:@selector(runPacServer) toTarget:[LauncherHelper class] withObject:nil];
+            return local_main(argc + 1, argv);
         }
-        
-        struct sockaddr_in client;
-        struct sockaddr_in server;
-        socklen_t socksize = sizeof(struct sockaddr_in);
-        int sock;
-        int conn;
-        int optval = 1;
-        FILE *stream;
-        BOOL autoProxy;
-        NSString *pacFile;
-        
-        memset(&server, 0, sizeof(server));
-        server.sin_family = AF_INET;
-        server.sin_addr.s_addr = inet_addr("127.0.0.1");
-        server.sin_port = htons(PAC_PORT);
-        sock = socket(AF_INET, SOCK_STREAM, 0);
-        if (sock < 0) {
-            fprintf(stderr, "Error: cannot open socket\n");
-            exit(1);
-        }
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
-        if (bind(sock, (struct sockaddr *) &server, sizeof(struct sockaddr)) < 0) {
-            fprintf(stderr, "Error: cannot bind port\n");
-            close(sock);
-            exit(1);
-        }
-        if (listen(sock, 10) < 0) {
-            fprintf(stderr, "Error: cannot listen on port\n");
-            close(sock);
-            exit(1);
-        }
-        while (1) {
-            conn = accept(sock, (struct sockaddr *) &client, &socksize);
-            if (conn < 0) {
-                fprintf(stderr, "Error: cannot accept\n");
-                close(sock);
-                exit(1);
-            }
-            if (!(stream = fdopen(conn, "r+"))) {
-                fprintf(stderr, "Error: cannot open stream\n");
-                close(sock);
-                exit(1);
-            }
-            fprintf(stream, HTTP_RESPONSE);
-            BOOL sent = NO;
-            dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
-            if (dict) {
-                autoProxy = [[dict objectForKey:@"AUTO_PROXY"] boolValue];
-                if (autoProxy) {
-                    pacFile = (NSString *) [dict objectForKey:@"PAC_FILE"];
-                    NSString *filePath = DEFAULT_PAC;
-                    if (pacFile) {
-                        pacFile = [pacFile stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-                        if ([[NSFileManager defaultManager] fileExistsAtPath:pacFile])
-                            filePath = pacFile;
-                    }
-                    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-                        fprintf(stream, "%s", [[NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil] cStringUsingEncoding:NSUTF8StringEncoding]);
-                        sent = YES;
-                    }
-                }
-            }
-            if (!sent)
-                fprintf(stream, EMPTY_PAC, LOCAL_PORT);
-            fflush(stream);
-            fclose(stream);
-            close(conn);
-        }
-        close(sock);
     }
     return 0;
 }

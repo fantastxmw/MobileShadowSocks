@@ -21,6 +21,7 @@
 - (id)initWithDaemonIdentifier:(NSString *)identifier andPacUrl:(NSString *)url;
 - (NSInteger)runProxySetting:(BOOL)isEnabled usingSocks:(BOOL)socks;
 - (NSInteger)runDaemon:(BOOL)isEnabled;
++ (void)runPacServer;
 
 @end
 

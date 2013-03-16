@@ -18,5 +18,7 @@
 	<string>root</string>
 	<key>WorkingDirectory</key>
 	<string>/Applications/MobileShadowSocks.app</string>
+	<key>KeepAlive</key>
+	<true/>
 </dict>
 </plist>
