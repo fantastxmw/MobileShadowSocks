@@ -18,8 +18,12 @@
 #include <unistd.h>
 #include <assert.h>
 
+#import <Foundation/Foundation.h>
+
 #include "local.h"
 #include "socks5.h"
+#include "Constant.h"
+#include "build_time.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,6 +42,9 @@
 static char *_server;
 static char *_remote_port;
 static int   _timeout;
+static char *_key;
+static ev_timer _local_timer;
+static int _local_timeout;
 
 int setnonblocking(int fd) {
     int flags;
@@ -46,16 +53,18 @@ int setnonblocking(int fd) {
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-int create_and_bind(const char *port) {
+int create_and_bind(int local_port) {
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int s, listen_sock;
+    char port[30];
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC; /* Return IPv4 and IPv6 choices */
     hints.ai_socktype = SOCK_STREAM; /* We want a TCP socket */
 
-    s = getaddrinfo("0.0.0.0", port, &hints, &result);
+    sprintf(port, "%d", local_port);
+    s = getaddrinfo("127.0.0.1", port, &hints, &result);
     if (s != 0) {
         LOGD("getaddrinfo: %s\n", gai_strerror(s));
         return -1;
@@ -291,7 +300,11 @@ static void server_send_cb (EV_P_ ev_io *w, int revents) {
             }
         }
     }
+}
 
+static void listen_timeout_cb(EV_P_ ev_timer *watcher, int revents) {
+    LOGD("Service timeout, exit\n");
+    ev_unloop (EV_A_ EVUNLOOP_ALL);
 }
 
 static void remote_timeout_cb(EV_P_ ev_timer *watcher, int revents) {
@@ -300,7 +313,7 @@ static void remote_timeout_cb(EV_P_ ev_timer *watcher, int revents) {
     struct remote *remote = remote_ctx->remote;
     struct server *server = remote->server;
 
-    LOGD("remote timeout\n");
+    LOGD("Remote timeout, disconnect\n");
 
     ev_timer_stop(EV_A_ watcher);
 
@@ -469,6 +482,7 @@ void free_remote(struct remote *remote) {
         free(remote);
     }
 }
+
 void close_and_free_remote(EV_P_ struct remote *remote) {
     if (remote != NULL) {
         ev_timer_stop(EV_A_ &remote->send_ctx->watcher);
@@ -535,6 +549,7 @@ static void accept_cb (EV_P_ ev_io *w, int revents)
             perror("accept");
             break;
         }
+        ev_timer_again(EV_A_ &_local_timer);
         setnonblocking(serverfd);
         struct server *server = new_server(serverfd);
         struct addrinfo hints, *res;
@@ -581,132 +596,117 @@ static void accept_cb (EV_P_ ev_io *w, int revents)
     }
 }
 
-static void print_usage() {
-    printf("usage: ss  -s server_host -p server_port -l local_port\n");
-    printf("           -k password [-m encrypt_method] [-f pid_file]\n");
-    printf("\n");
-    printf("info:\n");
-    printf("       encrypt_method:  table, rc4\n");
-    printf("       pid_file:        valid path to the pid file\n");
+int get_pac_content(char **content) {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
+    *content = 0;
+    if (dict && [[dict objectForKey:@"AUTO_PROXY"] boolValue]) {
+        NSString *filePath = [(NSString *) [dict objectForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (filePath && [[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+            const char *file_str = [[NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil]cStringUsingEncoding:NSUTF8StringEncoding];
+            if (file_str) {
+                *content = strdup(file_str);
+                [pool release];
+                return 1;
+            }
+        }
+    }
+    [pool release];
+    return 0;
 }
 
-int local_main (int argc, const char **argv)
-{
+static void pac_accept_cb (EV_P_ ev_io *w, int revents) {
+    struct listen_ctx *listener = (struct listen_ctx *)w;
+    int serverfd;
+    int will_update;
+    FILE *stream;
+    char *pac_file;
+    struct sockaddr_in client;
+    socklen_t socksize;
+    char buf[BUFF_SIZE];
+    while (1) {
+        memset(&client, 0, sizeof(client));
+        memset(&buf, 0, sizeof(buf));
+        socksize = sizeof(struct sockaddr_in);
+        serverfd = accept(listener->fd, (struct sockaddr *) &client, &socksize);
+        if (serverfd == -1) {
+            perror("accept");
+            break;
+        }
+        ev_timer_again(EV_A_ &_local_timer);
+        setnonblocking(serverfd);
+        if (!(stream = fdopen(serverfd, "r+"))) {
+            perror("fdopen");
+            break;
+        }
+        will_update = 0;
+        do {
+            fgets(buf, BUFF_SIZE, stream);
+            if (strstr(buf, UPDATE_CONF))
+                will_update = 1;
+        } while (strcmp(buf, "\r\n") && strcmp(buf, "\n"));
+        fprintf(stream, HTTP_RESPONSE);
+        if (will_update) {
+            update_config();
+            fprintf(stream, "Updated.\n");
+        }
+        else {
+            if (get_pac_content(&pac_file)) {
+                fprintf(stream, "%s", pac_file);
+                free(pac_file);
+            }
+            else
+                fprintf(stream, EMPTY_PAC, LOCAL_PORT);
+        }
+        fflush(stream);
+        fclose(stream);
+        close(serverfd);
+        break;
+    }
+}
 
-    char *server = NULL;
-    char *remote_port = NULL;
-    char *port = NULL;
-    char *key = NULL;
-    char *timeout = "10";
-    char *method = NULL;
-    int c;
-    int f_flags = 0;
-    char *f_path = NULL;
-
-    opterr = 0;
-
-    while ((c = getopt (argc, argv, "f:s:p:l:k:t:m:")) != -1) {
-        switch (c) {
-            case 's':
-                server = optarg;
-                break;
-            case 'p':
-                remote_port = optarg;
-                break;
-            case 'l':
-                port = optarg;
-                break;
-            case 'k':
-                key = optarg;
-                break;
-            case 'f':
-                f_flags = 1;
-                f_path = optarg;
-                break;
-            case 't':
-                timeout = optarg;
-                break;
-            case 'm':
-                method = optarg;
-                break;
+int store_config(char ** config_ptr, const char *new_config, const char *default_value) {
+    int changed = 0;
+    if (!*config_ptr) {
+        *config_ptr = strdup(default_value);
+        changed = 1;
+    }
+    if (new_config) {
+        if (strcmp(*config_ptr, new_config)) {
+            free(*config_ptr);
+            *config_ptr = strdup(new_config);
+            changed = 1;
         }
     }
+    return changed;
+}
 
-    if (server == NULL || remote_port == NULL ||
-            port == NULL || key == NULL) {
-        print_usage();
-        exit(EXIT_FAILURE);
+void update_config() {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSDictionary *prefDict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
+    NSString *remoteServer = [prefDict objectForKey:@"REMOTE_SERVER"];
+    NSString *remotePort = [prefDict objectForKey:@"REMOTE_PORT"];
+    NSString *socksPass = [prefDict objectForKey:@"SOCKS_PASS"];
+    BOOL useCrypto = [[prefDict objectForKey:@"USE_RC4"] boolValue];
+    store_config(&_server, [remoteServer cStringUsingEncoding:NSUTF8StringEncoding], "127.0.0.1");
+    store_config(&_remote_port, [remotePort cStringUsingEncoding:NSUTF8StringEncoding], "8080");
+    int key_changed = store_config(&_key, [socksPass cStringUsingEncoding:NSUTF8StringEncoding], "123456");
+    int new_method = useCrypto ? RC4 : TABLE;
+    if (key_changed || new_method != _method) {
+        _method = new_method;
+        LOGD("Using cipher:\t%s\n", _method == RC4 ? "RC4" : "Non-RC4");
+        if (_method == RC4)
+            enc_key_init(_key);
+        else
+            get_table(_key);
     }
+    LOGD("Remote server:\t%s:%s\n", _server, _remote_port);
+    [pool release];
+}
 
-    if (f_flags) {
-
-        if (f_path == NULL) {
-            print_usage();
-            exit(EXIT_FAILURE);
-        }
-
-        /* Our process ID and Session ID */
-        pid_t pid, sid;
-
-        /* Fork off the parent process */
-        pid = fork();
-        if (pid < 0) {
-            exit(EXIT_FAILURE);
-        }
-        /* If we got a good PID, then
-           we can exit the parent process. */
-        if (pid > 0) {
-            FILE *file = fopen(f_path, "w");
-            fprintf(file, "%d", pid);
-            fclose(file);
-            exit(EXIT_SUCCESS);
-        }
-
-        /* Change the file mode mask */
-        umask(0);
-
-        /* Open any logs here */        
-
-        /* Create a new SID for the child process */
-        sid = setsid();
-        if (sid < 0) {
-            /* Log the failure */
-            exit(EXIT_FAILURE);
-        }
-
-
-        /* Change the current working directory */
-        if ((chdir("/")) < 0) {
-            /* Log the failure */
-            exit(EXIT_FAILURE);
-        }
-
-        /* Close out the standard file descriptors */
-        close(STDIN_FILENO);
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
-    }
-
-    signal(SIGPIPE, SIG_IGN);
-
-    // init global variables
-    _server = strdup(server);
-    _remote_port = strdup(remote_port);
-    _timeout = atoi(timeout);
-    _method = TABLE;
-    if (method != NULL) {
-        if (strcmp(method, "rc4") == 0) {
-            _method = RC4;
-        }
-    }
-
-    LOGD("calculating ciphers %d\n", _method);
-    if (_method == RC4) {
-        enc_key_init(key);
-    } else {
-        get_table(key);
-    }
-
+int listen_on_port(EV_P_ struct listen_ctx *listen_ctx, int port, ev_handler handler) {
+    if (!loop)
+        return 1;
     int listenfd;
     listenfd = create_and_bind(port);
     if (listenfd < 0) {
@@ -717,18 +717,45 @@ int local_main (int argc, const char **argv)
         LOGE("listen() error.\n");
         return 1;
     }
-    LOGD("server listening at port %s\n", port);
-
     setnonblocking(listenfd);
-    struct listen_ctx listen_ctx;
-    listen_ctx.fd = listenfd;
-    struct ev_loop *loop = ev_default_loop(0);
-    if (!loop) {
-        return 1;
-    }
-    ev_io_init (&listen_ctx.io, accept_cb, listenfd, EV_READ);
-    ev_io_start (loop, &listen_ctx.io);
-    ev_run (loop, 0);
+    listen_ctx->fd = listenfd;
+    ev_io_init(&listen_ctx->io, handler, listenfd, EV_READ);
+    ev_io_start(EV_A_ &listen_ctx->io);
     return 0;
 }
 
+int main (int argc, const char **argv) {
+    LOGD("ShadowSocks-libev (Build %s)\n", BUILDTIME);
+    _server = 0;
+    _remote_port = 0;
+    _method = TABLE;
+    _key = 0;
+    _timeout = 0;
+    _local_timeout = 0;
+    if (argc == 3) {
+        _timeout = atoi(argv[1]);
+        _local_timeout = atoi(argv[2]);
+    }
+    if (!_timeout)
+        _timeout = REMOTE_TIMEOUT;
+    if (!_local_timeout)
+        _local_timeout = LOCAL_TIMEOUT;
+    LOGD("Exit no action:\t%ds\n", _local_timeout);
+    LOGD("Remote timeout:\t%ds\n", _timeout);
+    update_config();
+    signal(SIGPIPE, SIG_IGN);
+    struct ev_loop *loop = ev_default_loop(0);
+    struct listen_ctx local_ctx;
+    struct listen_ctx pac_ctx;
+    if (listen_on_port(EV_A_ &local_ctx, LOCAL_PORT, accept_cb))
+        return 1;
+    LOGD("Socks server:\t127.0.0.1:%d\n", LOCAL_PORT);
+    if (listen_on_port(EV_A_ &pac_ctx, PAC_PORT, pac_accept_cb))
+        return 1;
+    LOGD("Pac httpd:\t127.0.0.1:%d\n", PAC_PORT);
+    ev_timer_init(&_local_timer, listen_timeout_cb, 0, _local_timeout);
+    ev_timer_again(EV_A_ &_local_timer);
+    LOGD("Service running...\n");
+    ev_run(loop, 0);
+    return 0;
+}

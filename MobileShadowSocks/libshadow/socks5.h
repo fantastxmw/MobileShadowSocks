@@ -4,7 +4,6 @@
 #define SVERSION 0x05
 #define CONNECT 0x01
 #define IPV4 0x01
-#define DOMAIN 0x03
 #define IPV6 0x04
 #define CMD_NOT_SUPPORTED 0x07
 

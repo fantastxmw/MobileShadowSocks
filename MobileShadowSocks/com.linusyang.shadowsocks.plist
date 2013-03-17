@@ -6,19 +6,24 @@
 	<string>com.linusyang.shadowsocks</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Applications/MobileShadowSocks.app/launcher</string>
+		<string>/Applications/MobileShadowSocks.app/shadowd</string>
 	</array>
-	<key>RunAtLoad</key>
-	<true/>
+	<key>Sockets</key>
+	<dict>
+		<key>Listeners</key>
+		<dict>
+			<key>SockServiceName</key>
+			<string>1983</string>
+		</dict>
+		<key>Listeners2</key>
+		<dict>
+			<key>SockServiceName</key>
+			<string>1993</string>
+		</dict>
+	</dict>
 	<key>StandardErrorPath</key>
 	<string>/dev/null</string>
 	<key>StandardOutPath</key>
 	<string>/dev/null</string>
-	<key>UserName</key>
-	<string>root</string>
-	<key>WorkingDirectory</key>
-	<string>/Applications/MobileShadowSocks.app</string>
-	<key>KeepAlive</key>
-	<true/>
 </dict>
 </plist>

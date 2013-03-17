@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ShadowUtility.h"
+#import "libshadow/Constant.h"
+
+typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 
 @interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
-    ShadowUtility *_utility;
     CGFloat _cellWidth;
     NSInteger _tableSectionNumber;
     NSArray *_tableRowNumber;
@@ -19,12 +20,35 @@
     NSInteger _tagNumber;
     NSInteger _pacFileCellTag;
     NSInteger _autoProxyCellTag;
+    NSInteger _enableCellTag;
     NSMutableArray *_tagKey;
-    NSMutableArray *_tagAlwaysEnabled;
-    BOOL _isRunning;
+    NSMutableArray *_tagWillNotifyChange;
+    NSString *_pacURL;
     BOOL _isLaunched;
+    BOOL _isEnabled;
+    BOOL _isPrefChanged;
 }
 
 - (void)fixProxy;
+- (BOOL)setProxy:(ProxyStatus)status;
+- (void)notifyChanged;
 
 @end
+
+typedef const struct __SCPreferences *  SCPreferencesRef;
+SCPreferencesRef SCPreferencesCreate (CFAllocatorRef allocator, CFStringRef name, CFStringRef prefsID);
+typedef const struct __SCDynamicStore * SCDynamicStoreRef;
+typedef void (*SCDynamicStoreCallBack) (SCDynamicStoreRef store, CFArrayRef changedKeys, void *info);
+typedef struct {
+    CFIndex     version;
+    void *      info;
+    const void  *(*retain)(const void *info);
+    void        (*release)(const void *info);
+    CFStringRef (*copyDescription)(const void *info);
+} SCDynamicStoreContext;
+SCDynamicStoreRef SCDynamicStoreCreate (CFAllocatorRef allocator, CFStringRef name, SCDynamicStoreCallBack callout, SCDynamicStoreContext *context);
+CFArrayRef SCDynamicStoreCopyKeyList (SCDynamicStoreRef store, CFStringRef pattern);
+Boolean SCPreferencesPathSetValue (SCPreferencesRef prefs, CFStringRef path, CFDictionaryRef value);
+Boolean SCPreferencesCommitChanges (SCPreferencesRef prefs);
+Boolean SCPreferencesApplyChanges (SCPreferencesRef prefs);
+void SCPreferencesSynchronize (SCPreferencesRef prefs);

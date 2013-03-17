@@ -20,8 +20,13 @@
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
-    if (self)
+    if (self) {
+        setuid(0);
+        seteuid(501);
         _isLaunched = NO;
+        _isEnabled = NO;
+        _isPrefChanged = NO;
+    }
     return self;
 }
 
@@ -36,28 +41,33 @@
         _cellWidth = 560.0f;
     else
         _cellWidth = 180.0f;
-    UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Start", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(startProcess)];
     UIBarButtonItem *aboutButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"About", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(showAbout)];
-    [[self navigationItem] setLeftBarButtonItem:leftButton];
     [[self navigationItem] setRightBarButtonItem:aboutButton];
     [[self navigationItem] setTitle:NSLocalizedString(@"ShadowSocks", nil)];
-    [leftButton release];
     [aboutButton release];
-    _isRunning = NO;
-    _utility = [[ShadowUtility alloc] initWithDaemonIdentifier:DAEMON_ID];
+    _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
     _tagNumber = 0;
     _tagKey = [[NSMutableArray alloc] init];
-    _tagAlwaysEnabled = [[NSMutableArray alloc] init];
-    _tableSectionNumber = 2;
+    _tagWillNotifyChange = [[NSMutableArray alloc] init];
+    _tableSectionNumber = 3;
     _tableRowNumber = [[NSArray alloc] initWithObjects:
+                       [NSNumber numberWithInt:1], 
                        [NSNumber numberWithInt:4], 
                        [NSNumber numberWithInt:3], 
                        nil];
     _tableSectionTitle = [[NSArray alloc] initWithObjects:
+                          @"",
                           NSLocalizedString(@"Server Information", nil), 
                           NSLocalizedString(@"Proxy Settings", nil), 
                           nil];
     _tableElements = [[NSArray alloc] initWithObjects:
+                      [NSArray arrayWithObjects:
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Enable Proxy", nil), 
+                        @"PROXY_ENABLED", 
+                        @"NO", 
+                        CELL_SWITCH, nil], 
+                       nil],
                       [NSArray arrayWithObjects:
                        [NSArray arrayWithObjects:
                         NSLocalizedString(@"Server", nil), 
@@ -85,12 +95,12 @@
                         NSLocalizedString(@"Auto Proxy", nil), 
                         @"AUTO_PROXY", 
                         @"NO", 
-                        CELL_SWITCH CELL_ALWAYS, nil], 
+                        CELL_SWITCH, nil], 
                        [NSArray arrayWithObjects:
                         NSLocalizedString(@"PAC File", nil), 
                         @"PAC_FILE", 
                         NSLocalizedString(@"Please specify file path", nil), 
-                        CELL_TEXT CELL_ALWAYS, nil], 
+                        CELL_TEXT, nil], 
                        [NSArray arrayWithObjects:
                         NSLocalizedString(@"Exceptions", nil), 
                         @"EXCEPTION_LIST", 
@@ -114,11 +124,12 @@
 
 - (void)dealloc
 {
-    [_utility release];
+    [_pacURL release];
     [_tableRowNumber release];
     [_tableSectionTitle release];
     [_tableElements release];
     [_tagKey release];
+    [_tagWillNotifyChange release];
     [super dealloc];
 }
 
@@ -131,13 +142,15 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSNumber *rowNumber = (NSNumber *) [_tableRowNumber objectAtIndex:section];
-    return [rowNumber intValue];
+    return [(NSNumber *) [_tableRowNumber objectAtIndex:section] intValue];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return (NSString *) [_tableSectionTitle objectAtIndex:section];
+    NSString *title = [_tableSectionTitle objectAtIndex:section];
+    if (title && ![title isEqualToString:@""])
+        return title;
+    return nil;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
@@ -191,8 +204,8 @@
                 [cell setUserInteractionEnabled:isEnabled];
             }
             [_tagKey addObject:cellKey];
-            if ([cellType hasSuffix:CELL_ALWAYS])
-                [_tagAlwaysEnabled addObject:[NSNumber numberWithInt:_tagNumber]];
+            if ([indexPath section] == 1)
+                [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:textField];
             [textField release];
@@ -203,11 +216,16 @@
             [switcher setOn:switchValue animated:NO];
             [switcher addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
             [switcher setTag:_tagNumber];
+            if ([cellKey isEqualToString:@"PROXY_ENABLED"]) {
+                _enableCellTag = _tagNumber;
+                if ([switcher respondsToSelector:@selector(setAlternateColors:)])
+                    [switcher setAlternateColors:YES];
+            }
             if ([cellKey isEqualToString:@"AUTO_PROXY"])
                 _autoProxyCellTag = _tagNumber;
             [_tagKey addObject:cellKey];
-            if ([cellType hasSuffix:CELL_ALWAYS])
-                [_tagAlwaysEnabled addObject:[NSNumber numberWithInt:_tagNumber]];
+            if ([indexPath section] == 1)
+                [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:switcher];
             [switcher release];
@@ -273,20 +291,44 @@
     }
 }
 
+- (void)setProxySwitcher
+{
+    for (UITableViewCell *cell in self.tableView.visibleCells) {
+        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+            UISwitch *switcher = (UISwitch *) cell.accessoryView;
+            if ([switcher tag] == _enableCellTag) {
+                [[NSUserDefaults standardUserDefaults] setBool:_isEnabled forKey:@"PROXY_ENABLED"];
+                [switcher setOn:_isEnabled];
+                [switcher setEnabled:YES];
+                [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(_isEnabled ? 1 : 0)];
+            }
+        }
+    }
+}
+
 - (void)switchChanged:(id)sender
 {
     UISwitch* switcher = sender;
-    NSString *key = (NSString *) [_tagKey objectAtIndex:[switcher tag]];
+    if ([switcher tag] == _enableCellTag) {
+        [switcher setEnabled:NO];
+        [NSThread detachNewThreadSelector:@selector(threadRunProxy:) 
+                                 toTarget:self 
+                               withObject:[NSNumber numberWithBool:switcher.on]];
+        return;
+    }
+    NSString *key = [_tagKey objectAtIndex:[switcher tag]];
     [[NSUserDefaults standardUserDefaults] setBool:switcher.on forKey:key];
     if ([switcher tag] == _autoProxyCellTag) {
         [self setPacFileCellEnabled:switcher.on];
-        if (_isRunning) {
+        if (_isEnabled) {
             [switcher setEnabled:NO];
             [NSThread detachNewThreadSelector:@selector(threadChangeProxyStatus:) 
                                      toTarget:self 
                                    withObject:[NSNumber numberWithBool:switcher.on]];
         }
     }
+    if ([_tagWillNotifyChange indexOfObject:[NSNumber numberWithInt:[switcher tag]]] != NSNotFound)
+        _isPrefChanged = YES;
 }
 
 #pragma mark - Text field delegate
@@ -296,29 +338,6 @@
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UITextField class]])
             [cell.accessoryView resignFirstResponder];
-    }
-}
-
-- (void)setViewEnabled:(BOOL)isEnabled
-{
-    for (UITableViewCell *cell in self.tableView.visibleCells) {
-        if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
-            UITextField *textField = (UITextField *) cell.accessoryView;
-            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[textField tag]]] == NSNotFound) {
-                [textField setEnabled:isEnabled];
-                [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
-                [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
-                [cell setUserInteractionEnabled:isEnabled];
-            }
-        } 
-        else if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
-            UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            if ([_tagAlwaysEnabled indexOfObject:[NSNumber numberWithInt:[switcher tag]]] == NSNotFound) {
-                [switcher setEnabled:isEnabled];
-                [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
-                [cell setUserInteractionEnabled:isEnabled];
-            }
-        }
     }
 }
 
@@ -332,6 +351,8 @@
 {
     NSString *key = (NSString *) [_tagKey objectAtIndex:[textField tag]];
     [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:key];
+    if ([_tagWillNotifyChange indexOfObject:[NSNumber numberWithInt:[textField tag]]] != NSNotFound)
+        _isPrefChanged = YES;
 }
 
 #pragma mark - Proxy threads
@@ -343,43 +364,41 @@
     ProxyStatus status = kProxyNone;
     if (start) {
         [[NSUserDefaults standardUserDefaults] synchronize];
+        [self notifyChanged];
         NSString *pacFile = [[[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
             [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
-        BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
-        status = isAuto ? kProxyPac : kProxySocks;
+        status = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"] ? kProxyPac : kProxySocks;
     }
-    if ([_utility startStopDaemon:start]) {
-        if (![_utility setProxy:status])
-            [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:YES];
-    }
+    if ([self setProxy:status])
+        _isEnabled = start;
     else {
-        if (!start)
-            [_utility setProxy:status];
-        [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Cannot start or stop service.", nil) waitUntilDone:YES];
-        start = NO;
+        _isEnabled = !start;
+        [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
     }
-    [self performSelectorOnMainThread:@selector(doAfterProcess:) withObject:[NSNumber numberWithBool:start] waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
     [pool release];
 }
 
 - (void)threadFixProxy
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSDictionary *proxySettings = (NSDictionary *) CFNetworkCopySystemProxySettings();
-    BOOL pacEnabled = [[proxySettings objectForKey:@"ProxyAutoConfigEnable"] boolValue];
-    BOOL socksEnabled = [[proxySettings objectForKey:@"SOCKSEnable"] boolValue];
-    BOOL proxyEnabled = (pacEnabled || socksEnabled) ? YES : NO;
-    ProxyStatus status = kProxyNone;
-    BOOL isRunning = [_utility isRunning];
-    if (isRunning) {
-        BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
-        status = isAuto ? kProxyPac : kProxySocks;
+    CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
+    BOOL pacEnabled = [[(NSDictionary *) proxyDict objectForKey:@"ProxyAutoConfigEnable"] boolValue];
+    BOOL socksEnabled = [[(NSDictionary *) proxyDict objectForKey:@"SOCKSEnable"] boolValue];
+    BOOL isEnabled = (socksEnabled || pacEnabled) ? YES : NO;
+    BOOL prefEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"PROXY_ENABLED"];
+    ProxyStatus prefStatus = kProxyNone;
+    if (prefEnabled)
+        prefStatus = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"] ? kProxyPac : kProxySocks;
+    if (isEnabled != prefEnabled) {
+        if ([self setProxy:prefStatus])
+            _isEnabled = prefEnabled;
+        else
+            _isEnabled = isEnabled;
+        [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
     }
-    if (isRunning != proxyEnabled)
-        [_utility setProxy:status];
-    if (isRunning != _isRunning)
-        [self performSelectorOnMainThread:@selector(setRunningStatus:) withObject:[NSNumber numberWithBool:isRunning] waitUntilDone:NO];
+    CFRelease(proxyDict);
     [pool release];
 }
 
@@ -388,41 +407,24 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     BOOL isAuto = [isAutoProxy boolValue];
     ProxyStatus status = isAuto ? kProxyPac : kProxySocks;
-    [_utility setProxy:status];
+    [self setProxy:status];
     [self performSelectorOnMainThread:@selector(setAutoProxySwitchable) withObject:nil waitUntilDone:NO];
     [pool release];
 }
 
+- (void)threadNotifyChanged
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:_pacURL]];
+    [request setValue:@"True" forHTTPHeaderField:[NSString stringWithFormat:@"%s", UPDATE_CONF]];
+    NSHTTPURLResponse *response;
+    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    _isPrefChanged = NO;
+    [request release];
+    [pool release];
+}
+
 #pragma mark - Proxy functions
-
-- (void)setRunningStatus:(NSNumber *)running
-{
-    BOOL isRunning = [running boolValue];
-    _isRunning = isRunning;
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:isRunning];
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(isRunning ? 1 : 0)];
-    [self setViewEnabled:!isRunning];
-    if ([[self navigationItem] leftBarButtonItem]) {
-        [[[self navigationItem] leftBarButtonItem] setTitle:(isRunning ? NSLocalizedString(@"Stop", nil) : NSLocalizedString(@"Start", nil))];
-        [[[self navigationItem] leftBarButtonItem] setStyle:(isRunning ? UIBarButtonItemStyleDone : UIBarButtonItemStyleBordered)];
-        [[[self navigationItem] leftBarButtonItem] setAction:(isRunning ? @selector(stopProcess) : @selector(startProcess))];
-    }
-}
-
-- (void)doProcess:(BOOL)start
-{
-    [[[self navigationItem] leftBarButtonItem] setEnabled:NO];
-    [self hideKeyboard];
-    [NSThread detachNewThreadSelector:@selector(threadRunProxy:) 
-                             toTarget:self 
-                           withObject:[NSNumber numberWithBool:start]];
-}
-
-- (void)doAfterProcess:(NSNumber *)isRunning
-{
-    [self setRunningStatus:isRunning];
-    [[[self navigationItem] leftBarButtonItem] setEnabled:YES];
-}
 
 - (void)fixProxy
 {
@@ -430,14 +432,97 @@
         [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
 }
 
-- (void)startProcess
+- (void)notifyChanged
 {
-    [self doProcess:YES];
+    if (_isPrefChanged)
+        [NSThread detachNewThreadSelector:@selector(threadNotifyChanged) toTarget:self withObject:nil];
 }
 
-- (void)stopProcess
+- (BOOL)setProxy:(ProxyStatus)status
 {
-    [self doProcess:NO];
+    BOOL isEnabled;
+    BOOL socks;
+    BOOL ret;
+    isEnabled = socks = NO;
+    switch (status) {
+        case kProxyPac:
+            isEnabled = YES;
+            break;
+        case kProxySocks:
+            isEnabled = socks = YES;
+            break;
+        default:
+            break;
+    }
+    ret = NO;
+    seteuid(0);
+    SCDynamicStoreRef store = SCDynamicStoreCreate(0, STORE_ID, 0, 0);
+    CFArrayRef list = SCDynamicStoreCopyKeyList(store, SC_IDENTI);
+    NSMutableSet *set = [NSMutableSet set];
+    int i, j, len;
+    for (NSString *state in (NSArray *) list) {
+        const char *s = [state cStringUsingEncoding:NSUTF8StringEncoding];
+        len = (int) ([state length] - 35);
+        for (i = 0; i < len; i++) {
+            for (j = i; j - i < 36; j++) {
+                if (j - i ==  8 || j - i == 13 || 
+                    j - i == 18 || j - i == 23) {
+                    if (s[j] != '-')
+                        break;
+                }
+                else if (!((s[j] >= 'A' && s[j] <= 'Z') ||
+                           (s[j] >= '0' && s[j] <= '9')))
+                    break;
+            }
+            if (j - i == 36)
+                [set addObject:[state substringWithRange:NSMakeRange(i, 36)]];
+        }
+    }
+    NSArray *interfaces = [set allObjects];
+    SCPreferencesRef pref = SCPreferencesCreate(0, STORE_ID, 0);
+    if ([interfaces count] > 0) {
+        NSMutableArray *exceptArray = [NSMutableArray array];
+        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
+        NSString *excepts = (NSString *) [dict objectForKey:@"EXCEPTION_LIST"];
+        NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
+        for (NSString *s in origArray)
+            if (![s isEqualToString:@""])
+                [exceptArray addObject:s];
+        NSMutableDictionary *proxySet = [NSMutableDictionary dictionary];
+        if (isEnabled) {
+            if ([exceptArray count] > 0)
+                [proxySet setObject:exceptArray forKey:@"ExceptionsList"];
+            if (socks) {
+                [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"SOCKSEnable"];
+                [proxySet setObject:@"127.0.0.1" forKey:@"SOCKSProxy"];
+                [proxySet setObject:[NSNumber numberWithInt:LOCAL_PORT] forKey:@"SOCKSPort"];
+            }
+            else {
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
+                [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
+                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
+                [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
+                [proxySet setObject:_pacURL forKey:@"ProxyAutoConfigURLString"];
+            }
+        }
+        else {
+            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
+            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPProxyType"];
+            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
+            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"ProxyAutoConfigEnable"];
+        }
+        ret = YES;
+        for (NSString *networkid in interfaces)
+            ret &= SCPreferencesPathSetValue(pref, (CFStringRef) [NSString stringWithFormat:@"/NetworkServices/%@/Proxies", networkid], (CFDictionaryRef) proxySet);
+        ret &= SCPreferencesCommitChanges(pref);
+        ret &= SCPreferencesApplyChanges(pref);
+        SCPreferencesSynchronize(pref);
+    }
+    CFRelease(pref);
+    CFRelease(list);
+    CFRelease(store);
+    seteuid(501);
+    return ret;
 }
 
 @end
