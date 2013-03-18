@@ -218,6 +218,7 @@
             [switcher setTag:_tagNumber];
             if ([cellKey isEqualToString:@"PROXY_ENABLED"]) {
                 _enableCellTag = _tagNumber;
+                _isEnabled = switchValue;
                 if ([switcher respondsToSelector:@selector(setAlternateColors:)])
                     [switcher setAlternateColors:YES];
             }
@@ -280,17 +281,6 @@
     }
 }
 
-- (void)setAutoProxySwitchable
-{
-    for (UITableViewCell *cell in self.tableView.visibleCells) {
-        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
-            UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            if ([switcher tag] == _autoProxyCellTag)
-                [switcher setEnabled:YES];
-        }
-    }
-}
-
 - (void)setProxySwitcher
 {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
@@ -299,7 +289,6 @@
             if ([switcher tag] == _enableCellTag) {
                 [[NSUserDefaults standardUserDefaults] setBool:_isEnabled forKey:@"PROXY_ENABLED"];
                 [switcher setOn:_isEnabled];
-                [switcher setEnabled:YES];
                 [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(_isEnabled ? 1 : 0)];
             }
         }
@@ -310,7 +299,6 @@
 {
     UISwitch* switcher = sender;
     if ([switcher tag] == _enableCellTag) {
-        [switcher setEnabled:NO];
         [NSThread detachNewThreadSelector:@selector(threadRunProxy:) 
                                  toTarget:self 
                                withObject:[NSNumber numberWithBool:switcher.on]];
@@ -321,7 +309,6 @@
     if ([switcher tag] == _autoProxyCellTag) {
         [self setPacFileCellEnabled:switcher.on];
         if (_isEnabled) {
-            [switcher setEnabled:NO];
             [NSThread detachNewThreadSelector:@selector(threadChangeProxyStatus:) 
                                      toTarget:self 
                                    withObject:[NSNumber numberWithBool:switcher.on]];
@@ -405,10 +392,7 @@
 - (void)threadChangeProxyStatus:(NSNumber *)isAutoProxy
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    BOOL isAuto = [isAutoProxy boolValue];
-    ProxyStatus status = isAuto ? kProxyPac : kProxySocks;
-    [self setProxy:status];
-    [self performSelectorOnMainThread:@selector(setAutoProxySwitchable) withObject:nil waitUntilDone:NO];
+    [self setProxy:([isAutoProxy boolValue] ? kProxyPac : kProxySocks)];
     [pool release];
 }
 
