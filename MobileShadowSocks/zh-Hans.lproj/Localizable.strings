@@ -9,6 +9,7 @@
     "Help Page" = "\U5e2e\U52a9\U9875\U9762";
     "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316: Linus Yang";
     OK = "\U597d";
+    On = "\U5f00";
     "Operation failed.\nPlease try again later." = "\U64cd\U4f5c\U5931\U8d25\Uff0c\U8bf7\U91cd\U8bd5\U3002";
     "PAC File" = "PAC \U6587\U4ef6";
     "PAC file not found. Redirect all traffic to proxy." = "PAC \U6587\U4ef6\U672a\U627e\U5230\Uff0c\U9ed8\U8ba4\U6240\U6709\U8fde\U63a5\U4f7f\U7528\U4ee3\U7406\U3002";

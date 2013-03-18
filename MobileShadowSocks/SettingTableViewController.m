@@ -288,11 +288,20 @@
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([switcher tag] == _enableCellTag) {
                 [[NSUserDefaults standardUserDefaults] setBool:_isEnabled forKey:@"PROXY_ENABLED"];
-                [switcher setOn:_isEnabled];
-                [[UIApplication sharedApplication] setApplicationIconBadgeNumber:(_isEnabled ? 1 : 0)];
+                [switcher setOn:_isEnabled];                
             }
         }
     }
+}
+
+- (void)setBadge
+{
+    if (_isEnabled) {
+        if ([[UIApplication sharedApplication] respondsToSelector:@selector(setApplicationBadgeString:)])
+            [[UIApplication sharedApplication] setApplicationBadgeString:NSLocalizedString(@"On", nil)];
+    }
+    else
+        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
 - (void)switchChanged:(id)sender
@@ -364,6 +373,7 @@
         [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
     }
     [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
+    [self setBadge];
     [pool release];
 }
 
@@ -378,13 +388,13 @@
     ProxyStatus prefStatus = kProxyNone;
     if (prefEnabled)
         prefStatus = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"] ? kProxyPac : kProxySocks;
+    _isEnabled = prefEnabled;
     if (isEnabled != prefEnabled) {
-        if ([self setProxy:prefStatus])
-            _isEnabled = prefEnabled;
-        else
+        if (![self setProxy:prefStatus])
             _isEnabled = isEnabled;
         [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
     }
+    [self setBadge];
     CFRelease(proxyDict);
     [pool release];
 }

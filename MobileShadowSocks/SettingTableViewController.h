@@ -32,6 +32,7 @@ typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 - (void)fixProxy;
 - (BOOL)setProxy:(ProxyStatus)status;
 - (void)notifyChanged;
+- (void)setBadge;
 
 @end
 
