@@ -17,7 +17,11 @@
 #define CELL_NUM @"Num"
 #define CELL_SWITCH @"Switch"
 #define CELL_NOTIFY @"Notify"
+#ifdef TARGET_OS_MAC
+#define PREF_FILE @"/Users/linusyang/Downloads/Keep/whitelist/com.linusyang.MobileShadowSocks.plist"
+#else
 #define PREF_FILE @"/var/mobile/Library/Preferences/com.linusyang.MobileShadowSocks.plist"
+#endif
 
 #define STORE_ID CFSTR("shadow")
 #define SC_IDENTI CFSTR("State:/Network/Service/[^/]+/IPv[46]")
@@ -29,7 +33,8 @@
 #define LOCAL_TIMEOUT 60
 #define EMPTY_PAC "function FindProxyForURL(url, host) \n{\n  return 'SOCKS 127.0.0.1:%d';\n}\n"
 #define HTTP_RESPONSE "HTTP/1.1 200 OK\r\nServer: Pac HTTP Server\r\nContent-Type: text/plain\r\n\r\n"
-#define USAGE_STR "shadowsocks launcher (build %s)\nUsage: %s [options]\n\nOptions:\n-r\tRun shadowsocks daemon\n-s\tStop shadowsocks daemon\n-p\tEnable proxy settings\n-n\tDisable proxy settings\n-k\tEnable socks proxy settings\n"
 #define UPDATE_CONF "Update-Conf"
+#define LAUNCHD_NAME_SOCKS "SOCKS"
+#define LAUNCHD_NAME_PAC "PAC"
 
 #endif

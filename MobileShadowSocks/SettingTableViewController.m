@@ -362,9 +362,14 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self notifyChanged];
         NSString *pacFile = [[[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
-            [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
-        status = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"] ? kProxyPac : kProxySocks;
+        BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
+        if (isAuto) {
+            status = kProxyPac;
+            if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+                [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
+        }
+        else
+            status = kProxySocks;
     }
     if ([self setProxy:status])
         _isEnabled = start;

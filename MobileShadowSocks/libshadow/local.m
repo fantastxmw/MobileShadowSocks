@@ -17,17 +17,13 @@
 #include <time.h>
 #include <unistd.h>
 #include <assert.h>
-
-#import <Foundation/Foundation.h>
+#include <launch.h>
+#include <Foundation/Foundation.h>
 
 #include "local.h"
 #include "socks5.h"
 #include "Constant.h"
 #include "build_time.h"
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #ifndef EAGAIN
 #define EAGAIN EWOULDBLOCK
@@ -704,55 +700,141 @@ void update_config() {
     [pool release];
 }
 
-int listen_on_port(EV_P_ struct listen_ctx *listen_ctx, int port, ev_handler handler) {
-    if (!loop)
-        return 1;
-    int listenfd;
-    listenfd = create_and_bind(port);
-    if (listenfd < 0) {
-        LOGE("bind() error..\n");
-        return 1;
-    }
-    if (listen(listenfd, SOMAXCONN) == -1) {
-        LOGE("listen() error.\n");
-        return 1;
-    }
-    setnonblocking(listenfd);
-    listen_ctx->fd = listenfd;
-    ev_io_init(&listen_ctx->io, handler, listenfd, EV_READ);
-    ev_io_start(EV_A_ &listen_ctx->io);
-    return 0;
-}
-
 int main (int argc, const char **argv) {
-    LOGD("ShadowSocks-libev (Build %s)\n", BUILDTIME);
     _server = 0;
     _remote_port = 0;
     _method = TABLE;
     _key = 0;
     _timeout = 0;
     _local_timeout = 0;
-    if (argc == 3) {
-        _timeout = atoi(argv[1]);
-        _local_timeout = atoi(argv[2]);
+    
+    int launchd_mode = 0;
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
+            if (strcmp(argv[i], "-d") == 0)
+                launchd_mode = 1;
+            else if (isdigit(argv[i][0])) {
+                if (!_timeout)
+                    _timeout = atoi(argv[i]);
+                if (!_local_timeout)
+                    _local_timeout = atoi(argv[i]);
+            }
+        }
     }
-    if (!_timeout)
+    if (_timeout <= 0)
         _timeout = REMOTE_TIMEOUT;
-    if (!_local_timeout)
+    if (_local_timeout <= 0)
         _local_timeout = LOCAL_TIMEOUT;
+    LOGD("ShadowSocks-libev (Build %s)\n", BUILDTIME);
+    update_config();
     LOGD("Exit no action:\t%ds\n", _local_timeout);
     LOGD("Remote timeout:\t%ds\n", _timeout);
-    update_config();
+
     signal(SIGPIPE, SIG_IGN);
-    struct ev_loop *loop = ev_default_loop(0);
     struct listen_ctx local_ctx;
     struct listen_ctx pac_ctx;
-    if (listen_on_port(EV_A_ &local_ctx, LOCAL_PORT, accept_cb))
+    if (launchd_mode) {
+        launch_data_t sockets_dict;
+        launch_data_t checkin_response;
+        launch_data_t checkin_request;
+        launch_data_t the_label;
+        launch_data_t listening_fd_array;
+        launch_data_t this_listening_fd;
+
+        // check-in launchd service
+        if ((checkin_request = launch_data_new_string(LAUNCH_KEY_CHECKIN)) == NULL) {
+            LOGE("launch_data_new_string error\n");
+            return 1;
+        }
+        if ((checkin_response = launch_msg(checkin_request)) == NULL) {
+            LOGE("launch_msg error\n");
+            return 1;
+        }
+        if (LAUNCH_DATA_ERRNO == launch_data_get_type(checkin_response)) {
+            LOGE("check-in failed\n");
+            return 1;
+        }
+        the_label = launch_data_dict_lookup(checkin_response, LAUNCH_JOBKEY_LABEL);
+        if (NULL == the_label) {
+            LOGE("no label found\n");
+            return 1;
+        }
+        sockets_dict = launch_data_dict_lookup(checkin_response, LAUNCH_JOBKEY_SOCKETS);
+        if (NULL == sockets_dict) {
+            LOGE("no sockets found to answer requests on\n");
+            return 1;
+        }
+
+        // get socks server file descriptor from launchd
+        listening_fd_array = launch_data_dict_lookup(sockets_dict, LAUNCHD_NAME_SOCKS);
+        if (NULL == listening_fd_array) {
+            LOGE("no socks entry found in plist\n");
+            return 1;
+        }
+        this_listening_fd = launch_data_array_get_index(listening_fd_array, 0);
+        local_ctx.fd = launch_data_get_fd(this_listening_fd);
+        if (local_ctx.fd == -1) {
+            LOGE("failed to get socks fd\n");
+            return 1;
+        }
+
+        // get pac file server file descriptor from launchd
+        listening_fd_array = launch_data_dict_lookup(sockets_dict, LAUNCHD_NAME_PAC);
+        if (NULL == listening_fd_array) {
+            LOGE("no pac entry found in plist\n");
+            return 1;
+        }
+        this_listening_fd = launch_data_array_get_index(listening_fd_array, 0);
+        pac_ctx.fd = launch_data_get_fd(this_listening_fd);
+        if (pac_ctx.fd == -1) {
+            LOGE("failed to get pac fd\n");
+            return 1;
+        }
+
+        launch_data_free(checkin_response);
+        launch_data_free(checkin_request);
+    }
+    else {
+        int listenfd;
+
+        // get socks server file descriptor
+        listenfd = create_and_bind(LOCAL_PORT);
+        if (listenfd < 0) {
+            LOGE("bind() error\n");
+            return 1;
+        }
+        if (listen(listenfd, SOMAXCONN) == -1) {
+            LOGE("listen() error\n");
+            return 1;
+        }
+        setnonblocking(listenfd);
+        local_ctx.fd = listenfd;
+
+        // get pac file server file descriptor
+        listenfd = create_and_bind(PAC_PORT);
+        if (listenfd < 0) {
+            LOGE("bind() error\n");
+            return 1;
+        }
+        if (listen(listenfd, SOMAXCONN) == -1) {
+            LOGE("listen() error\n");
+            return 1;
+        }
+        setnonblocking(listenfd);
+        pac_ctx.fd = listenfd;
+    }
+    
+    struct ev_loop *loop = ev_default_loop(0);
+    if (!loop) {
+        LOGE("Fatal error: libev loop failed");
         return 1;
+    }
     LOGD("Socks server:\t127.0.0.1:%d\n", LOCAL_PORT);
-    if (listen_on_port(EV_A_ &pac_ctx, PAC_PORT, pac_accept_cb))
-        return 1;
     LOGD("Pac httpd:\t127.0.0.1:%d\n", PAC_PORT);
+    ev_io_init(&local_ctx.io, accept_cb, local_ctx.fd, EV_READ);
+    ev_io_start(EV_A_ &local_ctx.io);
+    ev_io_init(&pac_ctx.io, pac_accept_cb, pac_ctx.fd, EV_READ);
+    ev_io_start(EV_A_ &pac_ctx.io);
     ev_timer_init(&_local_timer, listen_timeout_cb, 0, _local_timeout);
     ev_timer_again(EV_A_ &_local_timer);
     LOGD("Service running...\n");

@@ -5,3 +5,5 @@ xcuserdata/
 release/
 build/
 build_time.h
+*.o
+shadowd
