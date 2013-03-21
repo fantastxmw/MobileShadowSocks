@@ -1,7 +1,9 @@
 {
     About = "\U5173\U4e8e";
     "Auto Proxy" = "\U81ea\U52a8\U4ee3\U7406";
+    Cancel = "\U53d6\U6d88";
     "Cannot start or stop service." = "\U65e0\U6cd5\U542f\U52a8\U6216\U505c\U6b62\U670d\U52a1\U3002";
+    "Default PAC file is based on ChnRoutes and might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e26 PAC \U6587\U4ef6\U57fa\U4e8e\U7cbe\U7b80\U7684 ChnRoutes \U751f\U6210\Uff0c\U5bf9\U6240\U6709\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U3002\U60a8\U786e\U5b9a\U8981\U4f7f\U7528\U5417\Uff1f";
     "Enable Proxy" = "\U542f\U7528\U4ee3\U7406";
     Error = "\U9519\U8bef";
     Exceptions = "\U6392\U9664\U5217\U8868";
@@ -24,5 +26,6 @@
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U53f7\U5206\U9694";
     Start = "\U542f\U52a8";
     Stop = "\U505c\U6b62";
+    "Use Default PAC File" = "\U4f7f\U7528\U81ea\U5e26 PAC \U6587\U4ef6";
     Warning = "\U8b66\U544a";
 }

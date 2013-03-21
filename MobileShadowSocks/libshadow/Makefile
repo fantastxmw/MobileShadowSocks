@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -g
+CFLAGS = -g -DBUILD_FOR_MAC
 LDFLAGS = -framework Foundation
 DEPS = Constant.h build_time.h local.h encrypt.h md5.h rc4.h socks5.h libev/ev.h
 CSRC = encrypt.c md5.c rc4.c libev/ev.c

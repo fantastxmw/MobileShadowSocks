@@ -45,7 +45,7 @@
     [[self navigationItem] setRightBarButtonItem:aboutButton];
     [[self navigationItem] setTitle:NSLocalizedString(@"ShadowSocks", nil)];
     [aboutButton release];
-    _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
+    _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/shadow.pac", PAC_PORT];
     _tagNumber = 0;
     _tagKey = [[NSMutableArray alloc] init];
     _tagWillNotifyChange = [[NSMutableArray alloc] init];
@@ -53,7 +53,7 @@
     _tableRowNumber = [[NSArray alloc] initWithObjects:
                        [NSNumber numberWithInt:1], 
                        [NSNumber numberWithInt:4], 
-                       [NSNumber numberWithInt:3], 
+                       [NSNumber numberWithInt:4], 
                        nil];
     _tableSectionTitle = [[NSArray alloc] initWithObjects:
                           @"",
@@ -106,6 +106,11 @@
                         @"EXCEPTION_LIST", 
                         NSLocalizedString(@"Split with comma", nil), 
                         CELL_TEXT, nil], 
+                       [NSArray arrayWithObjects:
+                        NSLocalizedString(@"Use Default PAC File", nil), 
+                        @"DEFAULT_PAC_BUTTON", 
+                        @"", 
+                        CELL_BUTTON, nil],
                        nil],  
                       nil];
 }
@@ -160,6 +165,28 @@
     return nil;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSArray *tableSection = [_tableElements objectAtIndex:[indexPath section]];
+    NSArray *tableCell = [tableSection objectAtIndex:[indexPath row]];
+    NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
+    NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
+    if ([cellType hasPrefix:CELL_BUTTON]) {
+        if ([cellKey isEqualToString:@"DEFAULT_PAC_BUTTON"]) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) 
+                                                            message:NSLocalizedString(@"Default PAC file is based on ChnRoutes and might only be useful for users in China. Confirm to use it?", nil)
+                                                           delegate:self 
+                                                  cancelButtonTitle:NSLocalizedString(@"Cancel",nil) 
+                                                  otherButtonTitles:NSLocalizedString(@"OK",nil), 
+                                  nil];
+            [alert setTag:ALERT_TAG_DEFAULT_PAC];
+            [alert show];
+            [alert release];
+        }
+    }
+    [[self tableView] deselectRowAtIndexPath:indexPath animated:NO];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *CellIdentifier = [NSString stringWithFormat:@"%ld-%ld", [indexPath section], [indexPath row]];
@@ -175,7 +202,6 @@
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
         [[cell textLabel] setTextColor:kblackColor];
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         if ([cellType hasPrefix:CELL_TEXT]) {
             NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
             UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, _cellWidth, 24)];
@@ -208,6 +234,7 @@
                 [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:textField];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [textField release];
         }
         else if ([cellType hasPrefix:CELL_SWITCH]) {
@@ -229,7 +256,11 @@
                 [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:switcher];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [switcher release];
+        }
+        else if ([cellType hasPrefix:CELL_BUTTON]) {
+            [[cell textLabel] setTextAlignment:UITextAlignmentCenter];
         }
     }
     return cell;
@@ -240,6 +271,7 @@
 - (void)showAbout
 {
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version " APP_VER @" (Rev " APP_BUILD @")\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:NSLocalizedString(@"Help Page",nil), nil];
+    [alert setTag:ALERT_TAG_ABOUT];
     [alert show];
     [alert release];
 }
@@ -260,8 +292,23 @@
 
 - (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex != [alertView cancelButtonIndex])
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/linusyang/MobileShadowSocks#mobileshadowsocks"]];
+    if (buttonIndex != [alertView cancelButtonIndex]) {
+        if ([alertView tag] == ALERT_TAG_ABOUT)
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/linusyang/MobileShadowSocks#mobileshadowsocks"]];
+        else if ([alertView tag] == ALERT_TAG_DEFAULT_PAC) {
+            for (UITableViewCell *cell in self.tableView.visibleCells) {
+                if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
+                    UITextField *textField = (UITextField *) cell.accessoryView;
+                    if ([textField tag] == _pacFileCellTag) {
+                        NSString *pacFile = [NSString stringWithFormat:@"%@/auto.pac", [[NSBundle mainBundle] bundlePath]];
+                        [textField setText:pacFile];
+                        [[NSUserDefaults standardUserDefaults] setObject:pacFile forKey:@"PAC_FILE"];
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 #pragma mark - Switch delegate
@@ -276,6 +323,7 @@
                 [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
                 [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
                 [cell setUserInteractionEnabled:isEnabled];
+                break;
             }
         }
     }
@@ -288,7 +336,8 @@
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([switcher tag] == _enableCellTag) {
                 [[NSUserDefaults standardUserDefaults] setBool:_isEnabled forKey:@"PROXY_ENABLED"];
-                [switcher setOn:_isEnabled];                
+                [switcher setOn:_isEnabled];
+                break;
             }
         }
     }
@@ -299,6 +348,8 @@
     if (_isEnabled) {
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(setApplicationBadgeString:)])
             [[UIApplication sharedApplication] setApplicationBadgeString:NSLocalizedString(@"On", nil)];
+        else
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
     }
     else
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
@@ -385,22 +436,30 @@
 - (void)threadFixProxy
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
     CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
     BOOL pacEnabled = [[(NSDictionary *) proxyDict objectForKey:@"ProxyAutoConfigEnable"] boolValue];
     BOOL socksEnabled = [[(NSDictionary *) proxyDict objectForKey:@"SOCKSEnable"] boolValue];
     BOOL isEnabled = (socksEnabled || pacEnabled) ? YES : NO;
+    CFRelease(proxyDict);
+    ProxyStatus nowStatus = kProxyNone;
+    if (isEnabled)
+        nowStatus = pacEnabled ? kProxyPac : kProxySocks;
+    
     BOOL prefEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"PROXY_ENABLED"];
+    BOOL prefAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
     ProxyStatus prefStatus = kProxyNone;
     if (prefEnabled)
-        prefStatus = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"] ? kProxyPac : kProxySocks;
+        prefStatus = prefAuto ? kProxyPac : kProxySocks;
+    
     _isEnabled = prefEnabled;
-    if (isEnabled != prefEnabled) {
+    if (nowStatus != prefStatus) {
         if (![self setProxy:prefStatus])
             _isEnabled = isEnabled;
         [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
     }
     [self setBadge];
-    CFRelease(proxyDict);
+    
     [pool release];
 }
 
@@ -454,6 +513,7 @@
             break;
     }
     ret = NO;
+    NSString *excepts = [NSString stringWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"EXCEPTION_LIST"]];
     seteuid(0);
     SCDynamicStoreRef store = SCDynamicStoreCreate(0, STORE_ID, 0, 0);
     CFArrayRef list = SCDynamicStoreCopyKeyList(store, SC_IDENTI);
@@ -481,8 +541,6 @@
     SCPreferencesRef pref = SCPreferencesCreate(0, STORE_ID, 0);
     if ([interfaces count] > 0) {
         NSMutableArray *exceptArray = [NSMutableArray array];
-        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
-        NSString *excepts = (NSString *) [dict objectForKey:@"EXCEPTION_LIST"];
         NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
         for (NSString *s in origArray)
             if (![s isEqualToString:@""])

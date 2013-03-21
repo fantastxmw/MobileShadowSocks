@@ -17,7 +17,10 @@
 #define CELL_NUM @"Num"
 #define CELL_SWITCH @"Switch"
 #define CELL_NOTIFY @"Notify"
-#ifdef TARGET_OS_MAC
+#define CELL_BUTTON @"Button"
+#define ALERT_TAG_ABOUT 1
+#define ALERT_TAG_DEFAULT_PAC 2
+#ifdef BUILD_FOR_MAC
 #define PREF_FILE @"/Users/linusyang/Downloads/Keep/whitelist/com.linusyang.MobileShadowSocks.plist"
 #else
 #define PREF_FILE @"/var/mobile/Library/Preferences/com.linusyang.MobileShadowSocks.plist"
