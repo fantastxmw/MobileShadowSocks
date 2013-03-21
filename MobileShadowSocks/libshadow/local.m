@@ -17,8 +17,12 @@
 #include <time.h>
 #include <unistd.h>
 #include <assert.h>
-#include <launch.h>
 #include <Foundation/Foundation.h>
+
+#ifdef SUBLIME_CLANG
+#define __i386__
+#endif
+#include <launch.h>
 
 #include "local.h"
 #include "socks5.h"
@@ -41,6 +45,8 @@ static int   _timeout;
 static char *_key;
 static ev_timer _local_timer;
 static int _local_timeout;
+
+typedef void (*ev_handler)(struct ev_loop *, struct ev_io *, int);
 
 int setnonblocking(int fd) {
     int flags;
@@ -304,8 +310,7 @@ static void listen_timeout_cb(EV_P_ ev_timer *watcher, int revents) {
 }
 
 static void remote_timeout_cb(EV_P_ ev_timer *watcher, int revents) {
-    struct remote_ctx *remote_ctx = (struct remote_ctx *) (((void*)watcher)
-            - sizeof(ev_io));
+    struct remote_ctx *remote_ctx = (struct remote_ctx *) (((char *) watcher) - sizeof(ev_io));
     struct remote *remote = remote_ctx->remote;
     struct server *server = remote->server;
 
@@ -453,9 +458,9 @@ static void remote_send_cb (EV_P_ ev_io *w, int revents) {
 
 struct remote* new_remote(int fd) {
     struct remote *remote;
-    remote = malloc(sizeof(struct remote));
-    remote->recv_ctx = malloc(sizeof(struct remote_ctx));
-    remote->send_ctx = malloc(sizeof(struct remote_ctx));
+    remote = (struct remote *) malloc(sizeof(struct remote));
+    remote->recv_ctx = (struct remote_ctx *) malloc(sizeof(struct remote_ctx));
+    remote->send_ctx = (struct remote_ctx *) malloc(sizeof(struct remote_ctx));
     remote->fd = fd;
     ev_io_init(&remote->recv_ctx->io, remote_recv_cb, fd, EV_READ);
     ev_io_init(&remote->send_ctx->io, remote_send_cb, fd, EV_WRITE);
@@ -490,9 +495,9 @@ void close_and_free_remote(EV_P_ struct remote *remote) {
 }
 struct server* new_server(int fd) {
     struct server *server;
-    server = malloc(sizeof(struct server));
-    server->recv_ctx = malloc(sizeof(struct server_ctx));
-    server->send_ctx = malloc(sizeof(struct server_ctx));
+    server = (struct server *) malloc(sizeof(struct server));
+    server->recv_ctx = (struct server_ctx *) malloc(sizeof(struct server_ctx));
+    server->send_ctx = (struct server_ctx *) malloc(sizeof(struct server_ctx));
     server->fd = fd;
     ev_io_init(&server->recv_ctx->io, server_recv_cb, fd, EV_READ);
     ev_io_init(&server->send_ctx->io, server_send_cb, fd, EV_WRITE);
@@ -502,8 +507,8 @@ struct server* new_server(int fd) {
     server->send_ctx->connected = 0;
     server->stage = 0;
     if (_method == RC4) {
-        server->e_ctx = malloc(sizeof(struct rc4_state));
-        server->d_ctx = malloc(sizeof(struct rc4_state));
+        server->e_ctx = (struct rc4_state *) malloc(sizeof(struct rc4_state));
+        server->d_ctx = (struct rc4_state *) malloc(sizeof(struct rc4_state));
         enc_ctx_init(server->e_ctx, 1);
         enc_ctx_init(server->d_ctx, 0);
     } else {
@@ -700,6 +705,59 @@ void update_config() {
     [pool release];
 }
 
+struct listen_ctx *listen_from_launchd(EV_P_ const char *socket_name, launch_data_t sockets_dict, ev_handler handler) {
+    launch_data_t listening_fd_array;
+    launch_data_t this_listening_fd;
+    size_t array_len;
+    int i;
+    listening_fd_array = launch_data_dict_lookup(sockets_dict, socket_name);
+    if (NULL == listening_fd_array) {
+        LOGE("no %s entry found in plist\n", socket_name);
+        return NULL;
+    }
+    array_len = launch_data_array_get_count(listening_fd_array);
+    if (array_len <= 0) {
+        LOGE("no fd found from launchd\n");
+        return NULL;
+    }
+    struct listen_ctx *ctx_array = (struct listen_ctx *) malloc(sizeof(struct listen_ctx) * array_len);
+    int found_legal_fd = 0;
+    for (i = 0; i < array_len; i++) {
+        this_listening_fd = launch_data_array_get_index(listening_fd_array, i);
+        ctx_array[i].fd = launch_data_get_fd(this_listening_fd);
+        if (ctx_array[i].fd >= 0) {
+            ev_io_init(&ctx_array[i].io, handler, ctx_array[i].fd, EV_READ);
+            ev_io_start(EV_A_ &ctx_array[i].io);
+            if (!found_legal_fd)
+                found_legal_fd = 1;
+        }
+    }
+    if (!found_legal_fd) {
+        free(ctx_array);
+        LOGE("no legal fd found from launchd\n");
+        return NULL;
+    }
+    return ctx_array;
+}
+
+int listen_from_port(EV_P_ struct listen_ctx *ctx, int port, ev_handler handler) {
+    int listenfd;
+    listenfd = create_and_bind(LOCAL_PORT);
+    if (listenfd < 0) {
+        LOGE("bind error\n");
+        return 1;
+    }
+    if (listen(listenfd, SOMAXCONN) == -1) {
+        LOGE("listen error\n");
+        return 1;
+    }
+    setnonblocking(listenfd);
+    ctx->fd = listenfd;
+    ev_io_init(&ctx->io, handler, ctx->fd, EV_READ);
+    ev_io_start(EV_A_ &ctx->io);
+    return 0;
+}
+
 int main (int argc, const char **argv) {
     _server = 0;
     _remote_port = 0;
@@ -716,7 +774,7 @@ int main (int argc, const char **argv) {
             else if (isdigit(argv[i][0])) {
                 if (!_timeout)
                     _timeout = atoi(argv[i]);
-                if (!_local_timeout)
+                else if (!_local_timeout)
                     _local_timeout = atoi(argv[i]);
             }
         }
@@ -725,119 +783,79 @@ int main (int argc, const char **argv) {
         _timeout = REMOTE_TIMEOUT;
     if (_local_timeout <= 0)
         _local_timeout = LOCAL_TIMEOUT;
+    
     LOGD("ShadowSocks-libev (Build %s)\n", BUILDTIME);
+    struct ev_loop *loop = ev_default_loop(0);
+    if (!loop) {
+        LOGE("Fatal error: libev loop failed");
+        return 1;
+    }
     update_config();
     LOGD("Exit no action:\t%ds\n", _local_timeout);
     LOGD("Remote timeout:\t%ds\n", _timeout);
-
     signal(SIGPIPE, SIG_IGN);
+
+    struct listen_ctx *local_ctx_array;
+    struct listen_ctx *pac_ctx_array;
     struct listen_ctx local_ctx;
     struct listen_ctx pac_ctx;
     if (launchd_mode) {
         launch_data_t sockets_dict;
         launch_data_t checkin_response;
         launch_data_t checkin_request;
-        launch_data_t the_label;
-        launch_data_t listening_fd_array;
-        launch_data_t this_listening_fd;
-
-        // check-in launchd service
-        if ((checkin_request = launch_data_new_string(LAUNCH_KEY_CHECKIN)) == NULL) {
-            LOGE("launch_data_new_string error\n");
-            return 1;
+        int listen_ok;
+        do {
+            listen_ok = -1;
+            if ((checkin_request = launch_data_new_string(LAUNCH_KEY_CHECKIN)) == NULL) {
+                LOGE("launch_data_new_string error\n");
+                break;
+            }
+            if ((checkin_response = launch_msg(checkin_request)) == NULL) {
+                LOGE("launch_msg error\n");
+                break;
+            }
+            listen_ok = 0;
+            if (LAUNCH_DATA_ERRNO == launch_data_get_type(checkin_response)) {
+                LOGE("check-in failed\n");
+                break;
+            }
+            sockets_dict = launch_data_dict_lookup(checkin_response, LAUNCH_JOBKEY_SOCKETS);
+            if (NULL == sockets_dict) {
+                LOGE("no sockets found to answer requests on\n");
+                break;
+            }
+            if ((local_ctx_array = listen_from_launchd(EV_A_ LAUNCHD_NAME_SOCKS, sockets_dict, accept_cb)) == NULL)
+                break;
+            if ((pac_ctx_array = listen_from_launchd(EV_A_ LAUNCHD_NAME_PAC, sockets_dict, pac_accept_cb)) == NULL)
+                break;
+            listen_ok = 1;
+        } while (0);
+        if (listen_ok >= 0) {
+            launch_data_free(checkin_response);
+            launch_data_free(checkin_request);
         }
-        if ((checkin_response = launch_msg(checkin_request)) == NULL) {
-            LOGE("launch_msg error\n");
+        if (listen_ok != 1)
             return 1;
-        }
-        if (LAUNCH_DATA_ERRNO == launch_data_get_type(checkin_response)) {
-            LOGE("check-in failed\n");
-            return 1;
-        }
-        the_label = launch_data_dict_lookup(checkin_response, LAUNCH_JOBKEY_LABEL);
-        if (NULL == the_label) {
-            LOGE("no label found\n");
-            return 1;
-        }
-        sockets_dict = launch_data_dict_lookup(checkin_response, LAUNCH_JOBKEY_SOCKETS);
-        if (NULL == sockets_dict) {
-            LOGE("no sockets found to answer requests on\n");
-            return 1;
-        }
-
-        // get socks server file descriptor from launchd
-        listening_fd_array = launch_data_dict_lookup(sockets_dict, LAUNCHD_NAME_SOCKS);
-        if (NULL == listening_fd_array) {
-            LOGE("no socks entry found in plist\n");
-            return 1;
-        }
-        this_listening_fd = launch_data_array_get_index(listening_fd_array, 0);
-        local_ctx.fd = launch_data_get_fd(this_listening_fd);
-        if (local_ctx.fd == -1) {
-            LOGE("failed to get socks fd\n");
-            return 1;
-        }
-
-        // get pac file server file descriptor from launchd
-        listening_fd_array = launch_data_dict_lookup(sockets_dict, LAUNCHD_NAME_PAC);
-        if (NULL == listening_fd_array) {
-            LOGE("no pac entry found in plist\n");
-            return 1;
-        }
-        this_listening_fd = launch_data_array_get_index(listening_fd_array, 0);
-        pac_ctx.fd = launch_data_get_fd(this_listening_fd);
-        if (pac_ctx.fd == -1) {
-            LOGE("failed to get pac fd\n");
-            return 1;
-        }
-
-        launch_data_free(checkin_response);
-        launch_data_free(checkin_request);
     }
     else {
-        int listenfd;
-
-        // get socks server file descriptor
-        listenfd = create_and_bind(LOCAL_PORT);
-        if (listenfd < 0) {
-            LOGE("bind() error\n");
+        if (listen_from_port(EV_A_ &local_ctx, LOCAL_PORT, accept_cb)) {
+            LOGE("listen on socks port failed\n");
             return 1;
         }
-        if (listen(listenfd, SOMAXCONN) == -1) {
-            LOGE("listen() error\n");
+        if (listen_from_port(EV_A_ &pac_ctx, PAC_PORT, pac_accept_cb)) {
+            LOGE("listen on pac port failed\n");
             return 1;
         }
-        setnonblocking(listenfd);
-        local_ctx.fd = listenfd;
-
-        // get pac file server file descriptor
-        listenfd = create_and_bind(PAC_PORT);
-        if (listenfd < 0) {
-            LOGE("bind() error\n");
-            return 1;
-        }
-        if (listen(listenfd, SOMAXCONN) == -1) {
-            LOGE("listen() error\n");
-            return 1;
-        }
-        setnonblocking(listenfd);
-        pac_ctx.fd = listenfd;
-    }
-    
-    struct ev_loop *loop = ev_default_loop(0);
-    if (!loop) {
-        LOGE("Fatal error: libev loop failed");
-        return 1;
     }
     LOGD("Socks server:\t127.0.0.1:%d\n", LOCAL_PORT);
     LOGD("Pac httpd:\t127.0.0.1:%d\n", PAC_PORT);
-    ev_io_init(&local_ctx.io, accept_cb, local_ctx.fd, EV_READ);
-    ev_io_start(EV_A_ &local_ctx.io);
-    ev_io_init(&pac_ctx.io, pac_accept_cb, pac_ctx.fd, EV_READ);
-    ev_io_start(EV_A_ &pac_ctx.io);
     ev_timer_init(&_local_timer, listen_timeout_cb, 0, _local_timeout);
     ev_timer_again(EV_A_ &_local_timer);
     LOGD("Service running...\n");
     ev_run(loop, 0);
+    if (launchd_mode) {
+        free(local_ctx_array);
+        free(pac_ctx_array);
+    }
     return 0;
 }
