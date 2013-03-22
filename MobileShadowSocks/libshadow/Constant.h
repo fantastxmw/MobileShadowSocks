@@ -10,7 +10,7 @@
 #define MobileShadowSocks_Constant_h
 
 #define APP_VER @"0.2.3"
-#define APP_BUILD @"1"
+#define APP_BUILD @"2"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"

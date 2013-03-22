@@ -513,7 +513,8 @@
             break;
     }
     ret = NO;
-    NSString *excepts = [NSString stringWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"EXCEPTION_LIST"]];
+    NSString *exceptsPref = [[NSUserDefaults standardUserDefaults] stringForKey:@"EXCEPTION_LIST"];
+    NSString *excepts = exceptsPref ? [NSString stringWithString:exceptsPref] : nil;
     seteuid(0);
     SCDynamicStoreRef store = SCDynamicStoreCreate(0, STORE_ID, 0, 0);
     CFArrayRef list = SCDynamicStoreCopyKeyList(store, SC_IDENTI);
@@ -541,10 +542,12 @@
     SCPreferencesRef pref = SCPreferencesCreate(0, STORE_ID, 0);
     if ([interfaces count] > 0) {
         NSMutableArray *exceptArray = [NSMutableArray array];
-        NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
-        for (NSString *s in origArray)
-            if (![s isEqualToString:@""])
-                [exceptArray addObject:s];
+        if (excepts) {
+            NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
+            for (NSString *s in origArray)
+                if (![s isEqualToString:@""])
+                    [exceptArray addObject:s];
+        }
         NSMutableDictionary *proxySet = [NSMutableDictionary dictionary];
         if (isEnabled) {
             if ([exceptArray count] > 0)
