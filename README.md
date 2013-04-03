@@ -9,7 +9,7 @@ By Linus Yang
 * Fast, efficient and easy to use
 * System-wide proxy supporting Wi-Fi and Celluar networks
 * **NEW:** On-demand proxy, no need to start manually 
-* **NEW:** Pre-installed PAC file based on simplified ChnRoutes
+* **NEW:** Pre-installed PAC file using white-list
 
 ### Installation
 1. Open Cydia.app and refresh sources
