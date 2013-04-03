@@ -4,6 +4,5 @@ xcuserdata/
 *.swp
 release/
 build/
-build_time.h
 *.o
 shadowd

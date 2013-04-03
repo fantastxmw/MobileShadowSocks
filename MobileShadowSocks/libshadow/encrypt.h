@@ -36,8 +36,15 @@ unsigned int _i;
 unsigned long long _a;
 int _method;
 
+
+#ifdef DEBUG
 #define perror(str) (LOGE("%s\n", str))
 #define LOGD(...) ((void)fprintf(stderr, __VA_ARGS__))
 #define LOGE(...) ((void)fprintf(stderr, __VA_ARGS__))
+#else
+#define perror(str)
+#define LOGD(...)
+#define LOGE(...)
+#endif
 
 #endif // _ENCRYPT_H

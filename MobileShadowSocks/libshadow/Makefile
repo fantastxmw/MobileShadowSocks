@@ -1,7 +1,7 @@
 CC = clang
-CFLAGS = -g -DBUILD_FOR_MAC
+CFLAGS = -g -DBUILD_FOR_MAC -DDEBUG
 LDFLAGS = -framework Foundation
-DEPS = Constant.h build_time.h local.h encrypt.h md5.h rc4.h socks5.h libev/ev.h
+DEPS = Constant.h local.h encrypt.h md5.h rc4.h socks5.h libev/ev.h
 CSRC = encrypt.c md5.c rc4.c libev/ev.c
 MSRC = local.m
 OBJECTS = $(CSRC:.c=.o) $(MSRC:.m=.o)

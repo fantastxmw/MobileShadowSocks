@@ -48,7 +48,7 @@ typedef struct {
     CFStringRef (*copyDescription)(const void *info);
 } SCDynamicStoreContext;
 SCDynamicStoreRef SCDynamicStoreCreate (CFAllocatorRef allocator, CFStringRef name, SCDynamicStoreCallBack callout, SCDynamicStoreContext *context);
-CFArrayRef SCDynamicStoreCopyKeyList (SCDynamicStoreRef store, CFStringRef pattern);
+CFPropertyListRef SCPreferencesGetValue(SCPreferencesRef prefs, CFStringRef key);
 Boolean SCPreferencesPathSetValue (SCPreferencesRef prefs, CFStringRef path, CFDictionaryRef value);
 Boolean SCPreferencesCommitChanges (SCPreferencesRef prefs);
 Boolean SCPreferencesApplyChanges (SCPreferencesRef prefs);

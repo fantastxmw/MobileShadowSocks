@@ -3,13 +3,13 @@
     "Auto Proxy" = "\U81ea\U52a8\U4ee3\U7406";
     Cancel = "\U53d6\U6d88";
     "Cannot start or stop service." = "\U65e0\U6cd5\U542f\U52a8\U6216\U505c\U6b62\U670d\U52a1\U3002";
-    "Default PAC file is based on ChnRoutes and might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e26 PAC \U6587\U4ef6\U57fa\U4e8e\U7cbe\U7b80\U7684 ChnRoutes \U751f\U6210\Uff0c\U5bf9\U6240\U6709\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U3002\U60a8\U786e\U5b9a\U8981\U4f7f\U7528\U5417\Uff1f";
+    "Default PAC file might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e26 PAC \U4f7f\U7528\U201c\U767d\U540d\U5355\U201d\U6a21\U5f0f\Uff0c\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U8bbf\U95ee\Uff0c\U786e\U5b9a\U4f7f\U7528\U5417\Uff1f\n\n\U63d0\U793a\Uff1a\U53ef\U5728\U6392\U9664\U5217\U8868\U5185\U8bbe\U7f6e\U4e0d\U4f7f\U7528\U4ee3\U7406\U7684\U57df\U540d\U3002";
     "Enable Proxy" = "\U542f\U7528\U4ee3\U7406";
     Error = "\U9519\U8bef";
     Exceptions = "\U6392\U9664\U5217\U8868";
     "Failed to change proxy settings.\nMaybe no network access available." = "\U66f4\U6539\U4ee3\U7406\U8bbe\U7f6e\U5931\U8d25\U3002\n\U53ef\U80fd\U65e0\U7f51\U7edc\U8fde\U63a5\U3002";
     "Help Page" = "\U5e2e\U52a9\U9875\U9762";
-    "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316: Linus Yang";
+    "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316\Uff1aLinus Yang";
     OK = "\U597d";
     On = "\U5f00";
     "Operation failed.\nPlease try again later." = "\U64cd\U4f5c\U5931\U8d25\Uff0c\U8bf7\U91cd\U8bd5\U3002";

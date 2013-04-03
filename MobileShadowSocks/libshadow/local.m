@@ -27,7 +27,6 @@
 #include "local.h"
 #include "socks5.h"
 #include "Constant.h"
-#include "build_time.h"
 
 #ifndef EAGAIN
 #define EAGAIN EWOULDBLOCK
@@ -597,37 +596,60 @@ static void accept_cb (EV_P_ ev_io *w, int revents)
     }
 }
 
-int get_pac_content(char **content) {
+int get_pac_file_path(char *buf) {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
-    *content = 0;
+    int result = 1;
     if (dict && [[dict objectForKey:@"AUTO_PROXY"] boolValue]) {
         NSString *filePath = [(NSString *) [dict objectForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        if (filePath && [[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-            const char *file_str = [[NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil]cStringUsingEncoding:NSUTF8StringEncoding];
-            if (file_str) {
-                *content = strdup(file_str);
-                [pool release];
-                return 1;
-            }
+        int len = [filePath length];
+        if (filePath && len > 0) {
+            strncpy(buf, [filePath cStringUsingEncoding:NSUTF8StringEncoding], BUFF_MAX);
+            buf[BUFF_MAX - 1] = 0;
+            result = 0;
         }
     }
     [pool release];
-    return 0;
+    return result;
+}
+
+void send_pac_exception(FILE *stream) {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
+    NSString *excepts = [dict objectForKey:@"EXCEPTION_LIST"];
+    if (excepts) {
+        NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\\', "]];
+        BOOL first = YES;
+        for (NSString *str in origArray)
+            if (![str isEqualToString:@""]) {
+                if (first) {
+                    fprintf(stream, PAC_EXCEPT_HEAD);
+                    first = NO;
+                }
+                fprintf(stream, "%s", [[NSString stringWithFormat:PAC_EXCEPT_ENTRY, str, str] cStringUsingEncoding:NSUTF8StringEncoding]);
+            }
+    }
+    [pool release];
 }
 
 static void pac_accept_cb (EV_P_ ev_io *w, int revents) {
     struct listen_ctx *listener = (struct listen_ctx *)w;
     int serverfd;
-    int will_update;
+    char will_update;
+    char use_pac;
+    char exception_sent;
+    char found_pac_func;
+    int len;
     FILE *stream;
-    char *pac_file;
+    FILE *pacfile;
     struct sockaddr_in client;
     socklen_t socksize;
-    char buf[BUFF_SIZE];
+    char *buf;
+    char *pac_func_name;
+    char *pac_except_start;
+    int pac_header_num;
     while (1) {
         memset(&client, 0, sizeof(client));
-        memset(&buf, 0, sizeof(buf));
         socksize = sizeof(struct sockaddr_in);
         serverfd = accept(listener->fd, (struct sockaddr *) &client, &socksize);
         if (serverfd == -1) {
@@ -641,26 +663,58 @@ static void pac_accept_cb (EV_P_ ev_io *w, int revents) {
             break;
         }
         will_update = 0;
-        do {
-            fgets(buf, BUFF_SIZE, stream);
+        buf = (char *) malloc(BUFF_MAX);
+        while ((len = fread(buf, 1, BUFF_MAX - 1, stream)) > 0) {
+            buf[len] = 0;
             if (strstr(buf, UPDATE_CONF))
                 will_update = 1;
-        } while (strcmp(buf, "\r\n") && strcmp(buf, "\n"));
+        }
         fprintf(stream, HTTP_RESPONSE);
         if (will_update) {
             update_config();
             fprintf(stream, "Updated.\n");
         }
         else {
-            if (get_pac_content(&pac_file)) {
-                fprintf(stream, "%s", pac_file);
-                free(pac_file);
+            use_pac = 0;
+            if (!get_pac_file_path(buf)) {
+                if ((pacfile = fopen(buf, "r")) != NULL) {
+                    use_pac = 1;
+                    exception_sent = 0;
+                    found_pac_func = 0;
+                    while ((len = fread(buf, 1, BUFF_MAX, pacfile)) > 0) {
+                        if (!exception_sent) {
+                            pac_func_name = strstr(buf, PAC_FUNC);
+                            if (pac_func_name || found_pac_func) {
+                                if (pac_func_name)
+                                    found_pac_func = 1;
+                                else
+                                    pac_func_name = buf;
+                                pac_except_start = strchr(pac_func_name, '{');
+                                if (pac_except_start) {
+                                    pac_header_num = (pac_except_start - buf) + 1;
+                                    fwrite(buf, 1, pac_header_num, stream);
+                                    send_pac_exception(stream);
+                                    exception_sent = 1;
+                                    if (len - pac_header_num > 0)
+                                        fwrite(buf + pac_header_num, 1, len - pac_header_num, stream);
+                                }
+                            }
+                        }
+                        else
+                            fwrite(buf, 1, len, stream);
+                    }
+                    fclose(pacfile);
+                }
             }
-            else
-                fprintf(stream, EMPTY_PAC, LOCAL_PORT);
+            if (!use_pac) {
+                fprintf(stream, EMPTY_PAC_HEAD);
+                send_pac_exception(stream);
+                fprintf(stream, EMPTY_PAC_TAIL, LOCAL_PORT);
+            }
         }
         fflush(stream);
         fclose(stream);
+        free(buf);
         close(serverfd);
         break;
     }
@@ -742,7 +796,7 @@ struct listen_ctx *listen_from_launchd(EV_P_ const char *socket_name, launch_dat
 
 int listen_from_port(EV_P_ struct listen_ctx *ctx, int port, ev_handler handler) {
     int listenfd;
-    listenfd = create_and_bind(LOCAL_PORT);
+    listenfd = create_and_bind(port);
     if (listenfd < 0) {
         LOGE("bind error\n");
         return 1;
@@ -784,7 +838,7 @@ int main (int argc, const char **argv) {
     if (_local_timeout <= 0)
         _local_timeout = LOCAL_TIMEOUT;
     
-    LOGD("ShadowSocks-libev (Build %s)\n", BUILDTIME);
+    LOGD("ShadowSocks for iOS by linusyang\n");
     struct ev_loop *loop = ev_default_loop(0);
     if (!loop) {
         LOGE("Fatal error: libev loop failed");

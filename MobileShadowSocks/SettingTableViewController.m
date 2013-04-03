@@ -174,7 +174,7 @@
     if ([cellType hasPrefix:CELL_BUTTON]) {
         if ([cellKey isEqualToString:@"DEFAULT_PAC_BUTTON"]) {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) 
-                                                            message:NSLocalizedString(@"Default PAC file is based on ChnRoutes and might only be useful for users in China. Confirm to use it?", nil)
+                                                            message:NSLocalizedString(@"Default PAC file might only be useful for users in China. Confirm to use it?", nil)
                                                            delegate:self 
                                                   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) 
                                                   otherButtonTitles:NSLocalizedString(@"OK",nil), 
@@ -512,75 +512,55 @@
         default:
             break;
     }
-    ret = NO;
-    NSString *exceptsPref = [[NSUserDefaults standardUserDefaults] stringForKey:@"EXCEPTION_LIST"];
-    NSString *excepts = exceptsPref ? [NSString stringWithString:exceptsPref] : nil;
-    seteuid(0);
-    SCDynamicStoreRef store = SCDynamicStoreCreate(0, STORE_ID, 0, 0);
-    CFArrayRef list = SCDynamicStoreCopyKeyList(store, SC_IDENTI);
-    NSMutableSet *set = [NSMutableSet set];
-    int i, j, len;
-    for (NSString *state in (NSArray *) list) {
-        const char *s = [state cStringUsingEncoding:NSUTF8StringEncoding];
-        len = (int) ([state length] - 35);
-        for (i = 0; i < len; i++) {
-            for (j = i; j - i < 36; j++) {
-                if (j - i ==  8 || j - i == 13 || 
-                    j - i == 18 || j - i == 23) {
-                    if (s[j] != '-')
-                        break;
-                }
-                else if (!((s[j] >= 'A' && s[j] <= 'Z') ||
-                           (s[j] >= '0' && s[j] <= '9')))
-                    break;
+    NSMutableDictionary *proxySet = [NSMutableDictionary dictionary];
+    if (isEnabled) {
+        if (socks) {
+            NSString *excepts = [[NSUserDefaults standardUserDefaults] stringForKey:@"EXCEPTION_LIST"];
+            if (excepts) {
+                NSMutableArray *exceptArray = [NSMutableArray array];
+                NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
+                for (NSString *s in origArray)
+                    if (![s isEqualToString:@""])
+                        [exceptArray addObject:s];
+                if ([exceptArray count] > 0)
+                    [proxySet setObject:exceptArray forKey:@"ExceptionsList"];
             }
-            if (j - i == 36)
-                [set addObject:[state substringWithRange:NSMakeRange(i, 36)]];
-        }
-    }
-    NSArray *interfaces = [set allObjects];
-    SCPreferencesRef pref = SCPreferencesCreate(0, STORE_ID, 0);
-    if ([interfaces count] > 0) {
-        NSMutableArray *exceptArray = [NSMutableArray array];
-        if (excepts) {
-            NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
-            for (NSString *s in origArray)
-                if (![s isEqualToString:@""])
-                    [exceptArray addObject:s];
-        }
-        NSMutableDictionary *proxySet = [NSMutableDictionary dictionary];
-        if (isEnabled) {
-            if ([exceptArray count] > 0)
-                [proxySet setObject:exceptArray forKey:@"ExceptionsList"];
-            if (socks) {
-                [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"SOCKSEnable"];
-                [proxySet setObject:@"127.0.0.1" forKey:@"SOCKSProxy"];
-                [proxySet setObject:[NSNumber numberWithInt:LOCAL_PORT] forKey:@"SOCKSPort"];
-            }
-            else {
-                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
-                [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
-                [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
-                [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
-                [proxySet setObject:_pacURL forKey:@"ProxyAutoConfigURLString"];
-            }
+            [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"SOCKSEnable"];
+            [proxySet setObject:@"127.0.0.1" forKey:@"SOCKSProxy"];
+            [proxySet setObject:[NSNumber numberWithInt:LOCAL_PORT] forKey:@"SOCKSPort"];
         }
         else {
             [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
-            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPProxyType"];
+            [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
             [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
-            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"ProxyAutoConfigEnable"];
+            [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
+            [proxySet setObject:_pacURL forKey:@"ProxyAutoConfigURLString"];
         }
-        ret = YES;
-        for (NSString *networkid in interfaces)
-            ret &= SCPreferencesPathSetValue(pref, (CFStringRef) [NSString stringWithFormat:@"/NetworkServices/%@/Proxies", networkid], (CFDictionaryRef) proxySet);
-        ret &= SCPreferencesCommitChanges(pref);
-        ret &= SCPreferencesApplyChanges(pref);
-        SCPreferencesSynchronize(pref);
     }
-    CFRelease(pref);
-    CFRelease(list);
+    else {
+        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
+        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPProxyType"];
+        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
+        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"ProxyAutoConfigEnable"];
+    }
+    ret = YES;
+    seteuid(0);
+    SCPreferencesRef pref = SCPreferencesCreate(0, CFSTR("shadow"), 0);
+    NSDictionary *servicesDict = [NSDictionary dictionaryWithDictionary:(NSDictionary *) SCPreferencesGetValue(pref, CFSTR("NetworkServices"))];
+    for (NSString *key in [servicesDict allKeys]) {
+        NSDictionary *dict = [servicesDict objectForKey:key];
+        NSString *rank = [dict objectForKey:@"PrimaryRank"];
+        if (![rank isEqualToString:@"Never"]) {
+            NSString *path = [NSString stringWithFormat:@"/NetworkServices/%@/Proxies", key];
+            ret &= SCPreferencesPathSetValue(pref, (CFStringRef) path, (CFDictionaryRef) proxySet);
+        }
+    }
+    ret &= SCPreferencesCommitChanges(pref);
+    ret &= SCPreferencesApplyChanges(pref);
+    SCPreferencesSynchronize(pref);
+    SCDynamicStoreRef store = SCDynamicStoreCreate(0, CFSTR("shadow"), 0, 0);
     CFRelease(store);
+    CFRelease(pref);
     seteuid(501);
     return ret;
 }
