@@ -125,8 +125,6 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.legolas-media.com')) return 'DIRECT';
     if (shExpMatch(host, 'harrenmedianetwork.com')) return 'DIRECT';
     if (shExpMatch(host, '*.harrenmedianetwork.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ytimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ytimg.com')) return 'DIRECT';
     if (shExpMatch(host, 'google-analytics.com')) return 'DIRECT';
     if (shExpMatch(host, '*.google-analytics.com')) return 'DIRECT';
     if (shExpMatch(host, 'alipayobjects.com')) return 'DIRECT';
