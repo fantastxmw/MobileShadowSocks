@@ -673,8 +673,6 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.zhaodao123.com')) return 'DIRECT';
     if (shExpMatch(host, 'daqi.com')) return 'DIRECT';
     if (shExpMatch(host, '*.daqi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sourceforge.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.sourceforge.net')) return 'DIRECT';
     if (shExpMatch(host, 'yaolan.com')) return 'DIRECT';
     if (shExpMatch(host, '*.yaolan.com')) return 'DIRECT';
     if (shExpMatch(host, '5d6d.net')) return 'DIRECT';

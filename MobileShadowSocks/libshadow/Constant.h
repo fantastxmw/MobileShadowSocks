@@ -10,7 +10,7 @@
 #define MobileShadowSocks_Constant_h
 
 #define APP_VER @"0.2.3"
-#define APP_BUILD @"3"
+#define APP_BUILD @"4"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"
@@ -33,7 +33,7 @@
 #define LOCAL_TIMEOUT 60
 #define EMPTY_PAC_HEAD "function FindProxyForURL(url, host) {\n"
 #ifdef BUILD_FOR_MAC
-#define EMPTY_PAC_TAIL "    if (host == '127.0.0.1' || host == 'localhost')\n        return 'DIRECT'\n    return 'SOCKS5 127.0.0.1:%d';\n}\n"
+#define EMPTY_PAC_TAIL "    if (host == '127.0.0.1' || host == 'localhost')\n        return 'DIRECT'\n    return 'SOCKS5 127.0.0.1:%d; SOCKS 127.0.0.1:1983';\n}\n"
 #else
 #define EMPTY_PAC_TAIL "    if (host == '127.0.0.1' || host == 'localhost')\n        return 'DIRECT'\n    return 'SOCKS 127.0.0.1:%d';\n}\n"
 #endif

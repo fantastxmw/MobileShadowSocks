@@ -645,9 +645,10 @@ static void pac_accept_cb (EV_P_ ev_io *w, int revents) {
     struct sockaddr_in client;
     socklen_t socksize;
     char *buf;
+    char *now_buf;
     char *pac_func_name;
     char *pac_except_start;
-    int pac_header_num;
+    int sent_num;
     while (1) {
         memset(&client, 0, sizeof(client));
         socksize = sizeof(struct sockaddr_in);
@@ -681,7 +682,9 @@ static void pac_accept_cb (EV_P_ ev_io *w, int revents) {
                     use_pac = 1;
                     exception_sent = 0;
                     found_pac_func = 0;
-                    while ((len = fread(buf, 1, BUFF_MAX, pacfile)) > 0) {
+                    while ((len = fread(buf, 1, BUFF_MAX - 1, pacfile)) > 0) {
+                        buf[len] = 0;
+                        now_buf = buf;
                         if (!exception_sent) {
                             pac_func_name = strstr(buf, PAC_FUNC);
                             if (pac_func_name || found_pac_func) {
@@ -691,17 +694,17 @@ static void pac_accept_cb (EV_P_ ev_io *w, int revents) {
                                     pac_func_name = buf;
                                 pac_except_start = strchr(pac_func_name, '{');
                                 if (pac_except_start) {
-                                    pac_header_num = (pac_except_start - buf) + 1;
-                                    fwrite(buf, 1, pac_header_num, stream);
+                                    sent_num = (pac_except_start - buf) + 1;
+                                    fwrite(buf, 1, sent_num, stream);
                                     send_pac_exception(stream);
                                     exception_sent = 1;
-                                    if (len - pac_header_num > 0)
-                                        fwrite(buf + pac_header_num, 1, len - pac_header_num, stream);
+                                    now_buf += sent_num;
+                                    len -= sent_num;
                                 }
                             }
                         }
-                        else
-                            fwrite(buf, 1, len, stream);
+                        if (len > 0)
+                            fwrite(now_buf, 1, len, stream);
                     }
                     fclose(pacfile);
                 }
@@ -820,9 +823,10 @@ int main (int argc, const char **argv) {
     _timeout = 0;
     _local_timeout = 0;
     
+    int i;
     int launchd_mode = 0;
     if (argc > 1) {
-        for (int i = 1; i < argc; i++) {
+        for (i = 1; i < argc; i++) {
             if (strcmp(argv[i], "-d") == 0)
                 launchd_mode = 1;
             else if (isdigit(argv[i][0])) {
