@@ -10,6 +10,7 @@ By Linus Yang
 * System-wide proxy supporting Wi-Fi and Celluar networks
 * **NEW:** On-demand proxy, no need to start manually 
 * **NEW:** Pre-installed PAC file using white-list
+* **NEW:** AES cipher mode for strong encryption
 
 ### Installation
 1. Open Cydia.app and refresh sources
@@ -38,20 +39,14 @@ No. The daemon uses the " **On Demand** " mechanism of `launchd`, which means it
 #### 5. I cannot find any proxy settings in *Settings.app*. Is the proxy actually enabled? And where are the proxy settings?
 The proxy settings are **indeed** set successfully if you don't see any alert views when turning on the switch. They just don't show in the Settings.app. If you want to check it, call `scutil --proxy` in terminal.
 
-#### 6. The *Shadow* app remains in background on iOS 6.x when I kill it with the iOS task switcher. What can I do?
-This is a glitch for apps running as super user on iOS 6: iOS simply does not kill them on first attempt. Here is what you need to do:
-* Kill Shadow using the iOS task switcher: Shadow goes into background.
-* Open Shadow once more.
-* Press the Home button.
-* Shadow got terminated by iOS.
-
 ### Credits
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @[clowwindy](https://github.com/clowwindy)
-* Based on [Shadowsocks-libev](https://github.com/madeye/shadowsocks-libev) from @[madeye](https://github.com/madeye)
+* Based on [Shadowsocks-libev](https://github.com/linusyang/shadowsocks-libev) from @[madeye](https://github.com/madeye)
 * App icon from [Tunnelblick](https://tunnelblick.googlecode.com) (Too lazy to draw one by myself :P)
 
 ### Note for Developers
 * You have to create a self-signed code-signing certificate named *iPhone Developer* ([turtorial](https://developer.apple.com/library/mac/#documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html)).
+* In order to build armv6 binary, you have to install iOS **5.1** SDK ([turtorial](http://blog.chpwn.com/post/31824877081)).
 * The final Debian package will be generated under **release** directory in the project directory.
 
 ### License
