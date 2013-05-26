@@ -1,0 +1,3 @@
+[submodule "shadowsocks-libev"]
+	path = shadowsocks-libev
+	url = git://github.com/linusyang/shadowsocks-libev.git

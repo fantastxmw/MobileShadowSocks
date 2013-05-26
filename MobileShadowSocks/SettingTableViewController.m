@@ -7,6 +7,28 @@
 //
 
 #import "SettingTableViewController.h"
+#import "CipherViewController.h"
+
+#define APP_VER @"0.2.4"
+#define APP_BUILD @"1"
+
+#define CELL_TEXT @"TextField"
+#define CELL_PASS @"Pass"
+#define CELL_NUM @"Num"
+#define CELL_SWITCH @"Switch"
+#define CELL_NOTIFY @"Notify"
+#define CELL_BUTTON @"Button"
+#define CELL_VIEW @"View"
+#define ALERT_TAG_ABOUT 1
+#define ALERT_TAG_DEFAULT_PAC 2
+
+#define LOCAL_PORT 1983
+#define PAC_PORT 1993
+#define MAX_TRYTIMES 10
+#define UPDATE_CONF "Update-Conf"
+#define SET_PROXY_PAC "SetProxy-Pac"
+#define SET_PROXY_SOCKS "SetProxy-Socks"
+#define SET_PROXY_NONE "SetProxy-None"
 
 #define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
 #define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
@@ -21,11 +43,80 @@
 {
     self = [super initWithStyle:style];
     if (self) {
-        setuid(0);
-        seteuid(501);
-        _isLaunched = NO;
         _isEnabled = NO;
-        _isPrefChanged = NO;
+        _isPrefChanged = YES;
+        _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/shadow.pac", PAC_PORT];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            _cellWidth = 560.0f;
+        else
+            _cellWidth = 180.0f;
+        _tagNumber = 0;
+        _tagKey = [[NSMutableArray alloc] init];
+        _tagWillNotifyChange = [[NSMutableArray alloc] init];
+        _tableSectionNumber = 3;
+        _tableRowNumber = [[NSArray alloc] initWithObjects:
+                           [NSNumber numberWithInt:1],
+                           [NSNumber numberWithInt:4],
+                           [NSNumber numberWithInt:4],
+                           nil];
+        _tableSectionTitle = [[NSArray alloc] initWithObjects:
+                              @"",
+                              NSLocalizedString(@"Server Information", nil),
+                              NSLocalizedString(@"Proxy Settings", nil),
+                              nil];
+        _tableElements = [[NSArray alloc] initWithObjects:
+                          [NSArray arrayWithObjects:
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Enable Proxy", nil),
+                            @"PROXY_ENABLED",
+                            @"NO",
+                            CELL_SWITCH, nil],
+                           nil],
+                          [NSArray arrayWithObjects:
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Server", nil),
+                            @"REMOTE_SERVER",
+                            @"127.0.0.1",
+                            CELL_TEXT, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Port", nil),
+                            @"REMOTE_PORT",
+                            @"8080",
+                            CELL_TEXT CELL_NUM, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Password", nil),
+                            @"SOCKS_PASS",
+                            @"123456",
+                            CELL_TEXT CELL_PASS, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Cipher", nil),
+                            @"CRYPTO_METHOD",
+                            @"table",
+                            CELL_VIEW, nil],
+                           nil],
+                          [NSArray arrayWithObjects:
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Auto Proxy", nil),
+                            @"AUTO_PROXY",
+                            @"NO",
+                            CELL_SWITCH, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"PAC File", nil),
+                            @"PAC_FILE",
+                            NSLocalizedString(@"Please specify file path", nil),
+                            CELL_TEXT, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Exceptions", nil),
+                            @"EXCEPTION_LIST",
+                            NSLocalizedString(@"Split with comma", nil),
+                            CELL_TEXT, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Use Default PAC File", nil),
+                            @"DEFAULT_PAC_BUTTON", 
+                            @"", 
+                            CELL_BUTTON, nil],
+                           nil],  
+                          nil];
     }
     return self;
 }
@@ -37,89 +128,16 @@
     gestureRecognizer.cancelsTouchesInView = NO;
     [self.tableView addGestureRecognizer:gestureRecognizer];
     [gestureRecognizer release];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        _cellWidth = 560.0f;
-    else
-        _cellWidth = 180.0f;
     UIBarButtonItem *aboutButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"About", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(showAbout)];
     [[self navigationItem] setRightBarButtonItem:aboutButton];
     [[self navigationItem] setTitle:NSLocalizedString(@"ShadowSocks", nil)];
     [aboutButton release];
-    _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/shadow.pac", PAC_PORT];
-    _tagNumber = 0;
-    _tagKey = [[NSMutableArray alloc] init];
-    _tagWillNotifyChange = [[NSMutableArray alloc] init];
-    _tableSectionNumber = 3;
-    _tableRowNumber = [[NSArray alloc] initWithObjects:
-                       [NSNumber numberWithInt:1], 
-                       [NSNumber numberWithInt:4], 
-                       [NSNumber numberWithInt:4], 
-                       nil];
-    _tableSectionTitle = [[NSArray alloc] initWithObjects:
-                          @"",
-                          NSLocalizedString(@"Server Information", nil), 
-                          NSLocalizedString(@"Proxy Settings", nil), 
-                          nil];
-    _tableElements = [[NSArray alloc] initWithObjects:
-                      [NSArray arrayWithObjects:
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Enable Proxy", nil), 
-                        @"PROXY_ENABLED", 
-                        @"NO", 
-                        CELL_SWITCH, nil], 
-                       nil],
-                      [NSArray arrayWithObjects:
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Server", nil), 
-                        @"REMOTE_SERVER", 
-                        @"127.0.0.1", 
-                        CELL_TEXT, nil], 
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Port", nil), 
-                        @"REMOTE_PORT", 
-                        @"8080", 
-                        CELL_TEXT CELL_NUM, nil], 
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Password", nil), 
-                        @"SOCKS_PASS", 
-                        @"123456", 
-                        CELL_TEXT CELL_PASS, nil], 
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"RC4 Crypto", nil), 
-                        @"USE_RC4", 
-                        @"NO", 
-                        CELL_SWITCH, nil], 
-                       nil],
-                      [NSArray arrayWithObjects:
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Auto Proxy", nil), 
-                        @"AUTO_PROXY", 
-                        @"NO", 
-                        CELL_SWITCH, nil], 
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"PAC File", nil), 
-                        @"PAC_FILE", 
-                        NSLocalizedString(@"Please specify file path", nil), 
-                        CELL_TEXT, nil], 
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Exceptions", nil), 
-                        @"EXCEPTION_LIST", 
-                        NSLocalizedString(@"Split with comma", nil), 
-                        CELL_TEXT, nil], 
-                       [NSArray arrayWithObjects:
-                        NSLocalizedString(@"Use Default PAC File", nil), 
-                        @"DEFAULT_PAC_BUTTON", 
-                        @"", 
-                        CELL_BUTTON, nil],
-                       nil],  
-                      nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    _isLaunched = YES;
-    [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
+    [[self tableView] reloadData];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -183,6 +201,12 @@
             [alert show];
             [alert release];
         }
+    } else if ([cellType hasPrefix:CELL_VIEW]) {
+        if ([cellKey isEqualToString:@"CRYPTO_METHOD"]) {
+            CipherViewController *cipherViewController = [[CipherViewController alloc] initWithStyle:UITableViewStyleGrouped withParentView:self];
+            [self.navigationController pushViewController:cipherViewController animated:YES];
+            [cipherViewController release];
+        }
     }
     [[self tableView] deselectRowAtIndexPath:indexPath animated:NO];
 }
@@ -191,14 +215,15 @@
 {
     NSString *CellIdentifier = [NSString stringWithFormat:@"%ld-%ld", (long) [indexPath section], (long) [indexPath row]];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    NSArray *tableSection = [_tableElements objectAtIndex:[indexPath section]];
+    NSArray *tableCell = [tableSection objectAtIndex:[indexPath row]];
+    NSString *cellTitle = (NSString *) [tableCell objectAtIndex:0];
+    NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
+    NSString *cellDefaultValue = (NSString *) [tableCell objectAtIndex:2];
+    NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
+    UITableViewCellStyle cellStyle = [cellType hasPrefix:CELL_VIEW] ? UITableViewCellStyleValue1 : UITableViewCellStyleDefault;
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-        NSArray *tableSection = [_tableElements objectAtIndex:[indexPath section]];
-        NSArray *tableCell = [tableSection objectAtIndex:[indexPath row]];
-        NSString *cellTitle = (NSString *) [tableCell objectAtIndex:0];
-        NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
-        NSString *cellDefaultValue = (NSString *) [tableCell objectAtIndex:2];
-        NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
+        cell = [[[UITableViewCell alloc] initWithStyle:cellStyle reuseIdentifier:CellIdentifier] autorelease];
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
         [[cell textLabel] setTextColor:kblackColor];
@@ -262,6 +287,14 @@
         else if ([cellType hasPrefix:CELL_BUTTON]) {
             [[cell textLabel] setTextAlignment:UITextAlignmentCenter];
         }
+        else if ([cellType hasPrefix:CELL_VIEW]) {
+            [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        }
+    }
+    if ([cellKey isEqualToString:@"CRYPTO_METHOD"]) {
+        NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
+        NSString *labelString = currentSetting ? currentSetting : cellDefaultValue;
+        [[cell detailTextLabel] setText:labelString];
     }
     return cell;
 }
@@ -470,99 +503,92 @@
     [pool release];
 }
 
-- (void)threadNotifyChanged
+- (BOOL)threadSendNotifyMessage:(NSNumber *)messageNumber
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:_pacURL]];
-    [request setValue:@"True" forHTTPHeaderField:[NSString stringWithFormat:@"%s", UPDATE_CONF]];
+    const char *messageHeader = UPDATE_CONF;
+    int messageId = [messageNumber intValue];
+    switch (messageId) {
+        case 0:
+            messageHeader = UPDATE_CONF;
+            break;
+        case 1:
+            messageHeader = SET_PROXY_NONE;
+            break;
+        case 2:
+            messageHeader = SET_PROXY_SOCKS;
+            break;
+        case 3:
+            messageHeader = SET_PROXY_PAC;
+            break;
+        default:
+            messageHeader = SET_PROXY_NONE;
+            break;
+    }
+    [request setValue:@"True" forHTTPHeaderField:[NSString stringWithFormat:@"%s", messageHeader]];
     NSHTTPURLResponse *response;
-    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-    _isPrefChanged = NO;
+    BOOL ret = NO;
+    int i;
+    for (i = 0; i < MAX_TRYTIMES; i++) {
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if ([str hasPrefix:@"Updated."]) {
+            ret = YES;
+            [str release];
+            break;
+        } else if ([str hasPrefix:@"Failed."]) {
+            [str release];
+            break;
+        }
+        [str release];
+    }
+    if (messageId == 0 && ret == YES)
+        _isPrefChanged = NO;
     [request release];
     [pool release];
+    return ret;
 }
 
 #pragma mark - Proxy functions
 
 - (void)fixProxy
 {
-    if (_isLaunched)
-        [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
+    [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
+}
+
+- (void)setPrefChanged
+{
+    _isPrefChanged = YES;
 }
 
 - (void)notifyChanged
 {
     if (_isPrefChanged)
-        [NSThread detachNewThreadSelector:@selector(threadNotifyChanged) toTarget:self withObject:nil];
+        [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:0]];
+}
+
+- (void)notifyChangedWhenRunning
+{
+    if (_isPrefChanged && _isEnabled)
+        [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:0]];
 }
 
 - (BOOL)setProxy:(ProxyStatus)status
 {
-    BOOL isEnabled;
-    BOOL socks;
-    BOOL ret;
-    isEnabled = socks = NO;
+    int statusId = 1;
     switch (status) {
-        case kProxyPac:
-            isEnabled = YES;
-            break;
         case kProxySocks:
-            isEnabled = socks = YES;
+            statusId = 2;
+            break;
+        case kProxyPac:
+            statusId = 3;
             break;
         default:
+            statusId = 1;
             break;
     }
-    NSMutableDictionary *proxySet = [NSMutableDictionary dictionary];
-    if (isEnabled) {
-        if (socks) {
-            NSString *excepts = [[NSUserDefaults standardUserDefaults] stringForKey:@"EXCEPTION_LIST"];
-            if (excepts) {
-                NSMutableArray *exceptArray = [NSMutableArray array];
-                NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
-                for (NSString *s in origArray)
-                    if (![s isEqualToString:@""])
-                        [exceptArray addObject:s];
-                if ([exceptArray count] > 0)
-                    [proxySet setObject:exceptArray forKey:@"ExceptionsList"];
-            }
-            [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"SOCKSEnable"];
-            [proxySet setObject:@"127.0.0.1" forKey:@"SOCKSProxy"];
-            [proxySet setObject:[NSNumber numberWithInt:LOCAL_PORT] forKey:@"SOCKSPort"];
-        }
-        else {
-            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
-            [proxySet setObject:[NSNumber numberWithInt:2] forKey:@"HTTPProxyType"];
-            [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
-            [proxySet setObject:[NSNumber numberWithInt:1] forKey:@"ProxyAutoConfigEnable"];
-            [proxySet setObject:_pacURL forKey:@"ProxyAutoConfigURLString"];
-        }
-    }
-    else {
-        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPEnable"];
-        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPProxyType"];
-        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"HTTPSEnable"];
-        [proxySet setObject:[NSNumber numberWithInt:0] forKey:@"ProxyAutoConfigEnable"];
-    }
-    ret = YES;
-    seteuid(0);
-    SCPreferencesRef pref = SCPreferencesCreate(0, CFSTR("shadow"), 0);
-    NSDictionary *servicesDict = [NSDictionary dictionaryWithDictionary:(NSDictionary *) SCPreferencesGetValue(pref, CFSTR("NetworkServices"))];
-    for (NSString *key in [servicesDict allKeys]) {
-        NSDictionary *dict = [servicesDict objectForKey:key];
-        NSString *rank = [dict objectForKey:@"PrimaryRank"];
-        if (![rank isEqualToString:@"Never"]) {
-            NSString *path = [NSString stringWithFormat:@"/NetworkServices/%@/Proxies", key];
-            ret &= SCPreferencesPathSetValue(pref, (CFStringRef) path, (CFDictionaryRef) proxySet);
-        }
-    }
-    ret &= SCPreferencesCommitChanges(pref);
-    ret &= SCPreferencesApplyChanges(pref);
-    SCPreferencesSynchronize(pref);
-    SCDynamicStoreRef store = SCDynamicStoreCreate(0, CFSTR("shadow"), 0, 0);
-    CFRelease(store);
-    CFRelease(pref);
-    seteuid(501);
-    return ret;
+    return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];
 }
 
 @end
