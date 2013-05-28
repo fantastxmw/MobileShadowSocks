@@ -58,7 +58,6 @@
 		4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = gen_entitlements.py; sourceTree = "<group>"; };
 		4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.linusyang.shadowsocks.plist; sourceTree = "<group>"; };
 		4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SettingTableViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		4BF9031416BA9F8D00E35F60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4BF9031616BA9F9200E35F60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -238,7 +237,6 @@
 		4BF9031316BA9F8D00E35F60 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				4BF9031416BA9F8D00E35F60 /* en */,
 				4BF9031616BA9F9200E35F60 /* zh-Hans */,
 			);
 			name = Localizable.strings;

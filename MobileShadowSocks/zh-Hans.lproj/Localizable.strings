@@ -1,4 +1,5 @@
 {
+    "\"Table\" is the default cipher. Other ciphers need ShadowSocks 1.2 or above on the server." = "\U201cTable\U201d \U662f\U9ed8\U8ba4\U7684\U52a0\U5bc6\U65b9\U5f0f\U3002\U5176\U4f59\U52a0\U5bc6\U65b9\U5f0f\U9700\U8981\U670d\U52a1\U7aef\U4f7f\U7528 ShadowSocks 1.2 \U6216\U66f4\U9ad8\U7248\U672c\U3002";
     "AES (128-bit, CFB mode)" = "AES (128 \U4f4d, CFB \U6a21\U5f0f)";
     "AES (192-bit, CFB mode)" = "AES (192 \U4f4d, CFB \U6a21\U5f0f)";
     "AES (256-bit, CFB mode)" = "AES (256 \U4f4d, CFB \U6a21\U5f0f)";

@@ -74,6 +74,13 @@
     return _cipherNumber;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+{
+    if (section == 0)
+        return NSLocalizedString(@"\"Table\" is the default cipher. Other ciphers need ShadowSocks 1.2 or above on the server.", @"nil");
+    return nil;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *CellIdentifier = [NSString stringWithFormat:@"Cell-%d", (int) [indexPath row]];
