@@ -8,6 +8,7 @@ By Linus Yang
 ### Features
 * Fast, efficient and easy to use
 * System-wide proxy supporting Wi-Fi and Celluar networks
+* Universal app for iPhone, iPad and iPod touch with *jailbroken* iOS 3.0 or above
 * **NEW:** On-demand proxy, no need to start manually 
 * **NEW:** Pre-installed PAC file using white-list
 * **NEW:** AES cipher mode for strong encryption
