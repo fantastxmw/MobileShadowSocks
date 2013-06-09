@@ -15,7 +15,7 @@
     self = [super initWithStyle:style];
     if (self) {
         _parentView = parentView;
-        _cipherNumber = 8;
+        _cipherNumber = 14;
         _cipherKeyArray = [[NSArray alloc] initWithObjects:
                            @"table",
                            @"rc4",
@@ -23,8 +23,14 @@
                            @"aes-192-cfb",
                            @"aes-256-cfb",
                            @"bf-cfb",
+                           @"camellia-128-cfb",
+                           @"camellia-192-cfb",
+                           @"camellia-256-cfb",
                            @"cast5-cfb",
                            @"des-cfb",
+                           @"idea-cfb",
+                           @"rc2-cfb",
+                           @"seed-cfb",
                            nil];
         _cipherNameArray = [[NSArray alloc] initWithObjects:
                             NSLocalizedString(@"Table (Default)", nil),
@@ -33,8 +39,14 @@
                             NSLocalizedString(@"AES (192-bit, CFB mode)", nil),
                             NSLocalizedString(@"AES (256-bit, CFB mode)", nil),
                             NSLocalizedString(@"Blowfish (CFB mode)", nil),
+                            NSLocalizedString(@"Camellia (128-bit, CFB mode)", nil),
+                            NSLocalizedString(@"Camellia (192-bit, CFB mode)", nil),
+                            NSLocalizedString(@"Camellia (256-bit, CFB mode)", nil),
                             NSLocalizedString(@"CAST5 (CFB mode)", nil),
                             NSLocalizedString(@"DES (CFB mode)", nil),
+                            NSLocalizedString(@"IDEA (CFB mode)", nil),
+                            NSLocalizedString(@"RC2 (CFB mode)", nil),
+                            NSLocalizedString(@"SEED (CFB mode)", nil),
                             nil];
     }
     return self;
@@ -51,8 +63,10 @@
     [super viewWillAppear:animated];
     NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:@"CRYPTO_METHOD"];
     NSUInteger index = [_cipherKeyArray indexOfObject:currentSetting ? currentSetting : @"table"];
-    _selectedCipher = (index == NSNotFound) ? 0 : index;;
+    _selectedCipher = (index == NSNotFound) ? 0 : index;
     [[self tableView] reloadData];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:_selectedCipher inSection:0];
+    [[self tableView] scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
 }
 
 - (void)dealloc

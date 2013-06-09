@@ -25,7 +25,7 @@
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     _tabViewController = [[SettingTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     _navController = [[UINavigationController alloc] initWithRootViewController:_tabViewController];
-    [self.window addSubview:[_navController view]];
+    [self.window setRootViewController:_navController];
     [self.window makeKeyAndVisible];
     return YES;
 }

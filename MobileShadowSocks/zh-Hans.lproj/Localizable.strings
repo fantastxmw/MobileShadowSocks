@@ -7,6 +7,9 @@
     "Auto Proxy" = "\U81ea\U52a8\U4ee3\U7406";
     "Blowfish (CFB mode)" = "Blowfish (CFB \U6a21\U5f0f)";
     "CAST5 (CFB mode)" = "CAST5 (CFB \U6a21\U5f0f)";
+    "Camellia (128-bit, CFB mode)" = "Camellia (128 \U4f4d, CFB \U6a21\U5f0f)";
+    "Camellia (192-bit, CFB mode)" = "Camellia (192 \U4f4d, CFB \U6a21\U5f0f)";
+    "Camellia (256-bit, CFB mode)" = "Camellia (256 \U4f4d, CFB \U6a21\U5f0f)";
     Cancel = "\U53d6\U6d88";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "DES (CFB mode)" = "DES (CFB \U6a21\U5f0f)";
@@ -16,6 +19,7 @@
     Exceptions = "\U6392\U9664\U5217\U8868";
     "Failed to change proxy settings.\nMaybe no network access available." = "\U66f4\U6539\U4ee3\U7406\U8bbe\U7f6e\U5931\U8d25\U3002\n\U53ef\U80fd\U65e0\U7f51\U7edc\U8fde\U63a5\U3002";
     "Help Page" = "\U5e2e\U52a9\U9875\U9762";
+    "IDEA (CFB mode)" = "IDEA (CFB \U6a21\U5f0f)";
     "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316\Uff1aLinus Yang";
     OK = "\U597d";
     On = "\U5f00";
@@ -26,7 +30,9 @@
     "Please specify file path" = "\U8bf7\U6307\U5b9a\U6587\U4ef6\U8def\U5f84";
     Port = "\U670d\U52a1\U5668\U7aef\U53e3";
     "Proxy Settings" = "\U4ee3\U7406\U8bbe\U7f6e";
+    "RC2 (CFB mode)" = "RC2 (CFB \U6a21\U5f0f)";
     RC4 = RC4;
+    "SEED (CFB mode)" = "SEED (CFB \U6a21\U5f0f)";
     Server = "\U670d\U52a1\U5668\U5730\U5740";
     "Server Information" = "\U670d\U52a1\U5668\U8bbe\U7f6e";
     ShadowSocks = ShadowSocks;

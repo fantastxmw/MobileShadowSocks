@@ -49,6 +49,7 @@
 		4B3A811C16BA4A2C00BE1B4C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4B3A812416BA4ABE00BE1B4C /* SettingTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SettingTableViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		4B55FD1F176468800062BA97 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4BE04A351751E9AF0019AAB1 /* CipherViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CipherViewController.h; sourceTree = "<group>"; };
 		4BE04A361751E9AF0019AAB1 /* CipherViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CipherViewController.m; sourceTree = "<group>"; };
 		4BF7CE9516C0775900713EC9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -238,6 +239,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4BF9031616BA9F9200E35F60 /* zh-Hans */,
+				4B55FD1F176468800062BA97 /* en */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
