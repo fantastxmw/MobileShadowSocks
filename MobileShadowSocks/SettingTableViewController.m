@@ -513,13 +513,13 @@
         case 0:
             messageHeader = UPDATE_CONF;
             break;
-        case 1:
+        case PROXY_NONE_STATUS:
             messageHeader = SET_PROXY_NONE;
             break;
-        case 2:
+        case PROXY_SOCKS_STATUS:
             messageHeader = SET_PROXY_SOCKS;
             break;
-        case 3:
+        case PROXY_PAC_STATUS:
             messageHeader = SET_PROXY_PAC;
             break;
         default:
@@ -576,16 +576,16 @@
 
 - (BOOL)setProxy:(ProxyStatus)status
 {
-    int statusId = 1;
+    int statusId = PROXY_NONE_STATUS;
     switch (status) {
         case kProxySocks:
-            statusId = 2;
+            statusId = PROXY_SOCKS_STATUS;
             break;
         case kProxyPac:
-            statusId = 3;
+            statusId = PROXY_PAC_STATUS;
             break;
         default:
-            statusId = 1;
+            statusId = PROXY_NONE_STATUS;
             break;
     }
     return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];

@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+#define PROXY_PAC_STATUS 3
+#define PROXY_SOCKS_STATUS 2
+#define PROXY_NONE_STATUS 1
+
 typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 
 @interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
