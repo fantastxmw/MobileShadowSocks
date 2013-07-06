@@ -367,8 +367,6 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.meituan.com')) return 'DIRECT';
     if (shExpMatch(host, '120ask.com')) return 'DIRECT';
     if (shExpMatch(host, '*.120ask.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ebay.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ebay.com')) return 'DIRECT';
     if (shExpMatch(host, '51cto.com')) return 'DIRECT';
     if (shExpMatch(host, '*.51cto.com')) return 'DIRECT';
     if (shExpMatch(host, 'sdo.com')) return 'DIRECT';
@@ -393,8 +391,6 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.oschina.net')) return 'DIRECT';
     if (shExpMatch(host, 'zhubajie.com')) return 'DIRECT';
     if (shExpMatch(host, '*.zhubajie.com')) return 'DIRECT';
-    if (shExpMatch(host, 'amazon.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.amazon.com')) return 'DIRECT';
     if (shExpMatch(host, 'babytree.com')) return 'DIRECT';
     if (shExpMatch(host, '*.babytree.com')) return 'DIRECT';
     if (shExpMatch(host, 'kdnet.net')) return 'DIRECT';
@@ -877,8 +873,16 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.lehecai.com')) return 'DIRECT';
     if (shExpMatch(host, '28.com')) return 'DIRECT';
     if (shExpMatch(host, '*.28.com')) return 'DIRECT';
+    if (shExpMatch(host, 'acfun.tv')) return 'DIRECT';
+    if (shExpMatch(host, '*.acfun.tv')) return 'DIRECT';
     if (shExpMatch(host, 'bilibili.tv')) return 'DIRECT';
     if (shExpMatch(host, '*.bilibili.tv')) return 'DIRECT';
+    if (shExpMatch(host, 'bogou.tv')) return 'DIRECT';
+    if (shExpMatch(host, '*.bogou.tv')) return 'DIRECT';
+    if (shExpMatch(host, 'fengyunzhibo.com')) return 'DIRECT';
+    if (shExpMatch(host, '*.fengyunzhibo.com')) return 'DIRECT';
+    if (shExpMatch(host, 'kukuplay.com')) return 'DIRECT';
+    if (shExpMatch(host, '*.kukuplay.com')) return 'DIRECT';
     if (shExpMatch(host, 'huaban.com')) return 'DIRECT';
     if (shExpMatch(host, '*.huaban.com')) return 'DIRECT';
     if (shExpMatch(host, 'szhome.com')) return 'DIRECT';
