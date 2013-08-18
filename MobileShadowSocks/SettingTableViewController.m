@@ -35,8 +35,12 @@
 #define kblackColor [UIColor colorWithRed:0 green:0 blue:0 alpha:1.0]
 #define kblackColorDisabled [UIColor colorWithRed:0 green:0 blue:0 alpha:0.439216f]
 
-@interface UISwitch (Addtion)
+@interface UISwitch (Addition)
 - (void)setAlternateColors:(BOOL)enabled;
+@end
+
+@interface UIApplication (Addition)
+- (void)setApplicationBadgeString:(NSString *)badgeString;
 @end
 
 @implementation SettingTableViewController
