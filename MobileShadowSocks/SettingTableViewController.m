@@ -35,6 +35,10 @@
 #define kblackColor [UIColor colorWithRed:0 green:0 blue:0 alpha:1.0]
 #define kblackColorDisabled [UIColor colorWithRed:0 green:0 blue:0 alpha:0.439216f]
 
+@interface UISwitch (Addtion)
+- (void)setAlternateColors:(BOOL)enabled;
+@end
+
 @implementation SettingTableViewController
 
 #pragma mark - View lifecycle
@@ -50,8 +54,8 @@
             _cellWidth = 560.0f;
         else
             _cellWidth = 180.0f;
-        _tagNumber = 0;
-        _tagKey = [[NSMutableArray alloc] init];
+        _tagNumber = 1000;
+        _tagKey = [[NSMutableDictionary alloc] init];
         _tagWillNotifyChange = [[NSMutableArray alloc] init];
         _tableSectionNumber = 3;
         _tableRowNumber = [[NSArray alloc] initWithObjects:
@@ -254,7 +258,7 @@
                 }
                 [cell setUserInteractionEnabled:isEnabled];
             }
-            [_tagKey addObject:cellKey];
+            [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
             if ([indexPath section] == 1)
                 [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
@@ -273,10 +277,10 @@
                 _isEnabled = switchValue;
                 if ([switcher respondsToSelector:@selector(setAlternateColors:)])
                     [switcher setAlternateColors:YES];
-            }
-            if ([cellKey isEqualToString:@"AUTO_PROXY"])
+            } else if ([cellKey isEqualToString:@"AUTO_PROXY"]) {
                 _autoProxyCellTag = _tagNumber;
-            [_tagKey addObject:cellKey];
+            }
+            [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
             if ([indexPath section] == 1)
                 [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
@@ -362,23 +366,23 @@
     }
 }
 
-- (void)setProxySwitcher
+- (void)setProxySwitcher:(NSNumber *)enabledObject
 {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([switcher tag] == _enableCellTag) {
-                [[NSUserDefaults standardUserDefaults] setBool:_isEnabled forKey:@"PROXY_ENABLED"];
-                [switcher setOn:_isEnabled];
+                [[NSUserDefaults standardUserDefaults] setBool:[enabledObject boolValue] forKey:@"PROXY_ENABLED"];
+                [switcher setOn:[enabledObject boolValue]];
                 break;
             }
         }
     }
 }
 
-- (void)setBadge
+- (void)setBadge:(BOOL)enabled
 {
-    if (_isEnabled) {
+    if (enabled) {
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(setApplicationBadgeString:)])
             [[UIApplication sharedApplication] setApplicationBadgeString:NSLocalizedString(@"On", nil)];
         else
@@ -397,7 +401,7 @@
                                withObject:[NSNumber numberWithBool:switcher.on]];
         return;
     }
-    NSString *key = [_tagKey objectAtIndex:[switcher tag]];
+    NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[switcher tag]]];
     [[NSUserDefaults standardUserDefaults] setBool:switcher.on forKey:key];
     if ([switcher tag] == _autoProxyCellTag) {
         [self setPacFileCellEnabled:switcher.on];
@@ -429,7 +433,7 @@
 
 - (void)textFieldDidChange:(UITextField *)textField
 {
-    NSString *key = (NSString *) [_tagKey objectAtIndex:[textField tag]];
+    NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[textField tag]]];
     [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:key];
     if ([_tagWillNotifyChange indexOfObject:[NSNumber numberWithInt:[textField tag]]] != NSNotFound)
         _isPrefChanged = YES;
@@ -461,8 +465,8 @@
         _isEnabled = !start;
         [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
     }
-    [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
-    [self setBadge];
+    [self performSelectorOnMainThread:@selector(setProxySwitcher:) withObject:[NSNumber numberWithBool:_isEnabled] waitUntilDone:NO];
+    [self setBadge:_isEnabled];
     [pool release];
 }
 
@@ -489,9 +493,9 @@
     if (nowStatus != prefStatus) {
         if (![self setProxy:prefStatus])
             _isEnabled = isEnabled;
-        [self performSelectorOnMainThread:@selector(setProxySwitcher) withObject:nil waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(setProxySwitcher:) withObject:[NSNumber numberWithBool:_isEnabled] waitUntilDone:NO];
     }
-    [self setBadge];
+    [self setBadge:_isEnabled];
     
     [pool release];
 }

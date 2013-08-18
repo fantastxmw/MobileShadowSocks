@@ -24,7 +24,7 @@ typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
     NSInteger _pacFileCellTag;
     NSInteger _autoProxyCellTag;
     NSInteger _enableCellTag;
-    NSMutableArray *_tagKey;
+    NSMutableDictionary *_tagKey;
     NSMutableArray *_tagWillNotifyChange;
     NSString *_pacURL;
     BOOL _isEnabled;
@@ -36,6 +36,5 @@ typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 - (void)setPrefChanged;
 - (void)notifyChanged;
 - (void)notifyChangedWhenRunning;
-- (void)setBadge;
 
 @end

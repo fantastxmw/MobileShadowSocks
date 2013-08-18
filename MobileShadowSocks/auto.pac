@@ -179,6 +179,8 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.360buyimg.com')) return 'DIRECT';
     if (shExpMatch(host, '51buy.com')) return 'DIRECT';
     if (shExpMatch(host, '*.51buy.com')) return 'DIRECT';
+    if (shExpMatch(host, 'yixun.com')) return 'DIRECT';
+    if (shExpMatch(host, '*.yixun.com')) return 'DIRECT';
     if (shExpMatch(host, 'icson.com')) return 'DIRECT';
     if (shExpMatch(host, '*.icson.com')) return 'DIRECT';
     if (shExpMatch(host, 'baidu.com')) return 'DIRECT';
