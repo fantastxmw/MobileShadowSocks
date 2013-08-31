@@ -163,6 +163,8 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.sohu.com')) return 'DIRECT';
     if (shExpMatch(host, 'ifeng.com')) return 'DIRECT';
     if (shExpMatch(host, '*.ifeng.com')) return 'DIRECT';
+    if (shExpMatch(host, 'ifanr.com')) return 'DIRECT';
+    if (shExpMatch(host, '*.ifanr.com')) return 'DIRECT';
     if (shExpMatch(host, 'jysq.net')) return 'DIRECT';
     if (shExpMatch(host, '*.jysq.net')) return 'DIRECT';
     if (shExpMatch(host, 'nipic.com')) return 'DIRECT';
@@ -185,6 +187,8 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.icson.com')) return 'DIRECT';
     if (shExpMatch(host, 'baidu.com')) return 'DIRECT';
     if (shExpMatch(host, '*.baidu.com')) return 'DIRECT';
+    if (shExpMatch(host, 'baidu*.com')) return 'DIRECT';
+    if (shExpMatch(host, '*.baidu*.com')) return 'DIRECT';
     if (shExpMatch(host, 'weibo.com')) return 'DIRECT';
     if (shExpMatch(host, '*.weibo.com')) return 'DIRECT';
     if (shExpMatch(host, 'youku.com')) return 'DIRECT';
@@ -365,6 +369,8 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.tom.com')) return 'DIRECT';
     if (shExpMatch(host, 'tenpay.com')) return 'DIRECT';
     if (shExpMatch(host, '*.tenpay.com')) return 'DIRECT';
+    if (shExpMatch(host, 'tencent.com')) return 'DIRECT';
+    if (shExpMatch(host, '*.tencent.com')) return 'DIRECT';
     if (shExpMatch(host, 'meituan.com')) return 'DIRECT';
     if (shExpMatch(host, '*.meituan.com')) return 'DIRECT';
     if (shExpMatch(host, '120ask.com')) return 'DIRECT';
@@ -415,6 +421,8 @@ function FindProxyForURL(url, host) {
     if (shExpMatch(host, '*.ads8.com')) return 'DIRECT';
     if (shExpMatch(host, 'hiapk.com')) return 'DIRECT';
     if (shExpMatch(host, '*.hiapk.com')) return 'DIRECT';
+    if (shExpMatch(host, 'iapps.im')) return 'DIRECT';
+    if (shExpMatch(host, '*.iapps.im')) return 'DIRECT';
     if (shExpMatch(host, 'ynet.com')) return 'DIRECT';
     if (shExpMatch(host, '*.ynet.com')) return 'DIRECT';
     if (shExpMatch(host, 'sootoo.com')) return 'DIRECT';
