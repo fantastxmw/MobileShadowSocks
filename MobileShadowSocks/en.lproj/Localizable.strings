@@ -32,12 +32,16 @@
     "Proxy Settings" = "Proxy Settings";
     "RC2 (CFB mode)" = "RC2 (CFB mode)";
     RC4 = RC4;
+    Rev = Rev;
     "SEED (CFB mode)" = "SEED (CFB mode)";
     Server = Server;
     "Server Information" = "Server Information";
     ShadowSocks = ShadowSocks;
+    "ShadowSocks is created by @clowwindy" = "ShadowSocks is created by @clowwindy";
     "Split with comma" = "Split with comma";
     "Table (Default)" = "Table (Default)";
+    Twitter = Twitter;
     "Use Default PAC File" = "Use Default PAC File";
+    Version = Version;
     Warning = Warning;
 }

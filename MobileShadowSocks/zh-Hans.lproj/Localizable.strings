@@ -32,12 +32,16 @@
     "Proxy Settings" = "\U4ee3\U7406\U8bbe\U7f6e";
     "RC2 (CFB mode)" = "RC2 (CFB \U6a21\U5f0f)";
     RC4 = RC4;
+    Rev = "\U6784\U5efa";
     "SEED (CFB mode)" = "SEED (CFB \U6a21\U5f0f)";
     Server = "\U670d\U52a1\U5668\U5730\U5740";
     "Server Information" = "\U670d\U52a1\U5668\U8bbe\U7f6e";
-    ShadowSocks = ShadowSocks;
+    ShadowSocks = "\U5f71\U68ad";
+    "ShadowSocks is created by @clowwindy" = "\U5f71\U68ad\U534f\U8bae\U7531 @clowwindy \U539f\U521b\U3002";
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U53f7\U5206\U9694";
     "Table (Default)" = "Table (\U9ed8\U8ba4)";
+    Twitter = "\U63a8\U7279";
     "Use Default PAC File" = "\U4f7f\U7528\U81ea\U5e26 PAC \U6587\U4ef6";
+    Version = "\U7248\U672c";
     Warning = "\U8b66\U544a";
 }

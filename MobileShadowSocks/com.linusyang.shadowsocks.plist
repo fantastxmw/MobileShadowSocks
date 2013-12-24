@@ -9,7 +9,11 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/Applications/MobileShadowSocks.app/shadowd</string>
+		<string>-n</string>
 		<string>-d</string>
+		<string>480</string>
+		<string>-c</string>
+		<string>/var/mobile/Library/Preferences/com.linusyang.shadowsocks.json</string>
 	</array>
 	<key>ServiceIPC</key>
 	<true/>

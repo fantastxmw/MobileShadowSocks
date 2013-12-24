@@ -9,8 +9,8 @@
 #import "SettingTableViewController.h"
 #import "CipherViewController.h"
 
-#define APP_VER @"0.2.4"
-#define APP_BUILD @"3"
+#define APP_VER @"0.2.5"
+#define APP_BUILD @"1"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"
@@ -25,10 +25,14 @@
 #define LOCAL_PORT 1983
 #define PAC_PORT 1993
 #define MAX_TRYTIMES 10
+#define LOCAL_TIMEOUT 60
 #define UPDATE_CONF "Update-Conf"
 #define SET_PROXY_PAC "SetProxy-Pac"
 #define SET_PROXY_SOCKS "SetProxy-Socks"
 #define SET_PROXY_NONE "SetProxy-None"
+
+#define JSON_CONFIG_NAME @"com.linusyang.shadowsocks.json"
+#define PAC_DEFAULT_NAME @"auto.pac"
 
 #define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
 #define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
@@ -53,14 +57,20 @@
     if (self) {
         _isEnabled = NO;
         _isPrefChanged = YES;
-        _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/shadow.pac", PAC_PORT];
+        _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
+         _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
+        
+        NSArray *sysPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask, YES);
+        NSString *prefsDirectory = [[sysPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Preferences"];
+        _configPath = [[NSString alloc] initWithFormat:@"%@/%@", prefsDirectory, JSON_CONFIG_NAME];
+       
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
             _cellWidth = 560.0f;
         else
             _cellWidth = 180.0f;
+        
         _tagNumber = 1000;
         _tagKey = [[NSMutableDictionary alloc] init];
-        _tagWillNotifyChange = [[NSMutableArray alloc] init];
         _tableSectionNumber = 3;
         _tableRowNumber = [[NSArray alloc] initWithObjects:
                            [NSNumber numberWithInt:1],
@@ -156,11 +166,12 @@
 - (void)dealloc
 {
     [_pacURL release];
+    [_configPath release];
     [_tableRowNumber release];
     [_tableSectionTitle release];
     [_tableElements release];
     [_tagKey release];
-    [_tagWillNotifyChange release];
+    [_pacDefaultFile release];
     [super dealloc];
 }
 
@@ -187,7 +198,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
     if (section == _tableSectionNumber - 1)
-        return [NSString stringWithFormat:@"%@\n© 2013 Linus Yang", NSLocalizedString(@"Localization by Linus Yang", @"Localization Information")];
+        return [NSString stringWithFormat:@"%@\n© 2013-2014 Linus Yang", NSLocalizedString(@"Localization by Linus Yang", @"Localization Information")];
     return nil;
 }
 
@@ -263,8 +274,6 @@
                 [cell setUserInteractionEnabled:isEnabled];
             }
             [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
-            if ([indexPath section] == 1)
-                [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:textField];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -285,15 +294,13 @@
                 _autoProxyCellTag = _tagNumber;
             }
             [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
-            if ([indexPath section] == 1)
-                [_tagWillNotifyChange addObject:[NSNumber numberWithInt:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:switcher];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [switcher release];
         }
         else if ([cellType hasPrefix:CELL_BUTTON]) {
-            [[cell textLabel] setTextAlignment:UITextAlignmentCenter];
+            [[cell textLabel] setTextAlignment:NSTextAlignmentCenter];
         }
         else if ([cellType hasPrefix:CELL_VIEW]) {
             [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -311,7 +318,10 @@
 
 - (void)showAbout
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:@"Version " APP_VER @" (Rev " APP_BUILD @")\nTwitter: @linusyang\nhttp://linusyang.com/\n\nShadowSocks is created by @clowwindy" delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:NSLocalizedString(@"Help Page",nil), nil];
+    NSString *aboutMessage = [NSString stringWithFormat:@"%@ %@ (%@ %@)\n%@: @linusyang\nhttp://linusyang.com/\n\n%@",
+                              NSLocalizedString(@"Version", nil), APP_VER, NSLocalizedString(@"Rev", nil), APP_BUILD,
+                              NSLocalizedString(@"Twitter", nil), NSLocalizedString(@"ShadowSocks is created by @clowwindy", nil)];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:aboutMessage delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:NSLocalizedString(@"Help Page",nil), nil];
     [alert setTag:ALERT_TAG_ABOUT];
     [alert show];
     [alert release];
@@ -335,15 +345,15 @@
 {
     if (buttonIndex != [alertView cancelButtonIndex]) {
         if ([alertView tag] == ALERT_TAG_ABOUT)
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/linusyang/MobileShadowSocks#mobileshadowsocks"]];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"]];
         else if ([alertView tag] == ALERT_TAG_DEFAULT_PAC) {
             for (UITableViewCell *cell in self.tableView.visibleCells) {
                 if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
                     UITextField *textField = (UITextField *) cell.accessoryView;
                     if ([textField tag] == _pacFileCellTag) {
-                        NSString *pacFile = [NSString stringWithFormat:@"%@/auto.pac", [[NSBundle mainBundle] bundlePath]];
-                        [textField setText:pacFile];
-                        [[NSUserDefaults standardUserDefaults] setObject:pacFile forKey:@"PAC_FILE"];
+                        [textField setText:_pacDefaultFile];
+                        [[NSUserDefaults standardUserDefaults] setObject:_pacDefaultFile forKey:@"PAC_FILE"];
+                        [self setPrefChanged];
                         break;
                     }
                 }
@@ -415,8 +425,6 @@
                                    withObject:[NSNumber numberWithBool:switcher.on]];
         }
     }
-    if ([_tagWillNotifyChange indexOfObject:[NSNumber numberWithInt:[switcher tag]]] != NSNotFound)
-        _isPrefChanged = YES;
 }
 
 #pragma mark - Text field delegate
@@ -439,8 +447,7 @@
 {
     NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[textField tag]]];
     [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:key];
-    if ([_tagWillNotifyChange indexOfObject:[NSNumber numberWithInt:[textField tag]]] != NSNotFound)
-        _isPrefChanged = YES;
+    [self setPrefChanged];
 }
 
 #pragma mark - Proxy threads
@@ -452,20 +459,21 @@
     ProxyStatus status = kProxyNone;
     if (start) {
         [[NSUserDefaults standardUserDefaults] synchronize];
-        [self notifyChanged];
         NSString *pacFile = [[[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
         if (isAuto) {
             status = kProxyPac;
-            if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile])
+            if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile]) {
                 [self performSelectorOnMainThread:@selector(showFileNotFound) withObject:nil waitUntilDone:YES];
-        }
-        else
+            }
+        } else {
             status = kProxySocks;
+        }
     }
-    if ([self setProxy:status])
+    if ([self setProxy:status]) {
         _isEnabled = start;
-    else {
+        [self notifyChanged];
+    } else {
         _isEnabled = !start;
         [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
     }
@@ -518,7 +526,7 @@
     const char *messageHeader = UPDATE_CONF;
     int messageId = [messageNumber intValue];
     switch (messageId) {
-        case 0:
+        case PROXY_UPDATE_CONF:
             messageHeader = UPDATE_CONF;
             break;
         case PROXY_NONE_STATUS:
@@ -551,8 +559,9 @@
         }
         [str release];
     }
-    if (messageId == 0 && ret == YES)
+    if (messageId == PROXY_UPDATE_CONF && ret == YES) {
         _isPrefChanged = NO;
+    }
     [request release];
     [pool release];
     return ret;
@@ -572,14 +581,10 @@
 
 - (void)notifyChanged
 {
-    if (_isPrefChanged)
-        [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:0]];
-}
-
-- (void)notifyChangedWhenRunning
-{
-    if (_isPrefChanged && _isEnabled)
-        [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:0]];
+    if (_isPrefChanged && _isEnabled) {
+        [self syncSettings];
+        [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_UPDATE_CONF]];
+    }
 }
 
 - (BOOL)setProxy:(ProxyStatus)status
@@ -597,6 +602,70 @@
             break;
     }
     return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];
+}
+
+- (NSString *)fetchConfigForKey:(NSString *)key andDefault:(NSString *)defaultValue
+{
+    NSString *config = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+    NSString *trimmedConfig = [config stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if (config == nil || [config length] == 0 || [trimmedConfig length] == 0) {
+        config = defaultValue;
+    }
+    return config;
+}
+
+- (void)appendString:(NSMutableString *)string key:(NSString *)key value:(NSString *)value isString:(BOOL)isString
+{
+    if (value == nil) {
+        return;
+    }
+    static NSString *stringFormat =  @"    \"%@\":\"%@\",\n";
+    static NSString *normalFormat = @"    \"%@\":%@,\n";
+    NSString *trimmedValue = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    [string appendFormat:isString ? stringFormat : normalFormat, key, trimmedValue];
+}
+
+- (void)syncSettings
+{
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    NSString *remoteServer = [self fetchConfigForKey:@"REMOTE_SERVER" andDefault:@"127.0.0.1"];
+    NSString *remotePort = [self fetchConfigForKey:@"REMOTE_PORT" andDefault:@"8080"];
+    NSString *localPort = [NSString stringWithFormat:@"%d", LOCAL_PORT];
+    NSString *socksPass = [self fetchConfigForKey:@"SOCKS_PASS" andDefault:@"123456"];
+    NSString *timeOut = [NSString stringWithFormat:@"%d", LOCAL_TIMEOUT];
+    NSString *cryptoMethod = [self fetchConfigForKey:@"CRYPTO_METHOD" andDefault:@"table"];
+    NSMutableString *exceptString = nil;
+    NSString *pacFilePath = [self fetchConfigForKey:@"PAC_FILE" andDefault:nil];
+    
+    NSString *excepts = [self fetchConfigForKey:@"EXCEPTION_LIST" andDefault:nil];
+    if (excepts) {
+        NSMutableArray *exceptArray = [NSMutableArray array];
+        NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
+        for (NSString *s in origArray) {
+            if (![s isEqualToString:@""]) {
+                [exceptArray addObject:s];
+            }
+        }
+        if ([exceptArray count] > 0) {
+            exceptString = [NSMutableString stringWithFormat:@"[\"%@\"", [exceptArray objectAtIndex:0]];
+            for (NSInteger i = 1; i < [exceptArray count]; i++) {
+                [exceptString appendFormat:@",\"%@\"", [exceptArray objectAtIndex:i]];
+            }
+            [exceptString appendFormat:@"]"];
+        }
+    }
+    
+    NSMutableString *jsonConfigString = [NSMutableString stringWithString:@"{\n"];
+    [self appendString:jsonConfigString key:@"server" value:remoteServer isString:YES];
+    [self appendString:jsonConfigString key:@"server_port" value:remotePort isString:NO];
+    [self appendString:jsonConfigString key:@"local_port" value:localPort isString:NO];
+    [self appendString:jsonConfigString key:@"password" value:socksPass isString:YES];
+    [self appendString:jsonConfigString key:@"timeout" value:timeOut isString:NO];
+    [self appendString:jsonConfigString key:@"method" value:cryptoMethod isString:YES];
+    [self appendString:jsonConfigString key:@"except_list" value:exceptString isString:NO];
+    [self appendString:jsonConfigString key:@"pac_path" value:pacFilePath isString:YES];
+    [jsonConfigString appendFormat:@"    \"pac_port\":%d\n}\n", PAC_PORT];
+    [jsonConfigString writeToFile:_configPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
 @end

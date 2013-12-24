@@ -37,8 +37,7 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [_tabViewController notifyChangedWhenRunning];
+    [_tabViewController notifyChanged];
 }
 
 @end

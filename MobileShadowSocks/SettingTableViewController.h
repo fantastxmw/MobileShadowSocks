@@ -11,6 +11,7 @@
 #define PROXY_PAC_STATUS 3
 #define PROXY_SOCKS_STATUS 2
 #define PROXY_NONE_STATUS 1
+#define PROXY_UPDATE_CONF 0
 
 typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 
@@ -25,8 +26,9 @@ typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
     NSInteger _autoProxyCellTag;
     NSInteger _enableCellTag;
     NSMutableDictionary *_tagKey;
-    NSMutableArray *_tagWillNotifyChange;
     NSString *_pacURL;
+    NSString *_configPath;
+    NSString *_pacDefaultFile;
     BOOL _isEnabled;
     BOOL _isPrefChanged;
 }
@@ -35,6 +37,5 @@ typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
 - (BOOL)setProxy:(ProxyStatus)status;
 - (void)setPrefChanged;
 - (void)notifyChanged;
-- (void)notifyChangedWhenRunning;
 
 @end
