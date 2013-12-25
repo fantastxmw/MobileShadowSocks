@@ -49,9 +49,20 @@ Apple has just abandoned ARMv6 support for Xcode and its compilers. Thus, at the
 * Based on [Shadowsocks-libev](https://github.com/linusyang/shadowsocks-libev) from @[madeye](https://github.com/madeye)
 * App icon from [Shadowsocks Android](https://github.com/shadowsocks/shadowsocks-android) (Too lazy to draw one by myself :P)
 
-### Note for Developers
-* You shoud have the code-signing certificate named *iPhone Developer*. Either self-signed or official is OK.
-* The final built Debian package will be generated under __release__ folder in the project directory.
+### Development
+
+#### Prerequisites
+* Xcode 4 or above (using latest version is recommended)
+* Code-signing certificate named *iPhone Developer* (either self-signed or official is OK)
+
+#### Build
+```bash
+git clone --recursive https://github.com/linusyang/MobileShadowSocks.git
+cd MobileShadowSocks
+xcodebuild -configuration Release
+```
+
+And the built Debian package will be generated under __release__ folder in the project directory.
 
 ### License
 Licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html)
