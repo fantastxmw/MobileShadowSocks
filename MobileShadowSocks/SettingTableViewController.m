@@ -33,6 +33,8 @@
 
 #define JSON_CONFIG_NAME @"com.linusyang.shadowsocks.json"
 #define PAC_DEFAULT_NAME @"auto.pac"
+#define RESPONSE_SUCC @"Updated."
+#define RESPONSE_FAIL @"Failed."
 
 #define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
 #define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
@@ -549,11 +551,11 @@
     for (i = 0; i < MAX_TRYTIMES; i++) {
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
         NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if ([str hasPrefix:@"Updated."]) {
+        if ([str hasPrefix:RESPONSE_SUCC]) {
             ret = YES;
             [str release];
             break;
-        } else if ([str hasPrefix:@"Failed."]) {
+        } else if ([str hasPrefix:RESPONSE_FAIL]) {
             [str release];
             break;
         }
