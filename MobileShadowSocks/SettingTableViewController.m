@@ -603,6 +603,9 @@
             statusId = PROXY_NONE_STATUS;
             break;
     }
+    if (![[NSFileManager defaultManager] fileExistsAtPath:_configPath]) {
+        [self syncSettings];
+    }
     return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];
 }
 
