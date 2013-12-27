@@ -42,7 +42,9 @@ No. The daemon uses the "__On Demand__" mechanism of `launchd`, which means it i
 The proxy settings are **indeed** set successfully if you don't see any alert views when turning on the switch. Sometimes they just don't show in the Settings. If you want to check it, call `scutil --proxy` in terminal.
 
 #### 6. Why cannot I use the app if I have iOS lower than 4.3 now?
-Apple has just abandoned ARMv6 support for Xcode and its compilers. Thus, at the moment, only ARMv7 devices with iOS 4.3 and above are supported. Really sorry, but I can nothing about this. :(
+Apple has just abandoned ARMv6 support for Xcode and its compilers. Thus, at the moment, only ARMv7 devices with iOS 4.3 and above are supported. Really sorry, but I can do nothing for this. :( 
+
+However, if you need, the last [legacy version](https://github.com/linusyang/MobileShadowSocks/releases/tag/v0.2.4-3) supporting ARMv6 is still available for downloading.
 
 ### Credits
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @[clowwindy](https://github.com/clowwindy)
@@ -65,4 +67,4 @@ xcodebuild -configuration Release
 And the built Debian package will be generated under __release__ folder in the project directory.
 
 ### License
-Licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html)
+Licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html).
