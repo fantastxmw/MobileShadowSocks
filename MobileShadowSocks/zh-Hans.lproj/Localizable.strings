@@ -18,6 +18,7 @@
     "Default PAC file might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e26 PAC \U4f7f\U7528\U201c\U767d\U540d\U5355\U201d\U6a21\U5f0f\Uff0c\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U8bbf\U95ee\Uff0c\U786e\U5b9a\U4f7f\U7528\U5417\Uff1f\n\n\U63d0\U793a\Uff1a\U53ef\U5728\U6392\U9664\U5217\U8868\U5185\U8bbe\U7f6e\U4e0d\U4f7f\U7528\U4ee3\U7406\U7684\U57df\U540d\U3002";
     Done = "\U5b8c\U6210";
     Edit = "\U7f16\U8f91";
+    "Edit Profile" = "\U7f16\U8f91\U914d\U7f6e";
     "Enable Proxy" = "\U542f\U7528\U4ee3\U7406";
     Error = "\U9519\U8bef";
     Exceptions = "\U6392\U9664\U5217\U8868";
@@ -26,7 +27,7 @@
     "Help Page" = "\U5e2e\U52a9\U9875\U9762";
     "IDEA (CFB mode)" = "IDEA (CFB \U6a21\U5f0f)";
     "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316\Uff1aLinus Yang";
-    "Name of New Profile:" = "\U65b0\U914d\U7f6e\U540d\U79f0:";
+    Name = "\U540d\U79f0";
     "New Profile" = "\U65b0\U589e\U914d\U7f6e";
     OK = "\U597d";
     On = "\U5f00";

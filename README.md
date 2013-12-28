@@ -12,7 +12,7 @@ By Linus Yang
 * __User-friendly__: Easy to set and use. Built-in auto-proxy feature.
 * __Universal__: System-wide proxy for either Wi-Fi or cellular network.
 * __All-in-one__: Only one Debian package with no dependency. No MobileSubstrate stuff.
-* __Compatibility__: All iDevices with iOS 3.0 and above (some new features need iOS >= 4.3).
+* __Compatibility__: All iDevices with iOS 3.0 and above.
 
 ### Installation
 1. Open Cydia.app and refresh sources
@@ -42,9 +42,6 @@ No. The daemon uses the "__On Demand__" mechanism of `launchd`, which means it i
 
 #### 5. I cannot find any proxy settings in *Settings*. Is the proxy actually enabled? And where are the proxy settings?
 The proxy settings are **indeed** set successfully if you don't see any alert views when turning on the switch. Sometimes they just don't show in the Settings. If you want to check it, call `scutil --proxy` in terminal.
-
-#### 6. Why do new features need iOS 4.3 and above?
-You __can__ still install and use the latest app on iOS 4.3 and below, but without any new features. This is because Apple has just abandoned ARMv6 support for Xcode and its compilers. Thus, I have no compilers to build newer builds for older devices. Really sorry, but I can do nothing for this. :(
 
 ### Credits
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @[clowwindy](https://github.com/clowwindy)

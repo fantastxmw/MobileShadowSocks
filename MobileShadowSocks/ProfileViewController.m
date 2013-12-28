@@ -8,6 +8,10 @@
 
 #import "ProfileViewController.h"
 
+@interface ProfileViewController ()
+- (void)exitEditMode;
+@end
+
 @implementation ProfileViewController
 
 - (id)initWithStyle:(UITableViewStyle)style withParentView:(SettingTableViewController *)parentView
@@ -25,6 +29,7 @@
     [super viewDidLoad];
     [self exitEditMode];
     [[self navigationItem] setTitle:NSLocalizedString(@"Profiles", nil)];
+    [[self tableView] setAllowsSelectionDuringEditing:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -42,6 +47,17 @@
 }
 
 #pragma mark - Table view data source
+
+- (void)checkRow:(NSInteger)row
+{
+    NSIndexPath *newPath = [NSIndexPath indexPathForRow:row inSection:0];
+    NSIndexPath *selectedPath = [NSIndexPath indexPathForRow:_selectedIndex inSection:0];
+    UITableViewCell *newCell = [[self tableView] cellForRowAtIndexPath:newPath];
+    UITableViewCell *selectedCell = [[self tableView] cellForRowAtIndexPath:selectedPath];
+    [newCell setAccessoryType:UITableViewCellAccessoryCheckmark];
+    [selectedCell setAccessoryType:UITableViewCellAccessoryNone];
+    _selectedIndex = row;
+}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -87,15 +103,9 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if (_selectedIndex != 0) {
-            NSIndexPath *defaultPath = [NSIndexPath indexPathForRow:0 inSection:0];
-            NSIndexPath *selectedPath = [NSIndexPath indexPathForRow:_selectedIndex inSection:0];
-            UITableViewCell *defaultCell = [tableView cellForRowAtIndexPath:defaultPath];
-            UITableViewCell *selectedCell = [tableView cellForRowAtIndexPath:selectedPath];
-            [defaultCell setAccessoryType:UITableViewCellAccessoryCheckmark];
-            [selectedCell setAccessoryType:UITableViewCellAccessoryNone];
+            [self checkRow:0];
         }
         [_parentView removeProfile:[indexPath row] - 1];
-        _selectedIndex = 0;
         [tableView beginUpdates];
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
         [tableView endUpdates];
@@ -122,12 +132,40 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([indexPath row] != _selectedIndex) {
-        _selectedIndex = [indexPath row];
-        [tableView reloadData];
+    if ([[self tableView] isEditing]) {
+        if ([indexPath row] > 0) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Edit Profile", nil)
+                                                            message:@""
+                                                           delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                  otherButtonTitles:NSLocalizedString(@"OK",nil),
+                                  nil];
+            UITextField *textField = [_parentView textFieldInAlertView:alert isInit:YES];
+            [textField setText:[_parentView nameOfProfile:[indexPath row] - 1]];
+            [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
+            [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
+            [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
+            [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
+            [alert setTag:[indexPath row] - 1];
+            [alert show];
+            [alert release];
+        }
+    } else if ([indexPath row] != _selectedIndex) {
+        [self checkRow:[indexPath row]];
         [_parentView selectProfile:_selectedIndex - 1];
     }
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+#pragma mark - Alert view delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex != [alertView cancelButtonIndex]) {
+        UITextField *textField = [_parentView textFieldInAlertView:alertView isInit:NO];
+        [_parentView renameProfile:[alertView tag] withName:[textField text]];
+        [[self tableView] reloadData];
+    }
 }
 
 @end

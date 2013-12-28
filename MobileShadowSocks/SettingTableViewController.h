@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
+@interface SettingTableViewController : UITableViewController <UITextFieldDelegate, UIAlertViewDelegate> {
     CGFloat _cellWidth;
     NSInteger _tableSectionNumber;
     NSArray *_tableRowNumber;
@@ -23,9 +23,6 @@
     NSString *_configPath;
     NSString *_pacDefaultFile;
     NSInteger _currentProfile;
-    NSMutableDictionary *_textFields;
-    NSMutableDictionary *_switchers;
-    BOOL _isEnabled;
     BOOL _isPrefChanged;
 }
 
@@ -39,8 +36,11 @@
 - (NSString *)nameOfProfile:(NSInteger)index;
 - (void)selectProfile:(NSInteger)profileIndex;
 - (void)removeProfile:(NSInteger)profileIndex;
+- (void)renameProfile:(NSInteger)index withName:(NSString *)name;
 
 - (void)saveObject:(id)value forKey:(NSString *)key;
 - (id)readObject:(NSString *)key;
+
+- (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit;
 
 @end

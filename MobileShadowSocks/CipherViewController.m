@@ -78,6 +78,17 @@
 
 #pragma mark - Table view data source
 
+- (void)checkRow:(NSInteger)row
+{
+    NSIndexPath *newPath = [NSIndexPath indexPathForRow:row inSection:0];
+    NSIndexPath *selectedPath = [NSIndexPath indexPathForRow:_selectedCipher inSection:0];
+    UITableViewCell *newCell = [[self tableView] cellForRowAtIndexPath:newPath];
+    UITableViewCell *selectedCell = [[self tableView] cellForRowAtIndexPath:selectedPath];
+    [newCell setAccessoryType:UITableViewCellAccessoryCheckmark];
+    [selectedCell setAccessoryType:UITableViewCellAccessoryNone];
+    _selectedCipher = row;
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
@@ -117,12 +128,11 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath row] != _selectedCipher) {
-        _selectedCipher = [indexPath row];
-        [tableView reloadData];
+        [self checkRow:[indexPath row]];
         [_parentView saveObject:[_cipherKeyArray objectAtIndex:_selectedCipher] forKey:@"CRYPTO_METHOD"];
         [_parentView setPrefChanged];
     }
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

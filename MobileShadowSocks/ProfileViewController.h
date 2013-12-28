@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "SettingTableViewController.h"
 
-@interface ProfileViewController : UITableViewController {
+@interface ProfileViewController : UITableViewController <UIAlertViewDelegate> {
     SettingTableViewController *_parentView;
     NSInteger _selectedIndex;
 }
