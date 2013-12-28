@@ -64,6 +64,8 @@ rm -rf "${BUILT_PRODUCTS_DIR}/backport/"
 rm -f shadowd7 MobileShadowSocks7
 
 # Prepare app
+/usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 3.0" makedeb/Applications/MobileShadowSocks.app/Info.plist
+/usr/bin/plutil -convert binary1 makedeb/Applications/MobileShadowSocks.app/Info.plist
 rm -rf makedeb/Applications/MobileShadowSocks.app/CodeResources
 ln -s _CodeSignature/CodeResources makedeb/Applications/MobileShadowSocks.app/CodeResources
 mkdir -p makedeb/Library/LaunchDaemons
