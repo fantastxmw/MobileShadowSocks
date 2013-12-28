@@ -61,7 +61,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:@"CRYPTO_METHOD"];
+    NSString *currentSetting = [_parentView readObject:@"CRYPTO_METHOD"];
     NSUInteger index = [_cipherKeyArray indexOfObject:currentSetting ? currentSetting : @"table"];
     _selectedCipher = (index == NSNotFound) ? 0 : index;
     [[self tableView] reloadData];
@@ -97,13 +97,13 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *CellIdentifier = [NSString stringWithFormat:@"Cell-%d", (int) [indexPath row]];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    static NSString *cellIdentifier = @"CipherTableViewCellIdentifier";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-        [[cell textLabel] setText:[_cipherNameArray objectAtIndex:[indexPath row]]];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
     }
+    [[cell textLabel] setText:[_cipherNameArray objectAtIndex:[indexPath row]]];
     if ([indexPath row] == _selectedCipher) {
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
     } else {
@@ -119,7 +119,7 @@
     if ([indexPath row] != _selectedCipher) {
         _selectedCipher = [indexPath row];
         [tableView reloadData];
-        [[NSUserDefaults standardUserDefaults] setObject:[_cipherKeyArray objectAtIndex:_selectedCipher] forKey:@"CRYPTO_METHOD"];
+        [_parentView saveObject:[_cipherKeyArray objectAtIndex:_selectedCipher] forKey:@"CRYPTO_METHOD"];
         [_parentView setPrefChanged];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];

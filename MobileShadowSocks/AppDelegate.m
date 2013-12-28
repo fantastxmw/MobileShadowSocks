@@ -40,4 +40,9 @@
     [_tabViewController notifyChanged];
 }
 
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    [_tabViewController saveSettings];
+}
+
 @end

@@ -8,9 +8,10 @@
 
 #import "SettingTableViewController.h"
 #import "CipherViewController.h"
+#import "ProfileViewController.h"
 
 #define APP_VER @"0.2.5"
-#define APP_BUILD @"1"
+#define APP_BUILD @"2"
 
 #define CELL_TEXT @"TextField"
 #define CELL_PASS @"Pass"
@@ -21,6 +22,7 @@
 #define CELL_VIEW @"View"
 #define ALERT_TAG_ABOUT 1
 #define ALERT_TAG_DEFAULT_PAC 2
+#define ALERT_TAG_NEW_PROFILE 3
 
 #define LOCAL_PORT 1983
 #define PAC_PORT 1993
@@ -31,15 +33,36 @@
 #define SET_PROXY_SOCKS "SetProxy-Socks"
 #define SET_PROXY_NONE "SetProxy-None"
 
+#define PROXY_PAC_STATUS 3
+#define PROXY_SOCKS_STATUS 2
+#define PROXY_NONE_STATUS 1
+#define PROXY_UPDATE_CONF 0
+
+typedef enum {
+    kProxyPac,
+    kProxySocks,
+    kProxyNone
+} ProxyStatus;
+
 #define JSON_CONFIG_NAME @"com.linusyang.shadowsocks.json"
 #define PAC_DEFAULT_NAME @"auto.pac"
 #define RESPONSE_SUCC @"Updated."
 #define RESPONSE_FAIL @"Failed."
 
+#define GLOBAL_PROFILE_NOW_KEY @"SELECTED_PROFILE"
+#define GLOBAL_PROFILE_LIST_KEY @"PROFILE_LIST"
+#define GLOBAL_PROXY_ENABLE_KEY @"PROXY_ENABLED"
+
+#define PROFILE_DEFAULT_NAME NSLocalizedString(@"Default", nil)
+#define PROFILE_DEFAULT_INDEX -1
+#define PROFILE_NAME_KEY @"PROFILE_NAME"
+
 #define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
 #define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
 #define kblackColor [UIColor colorWithRed:0 green:0 blue:0 alpha:1.0]
 #define kblackColorDisabled [UIColor colorWithRed:0 green:0 blue:0 alpha:0.439216f]
+
+#define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
 @interface UISwitch (Addition)
 - (void)setAlternateColors:(BOOL)enabled;
@@ -47,6 +70,11 @@
 
 @interface UIApplication (Addition)
 - (void)setApplicationBadgeString:(NSString *)badgeString;
+@end
+
+@interface UIAlertView (Addition)
+- (void)addTextFieldWithValue:(NSString *)value label:(NSString *)label;
+- (UITextField *)textFieldAtIndex:(NSInteger)textFieldIndex;
 @end
 
 @implementation SettingTableViewController
@@ -65,6 +93,12 @@
         NSArray *sysPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask, YES);
         NSString *prefsDirectory = [[sysPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Preferences"];
         _configPath = [[NSString alloc] initWithFormat:@"%@/%@", prefsDirectory, JSON_CONFIG_NAME];
+        
+        _currentProfile = PROFILE_DEFAULT_INDEX;
+        [self reloadProfile];
+        
+        _textFields = [[NSMutableDictionary alloc] init];
+        _switchers = [[NSMutableDictionary alloc] init];
        
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
             _cellWidth = 560.0f;
@@ -75,12 +109,12 @@
         _tagKey = [[NSMutableDictionary alloc] init];
         _tableSectionNumber = 3;
         _tableRowNumber = [[NSArray alloc] initWithObjects:
-                           [NSNumber numberWithInt:1],
+                           [NSNumber numberWithInt:3],
                            [NSNumber numberWithInt:4],
                            [NSNumber numberWithInt:4],
                            nil];
         _tableSectionTitle = [[NSArray alloc] initWithObjects:
-                              @"",
+                              NSLocalizedString(@"General", nil),
                               NSLocalizedString(@"Server Information", nil),
                               NSLocalizedString(@"Proxy Settings", nil),
                               nil];
@@ -88,9 +122,19 @@
                           [NSArray arrayWithObjects:
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Enable Proxy", nil),
-                            @"PROXY_ENABLED",
+                            GLOBAL_PROXY_ENABLE_KEY,
                             @"NO",
                             CELL_SWITCH, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Profile", nil),
+                            GLOBAL_PROFILE_NOW_KEY,
+                            PROFILE_DEFAULT_NAME,
+                            CELL_VIEW, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Create New Profile", nil),
+                            @"NEW_PROFILE_BUTTON",
+                            @"",
+                            CELL_BUTTON, nil],
                            nil],
                           [NSArray arrayWithObjects:
                            [NSArray arrayWithObjects:
@@ -157,6 +201,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self reloadProfile];
     [[self tableView] reloadData];
 }
 
@@ -174,6 +219,8 @@
     [_tableElements release];
     [_tagKey release];
     [_pacDefaultFile release];
+    [_textFields release];
+    [_switchers release];
     [super dealloc];
 }
 
@@ -221,12 +268,31 @@
             [alert setTag:ALERT_TAG_DEFAULT_PAC];
             [alert show];
             [alert release];
+        } else if ([cellKey isEqualToString:@"NEW_PROFILE_BUTTON"]) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"New Profile", nil)
+                                                            message:NSLocalizedString(@"Name of New Profile:", nil)
+                                                           delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                  otherButtonTitles:NSLocalizedString(@"OK",nil),
+                                  nil];
+            UITextField *textField = [self textFieldInAlertView:alert isInit:YES];
+            [textField setPlaceholder:PROFILE_DEFAULT_NAME];
+            [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
+            [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
+            [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
+            [alert setTag:ALERT_TAG_NEW_PROFILE];
+            [alert show];
+            [alert release];
         }
     } else if ([cellType hasPrefix:CELL_VIEW]) {
         if ([cellKey isEqualToString:@"CRYPTO_METHOD"]) {
             CipherViewController *cipherViewController = [[CipherViewController alloc] initWithStyle:UITableViewStyleGrouped withParentView:self];
             [self.navigationController pushViewController:cipherViewController animated:YES];
             [cipherViewController release];
+        } else if ([cellKey isEqualToString:GLOBAL_PROFILE_NOW_KEY]) {
+            ProfileViewController *profileViewController = [[ProfileViewController alloc] initWithStyle:UITableViewStyleGrouped withParentView:self];
+            [self.navigationController pushViewController:profileViewController animated:YES];
+            [profileViewController release];
         }
     }
     [[self tableView] deselectRowAtIndexPath:indexPath animated:NO];
@@ -234,25 +300,25 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *CellIdentifier = [NSString stringWithFormat:@"%ld-%ld", (long) [indexPath section], (long) [indexPath row]];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     NSArray *tableSection = [_tableElements objectAtIndex:[indexPath section]];
     NSArray *tableCell = [tableSection objectAtIndex:[indexPath row]];
+    
     NSString *cellTitle = (NSString *) [tableCell objectAtIndex:0];
     NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
     NSString *cellDefaultValue = (NSString *) [tableCell objectAtIndex:2];
     NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
+    NSString *cellIdentifier = [NSString stringWithFormat:@"SettingTableCellIdentifier-%@", cellType];
+    
     UITableViewCellStyle cellStyle = [cellType hasPrefix:CELL_VIEW] ? UITableViewCellStyleValue1 : UITableViewCellStyleDefault;
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:cellStyle reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:cellStyle reuseIdentifier:cellIdentifier] autorelease];
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
         [[cell textLabel] setTextColor:kblackColor];
         if ([cellType hasPrefix:CELL_TEXT]) {
-            NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
             UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, _cellWidth, 24)];
             [textField setTextColor:kgrayBlueColor];
-            [textField setText:currentSetting ? currentSetting : @""];
             [textField setPlaceholder:cellDefaultValue];
             if ([cellType hasSuffix:CELL_NUM])
                 [textField setKeyboardType:UIKeyboardTypePhonePad];
@@ -267,29 +333,20 @@
             [textField setTag:_tagNumber];
             if ([cellKey isEqualToString:@"PAC_FILE"]) {
                 _pacFileCellTag = _tagNumber;
-                BOOL isEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
-                [textField setEnabled:isEnabled];
-                if (!isEnabled) {
-                    [textField setTextColor:kgrayBlueColorDisabled];
-                    [[cell textLabel] setTextColor:kblackColorDisabled];
-                }
-                [cell setUserInteractionEnabled:isEnabled];
             }
             [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:textField];
+            [_textFields setObject:textField forKey:cellKey];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [textField release];
         }
         else if ([cellType hasPrefix:CELL_SWITCH]) {
-            BOOL switchValue = [[NSUserDefaults standardUserDefaults] boolForKey:cellKey];
             UISwitch *switcher = [[UISwitch alloc] initWithFrame:CGRectZero];
-            [switcher setOn:switchValue animated:NO];
             [switcher addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
             [switcher setTag:_tagNumber];
-            if ([cellKey isEqualToString:@"PROXY_ENABLED"]) {
+            if ([cellKey isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
                 _enableCellTag = _tagNumber;
-                _isEnabled = switchValue;
                 if ([switcher respondsToSelector:@selector(setAlternateColors:)])
                     [switcher setAlternateColors:YES];
             } else if ([cellKey isEqualToString:@"AUTO_PROXY"]) {
@@ -298,6 +355,7 @@
             [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
             _tagNumber++;
             [cell setAccessoryView:switcher];
+            [_switchers setObject:switcher forKey:cellKey];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [switcher release];
         }
@@ -308,11 +366,38 @@
             [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         }
     }
-    if ([cellKey isEqualToString:@"CRYPTO_METHOD"]) {
-        NSString *currentSetting = [[NSUserDefaults standardUserDefaults] stringForKey:cellKey];
+    
+    if ([cellType hasPrefix:CELL_TEXT]) {
+        UITextField *textField = [_textFields objectForKey:cellKey];
+        NSString *currentSetting = [self readObject:cellKey];
+        [textField setText:currentSetting ? currentSetting : @""];
+        if ([cellKey isEqualToString:@"PAC_FILE"]) {
+            BOOL isEnabled = [self readBool:@"AUTO_PROXY"];
+            [textField setEnabled:isEnabled];
+            if (!isEnabled) {
+                [textField setTextColor:kgrayBlueColorDisabled];
+                [[cell textLabel] setTextColor:kblackColorDisabled];
+            }
+            [cell setUserInteractionEnabled:isEnabled];
+        }
+    } else if ([cellType hasPrefix:CELL_SWITCH]) {
+        UISwitch *switcher = [_switchers objectForKey:cellKey];
+        BOOL switchValue = [self readBool:cellKey];
+        [switcher setOn:switchValue animated:NO];
+        if ([cellKey isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
+            _isEnabled = switchValue;
+        }
+    } else if ([cellType hasPrefix:CELL_VIEW]) {
+        NSString *currentSetting = nil;
+        if ([cellKey isEqualToString:GLOBAL_PROFILE_NOW_KEY]) {
+            currentSetting = [self nameOfProfile:_currentProfile];
+        } else {
+            currentSetting = [self readObject:cellKey];
+        }
         NSString *labelString = currentSetting ? currentSetting : cellDefaultValue;
         [[cell detailTextLabel] setText:labelString];
     }
+    
     return cell;
 }
 
@@ -343,7 +428,28 @@
     [alert release];
 }
 
-- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex
+- (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit
+{
+    UITextField *textField = nil;
+    if (SYSTEM_VERSION_LESS_THAN(@"5.0")) {
+        if (isInit) {
+            if ([alertView respondsToSelector:@selector(addTextFieldWithValue:label:)]) {
+                [alertView addTextFieldWithValue:@"" label:@""];
+            }
+        }
+        if ([alertView respondsToSelector:@selector(textFieldAtIndex:)]) {
+            textField = [alertView textFieldAtIndex:0];
+        }
+    } else {
+        if (isInit) {
+            [alertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
+        }
+        textField = [alertView textFieldAtIndex:0];
+    }
+    return textField;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex != [alertView cancelButtonIndex]) {
         if ([alertView tag] == ALERT_TAG_ABOUT)
@@ -354,12 +460,15 @@
                     UITextField *textField = (UITextField *) cell.accessoryView;
                     if ([textField tag] == _pacFileCellTag) {
                         [textField setText:_pacDefaultFile];
-                        [[NSUserDefaults standardUserDefaults] setObject:_pacDefaultFile forKey:@"PAC_FILE"];
+                        [self saveObject:_pacDefaultFile forKey:@"PAC_FILE"];
                         [self setPrefChanged];
                         break;
                     }
                 }
             }
+        } else if ([alertView tag] == ALERT_TAG_NEW_PROFILE) {
+            UITextField *textField = [self textFieldInAlertView:alertView isInit:NO];
+            [self createProfile:[textField text]];
         }
     }
 }
@@ -388,7 +497,7 @@
         if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([switcher tag] == _enableCellTag) {
-                [[NSUserDefaults standardUserDefaults] setBool:[enabledObject boolValue] forKey:@"PROXY_ENABLED"];
+                [self saveBool:[enabledObject boolValue] forKey:GLOBAL_PROXY_ENABLE_KEY];
                 [switcher setOn:[enabledObject boolValue]];
                 break;
             }
@@ -418,7 +527,7 @@
         return;
     }
     NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[switcher tag]]];
-    [[NSUserDefaults standardUserDefaults] setBool:switcher.on forKey:key];
+    [self saveBool:switcher.on forKey:key];
     if ([switcher tag] == _autoProxyCellTag) {
         [self setPacFileCellEnabled:switcher.on];
         if (_isEnabled) {
@@ -448,7 +557,7 @@
 - (void)textFieldDidChange:(UITextField *)textField
 {
     NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[textField tag]]];
-    [[NSUserDefaults standardUserDefaults] setObject:[textField text] forKey:key];
+    [self saveObject:[textField text] forKey:key];
     [self setPrefChanged];
 }
 
@@ -460,9 +569,8 @@
     BOOL start = [willStart boolValue];
     ProxyStatus status = kProxyNone;
     if (start) {
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        NSString *pacFile = [[[NSUserDefaults standardUserDefaults] stringForKey:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        BOOL isAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
+        NSString *pacFile = [[self readObject:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        BOOL isAuto = [self readBool:@"AUTO_PROXY"];
         if (isAuto) {
             status = kProxyPac;
             if (!pacFile || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile]) {
@@ -497,8 +605,8 @@
     if (isEnabled)
         nowStatus = pacEnabled ? kProxyPac : kProxySocks;
     
-    BOOL prefEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"PROXY_ENABLED"];
-    BOOL prefAuto = [[NSUserDefaults standardUserDefaults] boolForKey:@"AUTO_PROXY"];
+    BOOL prefEnabled = [self readBool:GLOBAL_PROXY_ENABLE_KEY];
+    BOOL prefAuto = [self readBool:@"AUTO_PROXY"];
     ProxyStatus prefStatus = kProxyNone;
     if (prefEnabled)
         prefStatus = prefAuto ? kProxyPac : kProxySocks;
@@ -589,6 +697,13 @@
     }
 }
 
+- (void)saveSettings
+{
+    if (_isPrefChanged) {
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
 - (BOOL)setProxy:(ProxyStatus)status
 {
     int statusId = PROXY_NONE_STATUS;
@@ -609,15 +724,175 @@
     return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];
 }
 
+#pragma mark - Profile read settings
+
+- (void)saveObject:(id)value forKey:(NSString *)key
+{
+    if (key == nil) {
+        return;
+    }
+    if ([self isDefaultProfile] || \
+        [key isEqualToString:GLOBAL_PROFILE_NOW_KEY] || \
+        [key isEqualToString:GLOBAL_PROFILE_LIST_KEY] || \
+        [key isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
+        [[NSUserDefaults standardUserDefaults] setObject:value forKey:key];
+    } else {
+        NSArray *profileList = [self profileList];
+        NSDictionary *currentDict = [profileList objectAtIndex:_currentProfile];
+        if (currentDict == nil) {
+            return;
+        }
+        NSMutableDictionary *newDict = [NSMutableDictionary dictionaryWithDictionary:currentDict];
+        [newDict setObject:value forKey:key];
+        NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
+        [newProfileList replaceObjectAtIndex:_currentProfile withObject:newDict];
+        [self updateProfileList:newProfileList];
+    }
+}
+
+- (id)readObject:(NSString *)key
+{
+    id value = nil;
+    if (key == nil) {
+        return nil;
+    }
+    if ([self isDefaultProfile] || \
+        [key isEqualToString:GLOBAL_PROFILE_NOW_KEY] || \
+        [key isEqualToString:GLOBAL_PROFILE_LIST_KEY] || \
+        [key isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
+        value = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+    } else {
+        NSArray *profileList = [self profileList];
+        NSDictionary *currentDict = [profileList objectAtIndex:_currentProfile];
+        value = [currentDict objectForKey:key];
+    }
+    return value;
+}
+
+- (void)saveBool:(BOOL)value forKey:(NSString *)key
+{
+    [self saveObject:[NSNumber numberWithBool:value] forKey:key];
+}
+
+- (BOOL)readBool:(NSString *)key
+{
+    return [[self readObject:key] boolValue];
+}
+
+- (void)saveInt:(NSInteger)value forKey:(NSString *)key
+{
+    [self saveObject:[NSNumber numberWithInteger:value] forKey:key];
+}
+
+- (NSInteger)readInt:(NSString *)key
+{
+    NSNumber *value = [self readObject:key];
+    if (value == nil || ![value isKindOfClass:[NSNumber class]]) {
+        return PROFILE_DEFAULT_INDEX;
+    }
+    return [value integerValue];
+}
+
 - (NSString *)fetchConfigForKey:(NSString *)key andDefault:(NSString *)defaultValue
 {
-    NSString *config = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+    NSString *config = [self readObject:key];
     NSString *trimmedConfig = [config stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if (config == nil || [config length] == 0 || [trimmedConfig length] == 0) {
         config = defaultValue;
     }
     return config;
 }
+
+- (BOOL)isDefaultProfile
+{
+    return _currentProfile == PROFILE_DEFAULT_INDEX;
+}
+
+#pragma mark - Profile operations
+
+- (NSInteger)currentProfile
+{
+    return _currentProfile;
+}
+
+- (NSArray *)profileList
+{
+    NSArray *profileList = [[NSUserDefaults standardUserDefaults] objectForKey:GLOBAL_PROFILE_LIST_KEY];
+    if ([profileList isKindOfClass:[NSArray class]]) {
+        return profileList;
+    }
+    return nil;
+}
+
+- (NSInteger)profileListCount
+{
+    return [[self profileList] count];
+}
+
+- (NSString *)nameOfProfile:(NSInteger)index
+{
+    NSString *name = nil;
+    NSArray *profileList = [self profileList];
+    if (index == PROFILE_DEFAULT_INDEX) {
+        name = PROFILE_DEFAULT_NAME;
+    } else if (profileList != nil && index >= 0 && index < [profileList count]) {
+        NSDictionary *profile = [profileList objectAtIndex:index];
+        if ([profile isKindOfClass:[NSDictionary class]]) {
+            name = [profile objectForKey:PROFILE_NAME_KEY];
+        }
+    }
+    return name;
+}
+
+- (void)updateProfileList:(id)value
+{
+    [[NSUserDefaults standardUserDefaults] setObject:value forKey:GLOBAL_PROFILE_LIST_KEY];
+}
+
+- (void)selectProfile:(NSInteger)profileIndex
+{
+    [self saveInt:profileIndex forKey:GLOBAL_PROFILE_NOW_KEY];
+    _currentProfile = profileIndex;
+    [self setPrefChanged];
+}
+
+- (void)removeProfile:(NSInteger)profileIndex
+{
+    NSArray *profileList = [self profileList];
+    if (profileList == nil) {
+        return;
+    }
+    if (profileIndex >= 0 && profileIndex < [profileList count]) {
+        NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
+        [newProfileList removeObjectAtIndex:profileIndex];
+        [self updateProfileList:newProfileList];
+        [self selectProfile:PROFILE_DEFAULT_INDEX];
+    }
+}
+
+- (void)reloadProfile
+{
+    _currentProfile = [self readInt:GLOBAL_PROFILE_NOW_KEY];
+    if (_currentProfile < 0 || _currentProfile >= [self profileListCount]) {
+        _currentProfile = PROFILE_DEFAULT_INDEX;
+    }
+}
+
+- (void)createProfile:(NSString *)rawName
+{
+    NSString *profileName = [rawName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if (profileName == nil || [profileName length] == 0) {
+        return;
+    }
+    NSArray *profileList = [self profileList];
+    NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
+    [newProfileList addObject:[NSDictionary dictionaryWithObjectsAndKeys:profileName, PROFILE_NAME_KEY, nil]];
+    [self updateProfileList:newProfileList];
+    [self selectProfile:[newProfileList count] - 1];
+    [[self tableView] reloadData];
+}
+
+#pragma mark - JSON settings sync
 
 - (void)appendString:(NSMutableString *)string key:(NSString *)key value:(NSString *)value isString:(BOOL)isString
 {
@@ -632,7 +907,6 @@
 
 - (void)syncSettings
 {
-    [[NSUserDefaults standardUserDefaults] synchronize];
     NSString *remoteServer = [self fetchConfigForKey:@"REMOTE_SERVER" andDefault:@"127.0.0.1"];
     NSString *remotePort = [self fetchConfigForKey:@"REMOTE_PORT" andDefault:@"8080"];
     NSString *localPort = [NSString stringWithFormat:@"%d", LOCAL_PORT];

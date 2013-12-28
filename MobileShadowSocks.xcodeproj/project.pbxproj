@@ -16,6 +16,7 @@
 		4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */; };
 		4B6097791869FDC300A5FB30 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B60977B1869FDC300A5FB30 /* InfoPlist.strings */; };
 		4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE04A361751E9AF0019AAB1 /* CipherViewController.m */; };
+		4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF38F10186DD07F008C4EF1 /* ProfileViewController.m */; };
 		4BF7CE9616C0775900713EC9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BF7CE9516C0775900713EC9 /* CFNetwork.framework */; };
 		4BF902EE16BA996E00E35F60 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902EB16BA996E00E35F60 /* Icon-72.png */; };
 		4BF902EF16BA996E00E35F60 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF902EC16BA996E00E35F60 /* Icon.png */; };
@@ -55,11 +56,12 @@
 		4B60977C1869FDC600A5FB30 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		4BE04A351751E9AF0019AAB1 /* CipherViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CipherViewController.h; sourceTree = "<group>"; };
 		4BE04A361751E9AF0019AAB1 /* CipherViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CipherViewController.m; sourceTree = "<group>"; };
+		4BF38F0F186DD07F008C4EF1 /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
+		4BF38F10186DD07F008C4EF1 /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
 		4BF7CE9516C0775900713EC9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		4BF902EB16BA996E00E35F60 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
 		4BF902EC16BA996E00E35F60 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		4BF902ED16BA996E00E35F60 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
-		4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = gen_entitlements.py; sourceTree = "<group>"; };
 		4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.linusyang.shadowsocks.plist; sourceTree = "<group>"; };
 		4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SettingTableViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4BF9031616BA9F9200E35F60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -117,6 +119,8 @@
 				4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */,
 				4BE04A351751E9AF0019AAB1 /* CipherViewController.h */,
 				4BE04A361751E9AF0019AAB1 /* CipherViewController.m */,
+				4BF38F0F186DD07F008C4EF1 /* ProfileViewController.h */,
+				4BF38F10186DD07F008C4EF1 /* ProfileViewController.m */,
 				4B3A811416BA4A2C00BE1B4C /* Supporting Files */,
 			);
 			path = MobileShadowSocks;
@@ -129,7 +133,6 @@
 				4BF9031316BA9F8D00E35F60 /* Localizable.strings */,
 				4B080C8316FB2B6900DE1EE3 /* auto.pac */,
 				4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */,
-				4BF902FF16BA9D3A00E35F60 /* gen_entitlements.py */,
 				4BF902EB16BA996E00E35F60 /* Icon-72.png */,
 				4BF902EC16BA996E00E35F60 /* Icon.png */,
 				4BF902ED16BA996E00E35F60 /* Icon@2x.png */,
@@ -169,7 +172,7 @@
 		4B3A810016BA4A2C00BE1B4C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Linus Yang";
 			};
 			buildConfigurationList = 4B3A810316BA4A2C00BE1B4C /* Build configuration list for PBXProject "MobileShadowSocks" */;
@@ -221,7 +224,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#!/bin/bash\n\nif [[ \"${XCODE_VERSION_MAJOR}\" -ge \"0500\" ]]; then\n    export TC_PATH=\"${DT_TOOLCHAIN_DIR}/usr/bin\"\nelse\n    export TC_PATH=\"${PLATFORM_DEVELOPER_BIN_DIR}\"\nfi\n\nbuild_launcher() {\n    export CODESIGN_ALLOCATE=\"${TC_PATH}/codesign_allocate\"\n    SRCDIR=\"${PROJECT_DIR}/shadowsocks-libev\"\n    \"${TC_PATH}/clang\" -arch \"$1\" -O3 -I\"${SRCDIR}/libev\" -I\"${PROJECT_DIR}/MobileShadowSocks\" -I\"${SRCDIR}/src\" -I\"${SDKROOT}/usr/include\" -I\"${BUILT_PRODUCTS_DIR}/ssl/include\" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION=\"\\\"${NOWVER}-${NOWBUILD}\\\"\" -L\"${SDKROOT}/usr/lib\" -L\"${BUILT_PRODUCTS_DIR}/ssl/lib\" -miphoneos-version-min=3.0 -isysroot \"${SDKROOT}\" -framework CoreFoundation -framework SystemConfiguration -lcrypto \"${SRCDIR}/src/encrypt.c\" \"${SRCDIR}/src/local.c\" \"${SRCDIR}/src/utils.c\" \"${SRCDIR}/src/jconf.c\" \"${SRCDIR}/src/json.c\" \"${SRCDIR}/src/cache.c\" \"${SRCDIR}/src/udprelay.c\" \"${SRCDIR}/libev/ev.c\" -o \"$2\"\n    \"${PROJECT_DIR}/MobileShadowSocks/ldid\" -S \"$2\"\n}\n\nif [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\n\nset -e\n\n# Code sign\nexport CODESIGN_ALLOCATE=\"${TC_PATH}/codesign_allocate\"\npython \"${PROJECT_DIR}/MobileShadowSocks/gen_entitlements.py\" \"com.linusyang.${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\";\ncodesign -f -s \"iPhone Developer\" --entitlements \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/\"\nrm -f \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/${PROJECT_NAME}.xcent\"\n\n# Version info\nVERINFO=\"${PROJECT_DIR}/MobileShadowSocks/SettingTableViewController.m\"\nNOWVER=\"$(grep \"APP_VER\" \"${VERINFO}\" | awk '{print $3}' | sed 's/[\"@]//g' | head -1)\"\nNOWBUILD=\"$(grep \"APP_BUILD\" \"${VERINFO}\" | awk '{print $3}' | sed 's/[\"@]//g' | head -1)\"\n\n# Clean old build\ncd \"${BUILT_PRODUCTS_DIR}\"\nrm -rf makedeb\nrm -f *.deb\nmkdir -p makedeb\n\n# Fix permission\nchmod 755 \"${PROJECT_DIR}/MobileShadowSocks/ldid\"\nchmod 755 \"${PROJECT_DIR}/MobileShadowSocks/dpkg-deb\"\nchmod 755 \"${PROJECT_DIR}/MobileShadowSocks/gnutar\"\n\n# Build launcher\ntar zxf \"${PROJECT_DIR}/MobileShadowSocks/ssl.tgz\" -C \"${BUILT_PRODUCTS_DIR}/\"\nbuild_launcher armv7 shadowd\nrm -rf \"${BUILT_PRODUCTS_DIR}/ssl/\"\n\n# Prepare binaries\nmkdir -p makedeb/Applications\ncp -r \"${WRAPPER_NAME}\" makedeb/Applications/\nrm -f makedeb/Applications/MobileShadowSocks.app/CodeResources\nln -s _CodeSignature/CodeResources makedeb/Applications/MobileShadowSocks.app/CodeResources\nmv -f shadowd makedeb/Applications/MobileShadowSocks.app/\nchmod 755 makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks\nmkdir -p makedeb/Library/LaunchDaemons\nmv -f makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist makedeb/Library/LaunchDaemons/\n/usr/bin/plutil -convert binary1 makedeb/Library/LaunchDaemons/com.linusyang.shadowsocks.plist\nchmod 644 makedeb/Library/LaunchDaemons/com.linusyang.shadowsocks.plist\n\n# Make package\nfind . -name .DS_Store -type f -delete\nNOWSIZE=\"$(du -s -k makedeb | awk '{print $1}')\"\nCTRLFILE=\"Package: com.linusyang.shadowsocks\\nSection: Networking\\nInstalled-Size: $NOWSIZE\\nPre-Depends: firmware (>= 4.3)\\nAuthor: Linus Yang <laokongzi@gmail.com>\\nArchitecture: iphoneos-arm\\nVersion: $NOWVER-$NOWBUILD\\nDescription: shadowsocks client for iOS\\nName: ShadowSocks\\nHomepage: https://github.com/linusyang/MobileShadowSocks\\nIcon: file:///Applications/MobileShadowSocks.app/Icon.png\\nTag: purpose::uikit\\n\"\nPOSTFILE='#!/bin/sh\\nBUNDLE=\"/Applications/MobileShadowSocks.app\"\\nchmod 755 \"${BUNDLE}/MobileShadowSocks\"\\nchmod 755 \"${BUNDLE}/shadowd\"\\nchown -R 0:0 \"${BUNDLE}\"\\nexit 0\\n'\nEXTRA='#!/bin/sh\\n\\nchmod 644 /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\\nchown 0:0 /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\\n\\nif [[ $1 == upgrade ]]; then\\n    /bin/launchctl unload -w /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\\nfi\\n\\nif [[ $1 == install || $1 == upgrade ]]; then\\n    /bin/launchctl load -w /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\\nfi\\n\\nexit 0\\n'\nPRERM='#!/bin/sh\\n\\nif [[ $1 == remove || $1 == purge ]]; then\\n    /bin/launchctl unload -w /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\\nfi\\n\\nexit 0\\n'\nDEBNAME=\"com.linusyang.shadowsocks_$NOWVER-$NOWBUILD\"\nmkdir -p makedeb/DEBIAN\necho -ne \"${CTRLFILE}\" > makedeb/DEBIAN/control\necho -ne \"${POSTFILE}\" > makedeb/DEBIAN/postinst\necho -ne \"${PRERM}\" > makedeb/DEBIAN/prerm\necho -ne \"${EXTRA}\" > makedeb/DEBIAN/extrainst_\nchmod 755 makedeb/DEBIAN/postinst\nchmod 755 makedeb/DEBIAN/prerm\nchmod 755 makedeb/DEBIAN/extrainst_\nOLDPATH=\"${PATH}\"\nexport PATH=\"${PROJECT_DIR}/MobileShadowSocks:${PATH}\"\n\"${PROJECT_DIR}/MobileShadowSocks/dpkg-deb\" -b makedeb t.deb\nexport PATH=\"${OLDPATH}\"\nmkdir -p \"${PROJECT_DIR}/release\"\nmv -f t.deb \"${PROJECT_DIR}/release/${DEBNAME}\"_iphoneos-arm.deb\n\n# Clean\nrm -rf makedeb\n\nfi\n";
+			shellScript = "if [ \"${PLATFORM_NAME}\" == \"iphoneos\" ]; then\n/bin/bash ${PROJECT_DIR}/extra/build-extra.sh\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -234,6 +237,7 @@
 				4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */,
 				4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */,
 				4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */,
+				4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

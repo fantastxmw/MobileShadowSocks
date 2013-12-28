@@ -8,13 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-#define PROXY_PAC_STATUS 3
-#define PROXY_SOCKS_STATUS 2
-#define PROXY_NONE_STATUS 1
-#define PROXY_UPDATE_CONF 0
-
-typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
-
 @interface SettingTableViewController : UITableViewController <UITextFieldDelegate> {
     CGFloat _cellWidth;
     NSInteger _tableSectionNumber;
@@ -29,13 +22,25 @@ typedef enum {kProxyPac, kProxySocks, kProxyNone} ProxyStatus;
     NSString *_pacURL;
     NSString *_configPath;
     NSString *_pacDefaultFile;
+    NSInteger _currentProfile;
+    NSMutableDictionary *_textFields;
+    NSMutableDictionary *_switchers;
     BOOL _isEnabled;
     BOOL _isPrefChanged;
 }
 
 - (void)fixProxy;
-- (BOOL)setProxy:(ProxyStatus)status;
 - (void)setPrefChanged;
 - (void)notifyChanged;
+- (void)saveSettings;
+
+- (NSInteger)currentProfile;
+- (NSInteger)profileListCount;
+- (NSString *)nameOfProfile:(NSInteger)index;
+- (void)selectProfile:(NSInteger)profileIndex;
+- (void)removeProfile:(NSInteger)profileIndex;
+
+- (void)saveObject:(id)value forKey:(NSString *)key;
+- (id)readObject:(NSString *)key;
 
 @end

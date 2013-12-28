@@ -12,12 +12,14 @@ By Linus Yang
 * __User-friendly__: Easy to set and use. Built-in auto-proxy feature.
 * __Universal__: System-wide proxy for either Wi-Fi or cellular network.
 * __All-in-one__: Only one Debian package with no dependency. No MobileSubstrate stuff.
-* __Compatibility__: All iDevices with iOS 4.3 and above.
+* __Compatibility__: All iDevices with iOS 3.0 and above (some new features need iOS >= 4.3).
 
 ### Installation
 1. Open Cydia.app and refresh sources
 2. Search the package named *ShadowSocks* and install it
 3. That's it!
+
+__Note__: Latest packages are also available [here](https://github.com/linusyang/MobileShadowSocks/releases) for manual installation.
 
 ### Usage
 1. After installation, you will find a icon named *Shadow* on your device.
@@ -41,20 +43,27 @@ No. The daemon uses the "__On Demand__" mechanism of `launchd`, which means it i
 #### 5. I cannot find any proxy settings in *Settings*. Is the proxy actually enabled? And where are the proxy settings?
 The proxy settings are **indeed** set successfully if you don't see any alert views when turning on the switch. Sometimes they just don't show in the Settings. If you want to check it, call `scutil --proxy` in terminal.
 
-#### 6. Why cannot I use the app if I have iOS lower than 4.3 now?
-Apple has just abandoned ARMv6 support for Xcode and its compilers. Thus, at the moment, only ARMv7 devices with iOS 4.3 and above are supported. Really sorry, but I can do nothing for this. :( 
-
-However, if you need, the last [legacy version](https://github.com/linusyang/MobileShadowSocks/releases/tag/v0.2.4-3) supporting ARMv6 is still available for downloading.
+#### 6. Why do new features need iOS 4.3 and above?
+You __can__ still install and use the latest app on iOS 4.3 and below, but without any new features. This is because Apple has just abandoned ARMv6 support for Xcode and its compilers. Thus, I have no compilers to build newer builds for older devices. Really sorry, but I can do nothing for this. :(
 
 ### Credits
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @[clowwindy](https://github.com/clowwindy)
 * Based on [Shadowsocks-libev](https://github.com/linusyang/shadowsocks-libev) from @[madeye](https://github.com/madeye)
-* App icon from [Shadowsocks Android](https://github.com/shadowsocks/shadowsocks-android) (Too lazy to draw one by myself :P)
+* App icon by @[madeye](https://github.com/madeye) from [Shadowsocks Android](https://github.com/shadowsocks/shadowsocks-android) (Too lazy to draw one by myself :P)
 
 ### Development
 
 #### Prerequisites
 * Xcode 4 or above (using latest version is recommended)
+
+__Note__: You need to first quit Xcode completely and disable force code-sign of iOS SDK as follows (iOS 7 SDK as example, change to your current SDK version):
+
+```bash
+SDKFILE="$(xcode-select --print-path)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/SDKSettings.plist"
+sudo /usr/libexec/PlistBuddy -c "Set :DefaultProperties:CODE_SIGNING_REQUIRED NO" "$SDKFILE"
+sudo /usr/bin/plutil -convert binary1 "$SDKFILE"
+```
+
 * Code-signing certificate named *iPhone Developer* (either self-signed or official is OK)
 
 #### Build
