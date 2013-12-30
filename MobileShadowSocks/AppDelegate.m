@@ -37,7 +37,7 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-    [_tabViewController notifyChanged];
+    [_tabViewController notifyChanged:NO];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application

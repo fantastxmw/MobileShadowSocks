@@ -28,7 +28,7 @@
 
 - (void)fixProxy;
 - (void)setPrefChanged;
-- (void)notifyChanged;
+- (void)notifyChanged:(BOOL)isForce;
 - (void)saveSettings;
 
 - (NSInteger)currentProfile;

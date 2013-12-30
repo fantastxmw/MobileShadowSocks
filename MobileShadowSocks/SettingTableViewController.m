@@ -11,7 +11,7 @@
 #import "ProfileViewController.h"
 
 #define APP_VER @"0.2.5"
-#define APP_BUILD @"2"
+#define APP_BUILD @"3"
 
 #define CELL_INDEX_TITLE 0
 #define CELL_INDEX_KEY 1
@@ -317,11 +317,11 @@ typedef enum {
     NSString *cellType = (NSString *) [tableCell objectAtIndex:CELL_INDEX_TYPE];
     NSString *cellDefaultValue = (NSString *) [tableCell objectAtIndex:CELL_INDEX_DEFAULT];
     NSString *cellKey = (NSString *) [tableCell objectAtIndex:CELL_INDEX_KEY];
-    NSString *cellIdentifier = [NSString stringWithFormat:@"SettingTableCellIdentifier-%@", cellType];
+    NSString *cellIdentifier = [NSString stringWithFormat:@"SettingTableCellIdentifier-%i-%i", [indexPath section], [indexPath row]];
     
-    UITableViewCellStyle cellStyle = [cellType hasPrefix:CELL_VIEW] ? UITableViewCellStyleValue1 : UITableViewCellStyleDefault;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
+        UITableViewCellStyle cellStyle = [cellType hasPrefix:CELL_VIEW] ? UITableViewCellStyleValue1 : UITableViewCellStyleDefault;
         cell = [[[UITableViewCell alloc] initWithStyle:cellStyle reuseIdentifier:cellIdentifier] autorelease];
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
@@ -590,7 +590,9 @@ typedef enum {
         }
     }
     if ([self setProxy:status]) {
-        [self notifyChanged];
+        if (willStartProxy) {
+            [self notifyChanged:YES];
+        }
     } else {
         willStartProxy = !willStartProxy;
         [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
@@ -642,7 +644,6 @@ typedef enum {
 - (BOOL)threadSendNotifyMessage:(NSNumber *)messageNumber
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:_pacURL]];
     const char *messageHeader = UPDATE_CONF;
     int messageId = [messageNumber intValue];
     switch (messageId) {
@@ -662,12 +663,16 @@ typedef enum {
             messageHeader = SET_PROXY_NONE;
             break;
     }
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_pacURL]];
     [request setValue:@"True" forHTTPHeaderField:[NSString stringWithFormat:@"%s", messageHeader]];
-    NSHTTPURLResponse *response;
+    [request setTimeoutInterval:5.0];
     BOOL ret = NO;
     int i;
     for (i = 0; i < MAX_TRYTIMES; i++) {
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+        if (data == nil) {
+            continue;
+        }
         NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if ([str hasPrefix:RESPONSE_SUCC]) {
             ret = YES;
@@ -682,7 +687,6 @@ typedef enum {
     if (messageId == PROXY_UPDATE_CONF && ret == YES) {
         _isPrefChanged = NO;
     }
-    [request release];
     [pool release];
     return ret;
 }
@@ -731,9 +735,12 @@ typedef enum {
     _isPrefChanged = YES;
 }
 
-- (void)notifyChanged
+- (void)notifyChanged:(BOOL)isForce
 {
-    if (_isPrefChanged && [self proxyEnabled]) {
+    if (!isForce && ![self proxyEnabled]) {
+        return;
+    }
+    if (_isPrefChanged) {
         [self syncSettings];
         [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_UPDATE_CONF]];
     }
