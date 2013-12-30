@@ -633,11 +633,7 @@ typedef enum {
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     BOOL prefAuto = [self readBool:@"AUTO_PROXY"];
-    ProxyStatus nowStatus = [self currentProxyStatus];
-    BOOL nowAuto = (nowStatus == kProxyPac) ? YES : NO;
-    if (nowStatus != kProxyNone && prefAuto != nowAuto) {
-        [self setProxy:prefAuto ? kProxyPac : kProxySocks];
-    }
+    [self setProxy:prefAuto ? kProxyPac : kProxySocks];
     [pool release];
 }
 
