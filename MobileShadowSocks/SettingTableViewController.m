@@ -629,14 +629,6 @@ typedef enum {
     [pool release];
 }
 
-- (void)threadFixAutoProxy
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    BOOL prefAuto = [self readBool:@"AUTO_PROXY"];
-    [self setProxy:prefAuto ? kProxyPac : kProxySocks];
-    [pool release];
-}
-
 - (BOOL)threadSendNotifyMessage:(NSNumber *)messageNumber
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -719,13 +711,6 @@ typedef enum {
     [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
 }
 
-- (void)fixAutoProxy
-{
-    if ([self proxyEnabled]) {
-        [NSThread detachNewThreadSelector:@selector(threadFixAutoProxy) toTarget:self withObject:nil];
-    }
-}
-
 - (void)setPrefChanged
 {
     _isPrefChanged = YES;
@@ -733,11 +718,17 @@ typedef enum {
 
 - (void)notifyChanged:(BOOL)isForce
 {
-    if (!isForce && ![self proxyEnabled]) {
+    BOOL proxyEnabled = [self proxyEnabled];
+    if (!isForce && !proxyEnabled) {
         return;
     }
     if (_isPrefChanged) {
         [self syncSettings];
+        if (!isForce) {
+            [NSThread detachNewThreadSelector:@selector(threadChangeProxyStatus:)
+                                     toTarget:self
+                                   withObject:[NSNumber numberWithBool:[self readBool:@"AUTO_PROXY"]]];
+        }
         [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_UPDATE_CONF]];
     }
 }
@@ -921,7 +912,6 @@ typedef enum {
     [self saveInt:profileIndex forKey:GLOBAL_PROFILE_NOW_KEY];
     _currentProfile = profileIndex;
     [self setPrefChanged];
-    [self fixAutoProxy];
 }
 
 - (void)removeProfile:(NSInteger)profileIndex
