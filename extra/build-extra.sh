@@ -11,7 +11,7 @@ fi
 build_launcher() {
     export CODESIGN_ALLOCATE="${TC_PATH}/codesign_allocate"
     SRCDIR="${PROJECT_DIR}/shadowsocks-libev"
-    "${TC_PATH}/clang" -arch "$1" -O3 -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${SDKROOT}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${SDKROOT}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=7.0 -isysroot "${SDKROOT}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "$2"
+    "${TC_PATH}/clang" -arch "$1" -O3 -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${SDKROOT}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${SDKROOT}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=5.1 -isysroot "${SDKROOT}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "$2"
     "${PROJECT_DIR}/extra/ldid" -S "$2"
 }
 
