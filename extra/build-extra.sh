@@ -11,7 +11,7 @@ fi
 build_launcher() {
     export CODESIGN_ALLOCATE="${TC_PATH}/codesign_allocate"
     SRCDIR="${PROJECT_DIR}/shadowsocks-libev"
-    "${TC_PATH}/clang" -arch "$1" -O3 -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${SDKROOT}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${SDKROOT}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=3.0 -isysroot "${SDKROOT}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "$2"
+    "${TC_PATH}/clang" -arch "$1" -O3 -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${SDKROOT}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${SDKROOT}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=7.0 -isysroot "${SDKROOT}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "$2"
     "${PROJECT_DIR}/extra/ldid" -S "$2"
 }
 
@@ -67,9 +67,10 @@ tar zxf "${PROJECT_DIR}/extra/backport.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 
 # Build and bundle binary
 try_build_legacy
+build_launcher arm64 shadowd64
 build_launcher armv7 shadowd7
 mv -f makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks MobileShadowSocks7
-lipo -create -output shadowd shadowd7 backport/shadowd-armv6
+lipo -create -output shadowd shadowd64 shadowd7 backport/shadowd-armv6
 lipo -create -output MobileShadowSocks MobileShadowSocks7 backport/MobileShadowSocks-armv6
 mv -f shadowd makedeb/Applications/MobileShadowSocks.app/
 mv -f MobileShadowSocks makedeb/Applications/MobileShadowSocks.app/
@@ -79,7 +80,7 @@ chmod 755 makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks
 # Clean temp files
 rm -rf "${BUILT_PRODUCTS_DIR}/ssl/"
 rm -rf "${BUILT_PRODUCTS_DIR}/backport/"
-rm -f shadowd7 MobileShadowSocks7
+rm -f shadowd64 shadowd7 MobileShadowSocks7
 
 # Prepare app
 /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 3.0" makedeb/Applications/MobileShadowSocks.app/Info.plist

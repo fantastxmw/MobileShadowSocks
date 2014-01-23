@@ -11,7 +11,7 @@
 #import "ProfileViewController.h"
 
 #define APP_VER @"0.2.5"
-#define APP_BUILD @"3"
+#define APP_BUILD @"4"
 
 #define CELL_INDEX_TITLE 0
 #define CELL_INDEX_KEY 1
@@ -217,7 +217,11 @@ typedef enum {
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        return YES;
+    } else {
+        return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    }
 }
 
 - (void)dealloc
@@ -317,7 +321,7 @@ typedef enum {
     NSString *cellType = (NSString *) [tableCell objectAtIndex:CELL_INDEX_TYPE];
     NSString *cellDefaultValue = (NSString *) [tableCell objectAtIndex:CELL_INDEX_DEFAULT];
     NSString *cellKey = (NSString *) [tableCell objectAtIndex:CELL_INDEX_KEY];
-    NSString *cellIdentifier = [NSString stringWithFormat:@"SettingTableCellIdentifier-%i-%i", [indexPath section], [indexPath row]];
+    NSString *cellIdentifier = [NSString stringWithFormat:@"SettingTableCellIdentifier-%d-%d", (int) [indexPath section], (int) [indexPath row]];
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {

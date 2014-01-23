@@ -3,1292 +3,669 @@
 function FindProxyForURL(url, host) {
     var PROXY = 'SOCKS 127.0.0.1:1983';
     if (isPlainHostName(host)) return 'DIRECT';
-    var re_ipv4 = /^\d+\.\d+\.\d+\.\d+$/g;
-    if (re_ipv4.test(host)) return 'DIRECT';
-    var host = host.toLowerCase();
-    if (shExpMatch(host, '*.cn')) return 'DIRECT';
-    if (shExpMatch(host, '*.lan')) return 'DIRECT';
-    if (shExpMatch(host, '*.local')) return 'DIRECT';
-    if (shExpMatch(host, '*.xn--fiqs8s')) return 'DIRECT';
-    if (shExpMatch(host, 'kandian.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kandian.com')) return 'DIRECT';
-    if (shExpMatch(host, 'homeinns.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.homeinns.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sinajs.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sinajs.com')) return 'DIRECT';
-    if (shExpMatch(host, 'douban.fm')) return 'DIRECT';
-    if (shExpMatch(host, '*.douban.fm')) return 'DIRECT';
-    if (shExpMatch(host, 'pixlr.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pixlr.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jing.fm')) return 'DIRECT';
-    if (shExpMatch(host, '*.jing.fm')) return 'DIRECT';
-    if (shExpMatch(host, 'oadz.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.oadz.com')) return 'DIRECT';
-    if (shExpMatch(host, 'youshang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.youshang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kuaidi100.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kuaidi100.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sinahk.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.sinahk.net')) return 'DIRECT';
-    if (shExpMatch(host, 'adsame.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.adsame.com')) return 'DIRECT';
-    if (shExpMatch(host, 'scorecardresearch.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.scorecardresearch.com')) return 'DIRECT';
-    if (shExpMatch(host, 'imrworldwide.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.imrworldwide.com')) return 'DIRECT';
-    if (shExpMatch(host, 'wrating.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.wrating.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mediav.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mediav.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lycos.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lycos.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gamesville.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gamesville.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lygo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lygo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'quantserve.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.quantserve.com')) return 'DIRECT';
-    if (shExpMatch(host, 'miaozhen.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.miaozhen.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qstatic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qstatic.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tremormedia.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tremormedia.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yieldmanager.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yieldmanager.com')) return 'DIRECT';
-    if (shExpMatch(host, 'adsonar.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.adsonar.com')) return 'DIRECT';
-    if (shExpMatch(host, 'adtechus.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.adtechus.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bluekai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bluekai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ipinyou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ipinyou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bdstatic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bdstatic.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bdimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bdimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mediaplex.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mediaplex.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ykimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ykimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'irs01.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.irs01.com')) return 'DIRECT';
-    if (shExpMatch(host, 'irs01.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.irs01.net')) return 'DIRECT';
-    if (shExpMatch(host, 'mmstat.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mmstat.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tanx.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tanx.com')) return 'DIRECT';
-    if (shExpMatch(host, 'atdmt.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.atdmt.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tudouui.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tudouui.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tdimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tdimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ku6img.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ku6img.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ku6cdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ku6cdn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'staticsdo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.staticsdo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'snyu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.snyu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mlt01.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mlt01.com')) return 'DIRECT';
-    if (shExpMatch(host, 'doubleclick.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.doubleclick.net')) return 'DIRECT';
-    if (shExpMatch(host, 'scanscout.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.scanscout.com')) return 'DIRECT';
-    if (shExpMatch(host, 'betrad.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.betrad.com')) return 'DIRECT';
-    if (shExpMatch(host, 'invitemedia.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.invitemedia.com')) return 'DIRECT';
-    if (shExpMatch(host, 'adroll.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.adroll.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mathtag.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mathtag.com')) return 'DIRECT';
-    if (shExpMatch(host, '2mdn.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.2mdn.net')) return 'DIRECT';
-    if (shExpMatch(host, 'rtbidder.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.rtbidder.net')) return 'DIRECT';
-    if (shExpMatch(host, 'compete.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.compete.com')) return 'DIRECT';
-    if (shExpMatch(host, 'vizu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.vizu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'adnxs.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.adnxs.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mookie1.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mookie1.com')) return 'DIRECT';
-    if (shExpMatch(host, 'pubmatic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pubmatic.com')) return 'DIRECT';
-    if (shExpMatch(host, 'serving-sys.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.serving-sys.com')) return 'DIRECT';
-    if (shExpMatch(host, 'legolas-media.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.legolas-media.com')) return 'DIRECT';
-    if (shExpMatch(host, 'harrenmedianetwork.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.harrenmedianetwork.com')) return 'DIRECT';
-    if (shExpMatch(host, 'google-analytics.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.google-analytics.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alipayobjects.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alipayobjects.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aliyun.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aliyun.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alicdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alicdn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'renren.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.renren.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sina.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sina.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iask.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iask.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cctv*.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cctv*.com')) return 'DIRECT';
-    if (shExpMatch(host, 'img.cctvpic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.img.cctvpic.com')) return 'DIRECT';
-    if (shExpMatch(host, '163.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.163.com')) return 'DIRECT';
-    if (shExpMatch(host, 'netease.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.netease.com')) return 'DIRECT';
-    if (shExpMatch(host, '126.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.126.net')) return 'DIRECT';
-    if (shExpMatch(host, 'qq.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qq.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gtimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gtimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'taobao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.taobao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'taobaocdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.taobaocdn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lxdns.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lxdns.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sohu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sohu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ifeng.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ifeng.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ifanr.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ifanr.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jysq.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.jysq.net')) return 'DIRECT';
-    if (shExpMatch(host, 'nipic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.nipic.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fastcdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fastcdn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'oeeee.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.oeeee.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mosso.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mosso.com')) return 'DIRECT';
-    if (shExpMatch(host, 'pengyou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pengyou.com')) return 'DIRECT';
-    if (shExpMatch(host, '360buyimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.360buyimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '51buy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51buy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yixun.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yixun.com')) return 'DIRECT';
-    if (shExpMatch(host, 'icson.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.icson.com')) return 'DIRECT';
-    if (shExpMatch(host, 'baidu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.baidu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'baidu*.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.baidu*.com')) return 'DIRECT';
-    if (shExpMatch(host, 'weibo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.weibo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'youku.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.youku.com')) return 'DIRECT';
-    if (shExpMatch(host, 'soso.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.soso.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tmall.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tmall.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hao123.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hao123.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tudou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tudou.com')) return 'DIRECT';
-    if (shExpMatch(host, '360buy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.360buy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jd.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jd.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinaz.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinaz.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alipay.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alipay.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sogou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sogou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnzz.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnzz.com')) return 'DIRECT';
-    if (shExpMatch(host, 'douban.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.douban.com')) return 'DIRECT';
-    if (shExpMatch(host, '58.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.58.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alibaba.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alibaba.com')) return 'DIRECT';
-    if (shExpMatch(host, '56.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.56.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xunlei.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xunlei.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bing.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bing.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iqiyi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iqiyi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qiyi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qiyi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'csdn.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.csdn.net')) return 'DIRECT';
-    if (shExpMatch(host, 'soku.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.soku.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xinhuanet.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xinhuanet.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ku6.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ku6.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aizhan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aizhan.com')) return 'DIRECT';
-    if (shExpMatch(host, '4399.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.4399.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yesky.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yesky.com')) return 'DIRECT';
-    if (shExpMatch(host, 'soufun.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.soufun.com')) return 'DIRECT';
-    if (shExpMatch(host, 'youdao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.youdao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'china.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.china.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hudong.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hudong.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ganji.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ganji.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kaixin001.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kaixin001.com')) return 'DIRECT';
-    if (shExpMatch(host, 'paipai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.paipai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'live.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.live.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alimama.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alimama.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mop.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mop.com')) return 'DIRECT';
-    if (shExpMatch(host, '51.la')) return 'DIRECT';
-    if (shExpMatch(host, '*.51.la')) return 'DIRECT';
-    if (shExpMatch(host, '51job.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51job.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dianping.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dianping.com')) return 'DIRECT';
-    if (shExpMatch(host, '126.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.126.com')) return 'DIRECT';
-    if (shExpMatch(host, 'admin5.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.admin5.com')) return 'DIRECT';
-    if (shExpMatch(host, 'it168.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.it168.com')) return 'DIRECT';
-    if (shExpMatch(host, '2345.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.2345.com')) return 'DIRECT';
-    if (shExpMatch(host, 'huanqiu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.huanqiu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'arpg2.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.arpg2.com')) return 'DIRECT';
-    if (shExpMatch(host, '777wyx.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.777wyx.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinanews.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinanews.com')) return 'DIRECT';
-    if (shExpMatch(host, 'letv.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.letv.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jiayuan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jiayuan.com')) return 'DIRECT';
-    if (shExpMatch(host, '39.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.39.net')) return 'DIRECT';
-    if (shExpMatch(host, 'twcczhu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.twcczhu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnblogs.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnblogs.com')) return 'DIRECT';
-    if (shExpMatch(host, 'microsoft.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.microsoft.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dangdang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dangdang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'pchome.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.pchome.net')) return 'DIRECT';
-    if (shExpMatch(host, 'pptv.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pptv.com')) return 'DIRECT';
-    if (shExpMatch(host, 'vancl.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.vancl.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zhaopin.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhaopin.com')) return 'DIRECT';
-    if (shExpMatch(host, 'apple.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.apple.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bitauto.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bitauto.com')) return 'DIRECT';
-    if (shExpMatch(host, 'etao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.etao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qunar.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qunar.com')) return 'DIRECT';
-    if (shExpMatch(host, 'eastmoney.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.eastmoney.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yihaodian.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yihaodian.com')) return 'DIRECT';
-    if (shExpMatch(host, '115.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.115.com')) return 'DIRECT';
-    if (shExpMatch(host, '21cn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.21cn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hupu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hupu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'duowan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.duowan.com')) return 'DIRECT';
-    if (shExpMatch(host, '52pk.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.52pk.net')) return 'DIRECT';
-    if (shExpMatch(host, 'baixing.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.baixing.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iteye.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iteye.com')) return 'DIRECT';
-    if (shExpMatch(host, 'verycd.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.verycd.com')) return 'DIRECT';
-    if (shExpMatch(host, 'suning.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.suning.com')) return 'DIRECT';
-    if (shExpMatch(host, 'discuz.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.discuz.net')) return 'DIRECT';
-    if (shExpMatch(host, '7k7k.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.7k7k.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mtime.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mtime.com')) return 'DIRECT';
-    if (shExpMatch(host, 'msn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.msn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ccb.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ccb.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hc360.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hc360.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cmbchina.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cmbchina.com')) return 'DIRECT';
-    if (shExpMatch(host, '51.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yoka.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yoka.com')) return 'DIRECT';
-    if (shExpMatch(host, 'seowhy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.seowhy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinabyte.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinabyte.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qidian.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qidian.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ctrip.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ctrip.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnbeta.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnbeta.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tom.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tom.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tenpay.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tenpay.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tencent.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tencent.com')) return 'DIRECT';
-    if (shExpMatch(host, 'meituan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.meituan.com')) return 'DIRECT';
-    if (shExpMatch(host, '120ask.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.120ask.com')) return 'DIRECT';
-    if (shExpMatch(host, '51cto.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51cto.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sdo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sdo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'meilishuo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.meilishuo.com')) return 'DIRECT';
-    if (shExpMatch(host, '17173.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.17173.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xyxy.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.xyxy.net')) return 'DIRECT';
-    if (shExpMatch(host, '19lou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.19lou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yiqifa.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yiqifa.com')) return 'DIRECT';
-    if (shExpMatch(host, 'nuomi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.nuomi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'eastday.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.eastday.com')) return 'DIRECT';
-    if (shExpMatch(host, 'onlinedown.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.onlinedown.net')) return 'DIRECT';
-    if (shExpMatch(host, 'oschina.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.oschina.net')) return 'DIRECT';
-    if (shExpMatch(host, 'zhubajie.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhubajie.com')) return 'DIRECT';
-    if (shExpMatch(host, 'babytree.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.babytree.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kdnet.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.kdnet.net')) return 'DIRECT';
-    if (shExpMatch(host, 'docin.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.docin.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qq937.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qq937.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tgbus.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tgbus.com')) return 'DIRECT';
-    if (shExpMatch(host, 'im286.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.im286.com')) return 'DIRECT';
-    if (shExpMatch(host, 'baomihua.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.baomihua.com')) return 'DIRECT';
-    if (shExpMatch(host, 'doubleclick.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.doubleclick.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dh818.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dh818.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ads8.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ads8.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hiapk.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hiapk.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iapps.im')) return 'DIRECT';
-    if (shExpMatch(host, '*.iapps.im')) return 'DIRECT';
-    if (shExpMatch(host, 'ynet.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ynet.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sootoo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sootoo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mogujie.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mogujie.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gfan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gfan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ppstream.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ppstream.com')) return 'DIRECT';
-    if (shExpMatch(host, 'pps.tv')) return 'DIRECT';
-    if (shExpMatch(host, '*.pps.tv')) return 'DIRECT';
-    if (shExpMatch(host, 'a135.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.a135.net')) return 'DIRECT';
-    if (shExpMatch(host, 'ip138.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ip138.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zx915.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zx915.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lashou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lashou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'crsky.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.crsky.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iciba.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iciba.com')) return 'DIRECT';
-    if (shExpMatch(host, 'uuzu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.uuzu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tuan800.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tuan800.com')) return 'DIRECT';
-    if (shExpMatch(host, 'haodf.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.haodf.com')) return 'DIRECT';
-    if (shExpMatch(host, 'youboy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.youboy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ulink.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.ulink.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'qiyou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qiyou.com')) return 'DIRECT';
-    if (shExpMatch(host, '88db.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.88db.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tao123.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tao123.com')) return 'DIRECT';
-    if (shExpMatch(host, '178.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.178.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ci123.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ci123.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yolk7.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yolk7.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tiexue.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.tiexue.net')) return 'DIRECT';
-    if (shExpMatch(host, 'stockstar.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.stockstar.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xici.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.xici.net')) return 'DIRECT';
-    if (shExpMatch(host, 'pcpop.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pcpop.com')) return 'DIRECT';
-    if (shExpMatch(host, 'linkedin.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.linkedin.com')) return 'DIRECT';
-    if (shExpMatch(host, 'weiphone.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.weiphone.com')) return 'DIRECT';
-    if (shExpMatch(host, 'doc88.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.doc88.com')) return 'DIRECT';
-    if (shExpMatch(host, 'adobe.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.adobe.com')) return 'DIRECT';
-    if (shExpMatch(host, 'shangdu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.shangdu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aili.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aili.com')) return 'DIRECT';
-    if (shExpMatch(host, 'anjuke.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.anjuke.com')) return 'DIRECT';
-    if (shExpMatch(host, '360doc.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.360doc.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnxad.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnxad.com')) return 'DIRECT';
-    if (shExpMatch(host, 'west263.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.west263.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jiathis.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jiathis.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gougou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gougou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'whlongda.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.whlongda.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mnwan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mnwan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'onetad.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.onetad.com')) return 'DIRECT';
-    if (shExpMatch(host, 'duote.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.duote.com')) return 'DIRECT';
-    if (shExpMatch(host, '55bbs.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.55bbs.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iloveyouxi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iloveyouxi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gongchang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gongchang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'meishichina.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.meishichina.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qire123.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qire123.com')) return 'DIRECT';
-    if (shExpMatch(host, '55tuan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.55tuan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cocoren.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cocoren.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiaomi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiaomi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'phpwind.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.phpwind.net')) return 'DIRECT';
-    if (shExpMatch(host, 'abchina.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.abchina.com')) return 'DIRECT';
-    if (shExpMatch(host, 'thethirdmedia.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.thethirdmedia.com')) return 'DIRECT';
-    if (shExpMatch(host, 'coo8.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.coo8.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aliexpress.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aliexpress.com')) return 'DIRECT';
-    if (shExpMatch(host, 'onlylady.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.onlylady.com')) return 'DIRECT';
-    if (shExpMatch(host, 'manzuo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.manzuo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'elong.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.elong.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aibang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aibang.com')) return 'DIRECT';
-    if (shExpMatch(host, '10010.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.10010.com')) return 'DIRECT';
-    if (shExpMatch(host, '3366.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.3366.com')) return 'DIRECT';
-    if (shExpMatch(host, '28tui.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.28tui.com')) return 'DIRECT';
-    if (shExpMatch(host, 'vipshop.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.vipshop.com')) return 'DIRECT';
-    if (shExpMatch(host, '1616.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.1616.net')) return 'DIRECT';
-    if (shExpMatch(host, 'pp.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.pp.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'jumei.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jumei.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tui18.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tui18.com')) return 'DIRECT';
-    if (shExpMatch(host, '52tlbb.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.52tlbb.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yinyuetai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yinyuetai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'eye.rs')) return 'DIRECT';
-    if (shExpMatch(host, '*.eye.rs')) return 'DIRECT';
-    if (shExpMatch(host, 'baihe.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.baihe.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iyaya.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iyaya.com')) return 'DIRECT';
-    if (shExpMatch(host, 'imanhua.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.imanhua.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lusongsong.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lusongsong.com')) return 'DIRECT';
-    if (shExpMatch(host, 'leho.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.leho.com')) return 'DIRECT';
-    if (shExpMatch(host, '315che.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.315che.com')) return 'DIRECT';
-    if (shExpMatch(host, 'donews.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.donews.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cqnews.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.cqnews.net')) return 'DIRECT';
-    if (shExpMatch(host, '591hx.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.591hx.com')) return 'DIRECT';
-    if (shExpMatch(host, '114la.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.114la.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gamersky.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gamersky.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tangdou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tangdou.com')) return 'DIRECT';
-    if (shExpMatch(host, '91.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.91.com')) return 'DIRECT';
-    if (shExpMatch(host, 'uuu9.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.uuu9.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xinnet.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xinnet.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dedecms.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dedecms.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnmo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnmo.com')) return 'DIRECT';
-    if (shExpMatch(host, '51fanli.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51fanli.com')) return 'DIRECT';
-    if (shExpMatch(host, 'liebiao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.liebiao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yyets.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yyets.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lady8844.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lady8844.com')) return 'DIRECT';
-    if (shExpMatch(host, 'newsmth.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.newsmth.net')) return 'DIRECT';
-    if (shExpMatch(host, 'ucjoy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ucjoy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'duba.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.duba.net')) return 'DIRECT';
-    if (shExpMatch(host, 'cnki.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnki.net')) return 'DIRECT';
-    if (shExpMatch(host, '70e.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.70e.com')) return 'DIRECT';
-    if (shExpMatch(host, 'funshion.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.funshion.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qjy168.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qjy168.com')) return 'DIRECT';
-    if (shExpMatch(host, 'paypal.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.paypal.com')) return 'DIRECT';
-    if (shExpMatch(host, '3dmgame.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.3dmgame.com')) return 'DIRECT';
-    if (shExpMatch(host, 'm18.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.m18.com')) return 'DIRECT';
-    if (shExpMatch(host, 'caixin.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.caixin.com')) return 'DIRECT';
-    if (shExpMatch(host, 'linezing.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.linezing.com')) return 'DIRECT';
-    if (shExpMatch(host, '53kf.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.53kf.com')) return 'DIRECT';
-    if (shExpMatch(host, 'makepolo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.makepolo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dospy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dospy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiami.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiami.com')) return 'DIRECT';
-    if (shExpMatch(host, '5173.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.5173.com')) return 'DIRECT';
-    if (shExpMatch(host, 'vjia.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.vjia.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hotsales.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.hotsales.net')) return 'DIRECT';
-    if (shExpMatch(host, '4738.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.4738.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mydrivers.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mydrivers.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alisoft.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alisoft.com')) return 'DIRECT';
-    if (shExpMatch(host, 'titan24.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.titan24.com')) return 'DIRECT';
-    if (shExpMatch(host, 'u17.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.u17.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jb51.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.jb51.net')) return 'DIRECT';
-    if (shExpMatch(host, 'diandian.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.diandian.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dzwww.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dzwww.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hichina.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hichina.com')) return 'DIRECT';
-    if (shExpMatch(host, 'abang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.abang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qianlong.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qianlong.com')) return 'DIRECT';
-    if (shExpMatch(host, 'm1905.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.m1905.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinahr.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinahr.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zhaodao123.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhaodao123.com')) return 'DIRECT';
-    if (shExpMatch(host, 'daqi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.daqi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yaolan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yaolan.com')) return 'DIRECT';
-    if (shExpMatch(host, '5d6d.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.5d6d.net')) return 'DIRECT';
-    if (shExpMatch(host, 'fobshanghai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fobshanghai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'q150.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.q150.com')) return 'DIRECT';
-    if (shExpMatch(host, 'l99.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.l99.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ccidnet.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ccidnet.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aifang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aifang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aol.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aol.com')) return 'DIRECT';
-    if (shExpMatch(host, 'theplanet.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.theplanet.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinaunix.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinaunix.net')) return 'DIRECT';
-    if (shExpMatch(host, 'hf365.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hf365.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ad1111.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ad1111.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zhihu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhihu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'blueidea.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.blueidea.com')) return 'DIRECT';
-    if (shExpMatch(host, 'net114.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.net114.com')) return 'DIRECT';
-    if (shExpMatch(host, '07073.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.07073.com')) return 'DIRECT';
-    if (shExpMatch(host, 'alivv.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.alivv.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mplife.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mplife.com')) return 'DIRECT';
-    if (shExpMatch(host, 'allyes.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.allyes.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jqw.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jqw.com')) return 'DIRECT';
-    if (shExpMatch(host, '1ting.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.1ting.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yougou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yougou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dbank.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dbank.com')) return 'DIRECT';
-    if (shExpMatch(host, 'made-in-china.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.made-in-china.com')) return 'DIRECT';
-    if (shExpMatch(host, '36kr.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.36kr.com')) return 'DIRECT';
-    if (shExpMatch(host, 'wumii.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.wumii.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zoosnet.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.zoosnet.net')) return 'DIRECT';
-    if (shExpMatch(host, 'xitek.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xitek.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ali213.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.ali213.net')) return 'DIRECT';
-    if (shExpMatch(host, 'exam8.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.exam8.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jxedt.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jxedt.com')) return 'DIRECT';
-    if (shExpMatch(host, 'uniontoufang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.uniontoufang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zqgame.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zqgame.com')) return 'DIRECT';
-    if (shExpMatch(host, '52kmh.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.52kmh.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yxlady.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yxlady.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sznews.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sznews.com')) return 'DIRECT';
-    if (shExpMatch(host, 'longhoo.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.longhoo.net')) return 'DIRECT';
-    if (shExpMatch(host, 'game3737.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.game3737.com')) return 'DIRECT';
-    if (shExpMatch(host, '51auto.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51auto.com')) return 'DIRECT';
-    if (shExpMatch(host, 'booksky.org')) return 'DIRECT';
-    if (shExpMatch(host, '*.booksky.org')) return 'DIRECT';
-    if (shExpMatch(host, 'iqilu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.iqilu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ddmap.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ddmap.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cncn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cncn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ename.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.ename.net')) return 'DIRECT';
-    if (shExpMatch(host, '1778.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.1778.com')) return 'DIRECT';
-    if (shExpMatch(host, 'blogchina.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.blogchina.com')) return 'DIRECT';
-    if (shExpMatch(host, '778669.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.778669.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dayoo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dayoo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ct10000.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ct10000.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zhibo8.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhibo8.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'qingdaonews.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qingdaonews.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zongheng.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zongheng.com')) return 'DIRECT';
-    if (shExpMatch(host, '1o26.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.1o26.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tiancity.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tiancity.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jinti.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jinti.com')) return 'DIRECT';
-    if (shExpMatch(host, 'si.kz')) return 'DIRECT';
-    if (shExpMatch(host, '*.si.kz')) return 'DIRECT';
-    if (shExpMatch(host, 'tuniu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tuniu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiu.com')) return 'DIRECT';
-    if (shExpMatch(host, '265.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.265.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gamestlbb.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gamestlbb.com')) return 'DIRECT';
-    if (shExpMatch(host, '2hua.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.2hua.com')) return 'DIRECT';
-    if (shExpMatch(host, 'moonbasa.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.moonbasa.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sf-express.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sf-express.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qiushibaike.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qiushibaike.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ztgame.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ztgame.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yupoo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yupoo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kimiss.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kimiss.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnhubei.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnhubei.com')) return 'DIRECT';
-    if (shExpMatch(host, 'pingan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pingan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lafaso.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lafaso.com')) return 'DIRECT';
-    if (shExpMatch(host, 'rakuten.co.jp')) return 'DIRECT';
-    if (shExpMatch(host, '*.rakuten.co.jp')) return 'DIRECT';
-    if (shExpMatch(host, 'zhenai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhenai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tiao8.info')) return 'DIRECT';
-    if (shExpMatch(host, '*.tiao8.info')) return 'DIRECT';
-    if (shExpMatch(host, '7c.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.7c.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tianji.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tianji.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kugou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kugou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'house365.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.house365.com')) return 'DIRECT';
-    if (shExpMatch(host, 'flickr.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.flickr.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiazaiba.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiazaiba.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aipai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aipai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sodu.org')) return 'DIRECT';
-    if (shExpMatch(host, '*.sodu.org')) return 'DIRECT';
-    if (shExpMatch(host, 'bankcomm.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bankcomm.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lietou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lietou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'toocle.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.toocle.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fengniao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fengniao.com')) return 'DIRECT';
-    if (shExpMatch(host, '99bill.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.99bill.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bendibao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bendibao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mapbar.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mapbar.com')) return 'DIRECT';
-    if (shExpMatch(host, 'nowec.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.nowec.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yingjiesheng.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yingjiesheng.com')) return 'DIRECT';
-    if (shExpMatch(host, 'comsenz.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.comsenz.com')) return 'DIRECT';
-    if (shExpMatch(host, 'meilele.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.meilele.com')) return 'DIRECT';
-    if (shExpMatch(host, 'otwan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.otwan.com')) return 'DIRECT';
-    if (shExpMatch(host, '61.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.61.com')) return 'DIRECT';
-    if (shExpMatch(host, 'meizu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.meizu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'readnovel.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.readnovel.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fenzhi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fenzhi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'up2c.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.up2c.com')) return 'DIRECT';
-    if (shExpMatch(host, '500wan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.500wan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fx120.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.fx120.net')) return 'DIRECT';
-    if (shExpMatch(host, 'ftuan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ftuan.com')) return 'DIRECT';
-    if (shExpMatch(host, '17u.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.17u.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lehecai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lehecai.com')) return 'DIRECT';
-    if (shExpMatch(host, '28.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.28.com')) return 'DIRECT';
-    if (shExpMatch(host, 'acfun.tv')) return 'DIRECT';
-    if (shExpMatch(host, '*.acfun.tv')) return 'DIRECT';
-    if (shExpMatch(host, 'bilibili.tv')) return 'DIRECT';
-    if (shExpMatch(host, '*.bilibili.tv')) return 'DIRECT';
-    if (shExpMatch(host, 'bogou.tv')) return 'DIRECT';
-    if (shExpMatch(host, '*.bogou.tv')) return 'DIRECT';
-    if (shExpMatch(host, 'fengyunzhibo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fengyunzhibo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kukuplay.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kukuplay.com')) return 'DIRECT';
-    if (shExpMatch(host, 'huaban.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.huaban.com')) return 'DIRECT';
-    if (shExpMatch(host, 'szhome.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.szhome.com')) return 'DIRECT';
-    if (shExpMatch(host, 'miercn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.miercn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fblife.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fblife.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinaw3.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinaw3.com')) return 'DIRECT';
-    if (shExpMatch(host, 'smzdm.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.smzdm.com')) return 'DIRECT';
-    if (shExpMatch(host, 'b2b168.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.b2b168.com')) return 'DIRECT';
-    if (shExpMatch(host, '265g.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.265g.com')) return 'DIRECT';
-    if (shExpMatch(host, 'anzhi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.anzhi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chuangelm.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chuangelm.com')) return 'DIRECT';
-    if (shExpMatch(host, 'php100.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.php100.com')) return 'DIRECT';
-    if (shExpMatch(host, '100ye.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.100ye.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hefei.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.hefei.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'mumayi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mumayi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sttlbb.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sttlbb.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mangocity.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mangocity.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fantong.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fantong.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zoopda.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zoopda.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zdmimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zdmimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'appgame.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.appgame.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cctv.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cctv.com')) return 'DIRECT';
-    if (shExpMatch(host, '0x110.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.0x110.com')) return 'DIRECT';
-    if (shExpMatch(host, '100tjs.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.100tjs.com')) return 'DIRECT';
-    if (shExpMatch(host, '115img.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.115img.com')) return 'DIRECT';
-    if (shExpMatch(host, '123cha.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.123cha.com')) return 'DIRECT';
-    if (shExpMatch(host, '1717388.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.1717388.com')) return 'DIRECT';
-    if (shExpMatch(host, '17cdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.17cdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '17kuxun.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.17kuxun.com')) return 'DIRECT';
-    if (shExpMatch(host, '198game.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.198game.com')) return 'DIRECT';
-    if (shExpMatch(host, '1uuc.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.1uuc.com')) return 'DIRECT';
-    if (shExpMatch(host, '24quan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.24quan.com')) return 'DIRECT';
-    if (shExpMatch(host, '293.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.293.net')) return 'DIRECT';
-    if (shExpMatch(host, '360tl.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.360tl.com')) return 'DIRECT';
-    if (shExpMatch(host, '37see.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.37see.com')) return 'DIRECT';
-    if (shExpMatch(host, '5000pk.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.5000pk.com')) return 'DIRECT';
-    if (shExpMatch(host, '51img1.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51img1.com')) return 'DIRECT';
-    if (shExpMatch(host, '51jobcdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51jobcdn.com')) return 'DIRECT';
-    if (shExpMatch(host, '51yes.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.51yes.com')) return 'DIRECT';
-    if (shExpMatch(host, '5d6d.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.5d6d.com')) return 'DIRECT';
-    if (shExpMatch(host, '6dad.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.6dad.com')) return 'DIRECT';
-    if (shExpMatch(host, '6rooms.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.6rooms.com')) return 'DIRECT';
-    if (shExpMatch(host, '701sou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.701sou.com')) return 'DIRECT';
-    if (shExpMatch(host, '766.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.766.com')) return 'DIRECT';
-    if (shExpMatch(host, '859652.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.859652.com')) return 'DIRECT';
-    if (shExpMatch(host, '968tl.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.968tl.com')) return 'DIRECT';
-    if (shExpMatch(host, '9787.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.9787.com')) return 'DIRECT';
-    if (shExpMatch(host, '99114.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.99114.com')) return 'DIRECT';
-    if (shExpMatch(host, 'a963.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.a963.com')) return 'DIRECT';
-    if (shExpMatch(host, 'aliimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.aliimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'appinn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.appinn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'atpanel.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.atpanel.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bestb2b.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bestb2b.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bjbus.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.bjbus.com')) return 'DIRECT';
-    if (shExpMatch(host, 'blogbus.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.blogbus.com')) return 'DIRECT';
-    if (shExpMatch(host, 'bokee.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.bokee.net')) return 'DIRECT';
-    if (shExpMatch(host, 'boosj.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.boosj.com')) return 'DIRECT';
-    if (shExpMatch(host, 'brothersoft.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.brothersoft.com')) return 'DIRECT';
-    if (shExpMatch(host, 'caing.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.caing.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cdn20.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cdn20.com')) return 'DIRECT';
-    if (shExpMatch(host, 'changyou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.changyou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chdbits.org')) return 'DIRECT';
-    if (shExpMatch(host, '*.chdbits.org')) return 'DIRECT';
-    if (shExpMatch(host, 'chetx.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chetx.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinamobile.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinamobile.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chinaren.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chinaren.com')) return 'DIRECT';
-    if (shExpMatch(host, 'chiphell.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.chiphell.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnepub.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnepub.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cnfol.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnfol.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cngba.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cngba.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cntv.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.cntv.net')) return 'DIRECT';
-    if (shExpMatch(host, 'cnwest.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cnwest.com')) return 'DIRECT';
-    if (shExpMatch(host, 'cqtiyu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.cqtiyu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'didatuan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.didatuan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dipan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dipan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dpfile.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dpfile.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dream4ever.org')) return 'DIRECT';
-    if (shExpMatch(host, '*.dream4ever.org')) return 'DIRECT';
-    if (shExpMatch(host, 'duapp.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.duapp.com')) return 'DIRECT';
-    if (shExpMatch(host, 'duomi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.duomi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dy2018.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.dy2018.com')) return 'DIRECT';
-    if (shExpMatch(host, 'dytt8.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.dytt8.net')) return 'DIRECT';
-    if (shExpMatch(host, 'eb80.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.eb80.com')) return 'DIRECT';
-    if (shExpMatch(host, 'egou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.egou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'et8.org')) return 'DIRECT';
-    if (shExpMatch(host, '*.et8.org')) return 'DIRECT';
-    if (shExpMatch(host, 'eyoudi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.eyoudi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'fastif.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.fastif.net')) return 'DIRECT';
-    if (shExpMatch(host, 'fat999.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.fat999.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ffdy.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.ffdy.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'game3896.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.game3896.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gamewan.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.gamewan.net')) return 'DIRECT';
-    if (shExpMatch(host, 'gaopeng.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gaopeng.com')) return 'DIRECT';
-    if (shExpMatch(host, 'getfirebug.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.getfirebug.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gfw.io')) return 'DIRECT';
-    if (shExpMatch(host, '*.gfw.io')) return 'DIRECT';
-    if (shExpMatch(host, 'ggmm777.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ggmm777.com')) return 'DIRECT';
-    if (shExpMatch(host, 'go2map.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.go2map.com')) return 'DIRECT';
-    if (shExpMatch(host, 'goodbabygroup.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.goodbabygroup.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gy9y.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gy9y.com')) return 'DIRECT';
-    if (shExpMatch(host, 'gzmama.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.gzmama.com')) return 'DIRECT';
-    if (shExpMatch(host, 'haliyuya.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.haliyuya.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hdslb.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hdslb.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hi-pda.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.hi-pda.com')) return 'DIRECT';
-    if (shExpMatch(host, 'hlwan.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.hlwan.net')) return 'DIRECT';
-    if (shExpMatch(host, 'huochepiao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.huochepiao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'idailyapp.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.idailyapp.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ifengimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ifengimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ifensi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ifensi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ijinshan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ijinshan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'img-space.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.img-space.com')) return 'DIRECT';
-    if (shExpMatch(host, 'inc.gs')) return 'DIRECT';
-    if (shExpMatch(host, '*.inc.gs')) return 'DIRECT';
-    if (shExpMatch(host, 'infzm.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.infzm.com')) return 'DIRECT';
-    if (shExpMatch(host, 'is686.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.is686.com')) return 'DIRECT';
-    if (shExpMatch(host, 'iweek.ly')) return 'DIRECT';
-    if (shExpMatch(host, '*.iweek.ly')) return 'DIRECT';
-    if (shExpMatch(host, 'james520.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.james520.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jandan.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.jandan.net')) return 'DIRECT';
-    if (shExpMatch(host, 'jiatx.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jiatx.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jiepang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jiepang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jiuyaoyouxi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jiuyaoyouxi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jjwxc.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.jjwxc.net')) return 'DIRECT';
-    if (shExpMatch(host, 'joqoo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.joqoo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'jstv.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.jstv.com')) return 'DIRECT';
-    if (shExpMatch(host, 'junshijia.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.junshijia.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kandian.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.kandian.net')) return 'DIRECT';
-    if (shExpMatch(host, 'kanimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kanimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kankan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kankan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'keyunzhan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.keyunzhan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'koudai8.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.koudai8.com')) return 'DIRECT';
-    if (shExpMatch(host, 'kuaiwan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.kuaiwan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lampdrive.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lampdrive.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lashouimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lashouimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'logmein.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.logmein.com')) return 'DIRECT';
-    if (shExpMatch(host, 'lohas.ly')) return 'DIRECT';
-    if (shExpMatch(host, '*.lohas.ly')) return 'DIRECT';
-    if (shExpMatch(host, 'loli.mg')) return 'DIRECT';
-    if (shExpMatch(host, '*.loli.mg')) return 'DIRECT';
-    if (shExpMatch(host, 'loli.vg')) return 'DIRECT';
-    if (shExpMatch(host, '*.loli.vg')) return 'DIRECT';
-    if (shExpMatch(host, 'lvping.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.lvping.com')) return 'DIRECT';
-    if (shExpMatch(host, 'mapabc.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.mapabc.com')) return 'DIRECT';
-    if (shExpMatch(host, 'my.cl.ly')) return 'DIRECT';
-    if (shExpMatch(host, '*.my.cl.ly')) return 'DIRECT';
-    if (shExpMatch(host, 'nbweekly.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.nbweekly.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ngacn.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.ngacn.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'njobt.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.njobt.com')) return 'DIRECT';
-    if (shExpMatch(host, 'okbuy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.okbuy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'okooo.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.okooo.com')) return 'DIRECT';
-    if (shExpMatch(host, 'p5w.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.p5w.net')) return 'DIRECT';
-    if (shExpMatch(host, 'pcbeta.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pcbeta.com')) return 'DIRECT';
-    if (shExpMatch(host, 'pr56789.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.pr56789.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qiyipic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qiyipic.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qqmail.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qqmail.com')) return 'DIRECT';
-    if (shExpMatch(host, 'qvbuy.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.qvbuy.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ranwen.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ranwen.com')) return 'DIRECT';
-    if (shExpMatch(host, 'rrimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.rrimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sanguosha.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sanguosha.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sg560.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sg560.com')) return 'DIRECT';
-    if (shExpMatch(host, 'shuangtv.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.shuangtv.net')) return 'DIRECT';
-    if (shExpMatch(host, 'sinaapp.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sinaapp.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sinaedge.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sinaedge.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sinaimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sinaimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'sj-tl.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.sj-tl.com')) return 'DIRECT';
-    if (shExpMatch(host, 'skycn.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.skycn.com')) return 'DIRECT';
-    if (shExpMatch(host, 'snsfun.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.snsfun.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'soufunimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.soufunimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'synacast.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.synacast.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tbcache.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tbcache.com')) return 'DIRECT';
-    if (shExpMatch(host, 'thawte.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.thawte.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tianyaui.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tianyaui.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tlbb2.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tlbb2.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tlbb8.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tlbb8.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tlbbsifu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tlbbsifu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'tvmao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.tvmao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'umiwi.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.umiwi.com')) return 'DIRECT';
-    if (shExpMatch(host, 'uusee.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.uusee.com')) return 'DIRECT';
-    if (shExpMatch(host, 'vcimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.vcimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'wandoujia.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.wandoujia.com')) return 'DIRECT';
-    if (shExpMatch(host, 'wdjimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.wdjimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'web887.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.web887.com')) return 'DIRECT';
-    if (shExpMatch(host, 'woniu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.woniu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xi666.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xi666.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiachufang.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiachufang.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiami.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiami.net')) return 'DIRECT';
-    if (shExpMatch(host, 'xiaonei.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiaonei.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xilu.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xilu.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiyou53.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiyou53.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xiyou54.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xiyou54.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xlpan.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xlpan.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xmfish.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xmfish.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xp9365.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xp9365.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xtltt.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xtltt.com')) return 'DIRECT';
-    if (shExpMatch(host, 'xungou.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.xungou.com')) return 'DIRECT';
-    if (shExpMatch(host, 'ydstatic.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.ydstatic.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yihaodianimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yihaodianimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yintai.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.yintai.com')) return 'DIRECT';
-    if (shExpMatch(host, 'yiyi.cc')) return 'DIRECT';
-    if (shExpMatch(host, '*.yiyi.cc')) return 'DIRECT';
-    if (shExpMatch(host, 'yocc.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.yocc.net')) return 'DIRECT';
-    if (shExpMatch(host, 'youwo123.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.youwo123.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zaobao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zaobao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zaojiao.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zaojiao.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zbjimg.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zbjimg.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zdface.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zdface.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zhi.hu')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhi.hu')) return 'DIRECT';
-    if (shExpMatch(host, 'zhibo8.com')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhibo8.com')) return 'DIRECT';
-    if (shExpMatch(host, 'zhongsou.net')) return 'DIRECT';
-    if (shExpMatch(host, '*.zhongsou.net')) return 'DIRECT';
+    if (/^\d+\.\d+\.\d+\.\d+$/g.test(host)) return 'DIRECT';
+    var rules = [
+        [
+            'cn',
+            'lan',
+            'local',
+            'xn--fiqs8s'
+        ], [
+            'kandian.com',
+            'homeinns.com',
+            'sinajs.com',
+            'douban.fm',
+            'pixlr.com',
+            'jing.fm',
+            'oadz.com',
+            'youshang.com',
+            'kuaidi100.com',
+            'sinahk.net',
+            'adsame.com',
+            'scorecardresearch.com',
+            'imrworldwide.com',
+            'wrating.com',
+            'mediav.com',
+            'lycos.com',
+            'gamesville.com',
+            'lygo.com',
+            'quantserve.com',
+            'miaozhen.com',
+            'qstatic.com',
+            'tremormedia.com',
+            'yieldmanager.com',
+            'adsonar.com',
+            'adtechus.com',
+            'bluekai.com',
+            'ipinyou.com',
+            'bdstatic.com',
+            'bdimg.com',
+            'mediaplex.com',
+            'ykimg.com',
+            'irs01.com',
+            'irs01.net',
+            'mmstat.com',
+            'tanx.com',
+            'atdmt.com',
+            'tudouui.com',
+            'tdimg.com',
+            'ku6img.com',
+            'ku6cdn.com',
+            'staticsdo.com',
+            'snyu.com',
+            'mlt01.com',
+            'doubleclick.net',
+            'scanscout.com',
+            'betrad.com',
+            'invitemedia.com',
+            'adroll.com',
+            'mathtag.com',
+            '2mdn.net',
+            'rtbidder.net',
+            'compete.com',
+            'vizu.com',
+            'adnxs.com',
+            'mookie1.com',
+            'pubmatic.com',
+            'serving-sys.com',
+            'legolas-media.com',
+            'harrenmedianetwork.com',
+            'google-analytics.com',
+            'alipayobjects.com',
+            'aliyun.com',
+            'alicdn.com',
+            'renren.com',
+            'sina.com',
+            'iask.com',
+            'img.cctvpic.com',
+            '163.com',
+            'netease.com',
+            '126.net',
+            'qq.com',
+            'gtimg.com',
+            'taobao.com',
+            'taobaocdn.com',
+            'lxdns.com',
+            'sohu.com',
+            'ifeng.com',
+            'ifanr.com',
+            'jysq.net',
+            'nipic.com',
+            'fastcdn.com',
+            'oeeee.com',
+            'mosso.com',
+            'pengyou.com',
+            '360buyimg.com',
+            '51buy.com',
+            'yixun.com',
+            'icson.com',
+            'baidu.com',
+            'baidupcs.com',
+            'vmall.com',
+            'weibo.com',
+            'youku.com',
+            'soso.com',
+            'tmall.com',
+            'hao123.com',
+            'tudou.com',
+            '360buy.com',
+            'jd.com',
+            'chinaz.com',
+            'alipay.com',
+            'sogou.com',
+            'cnzz.com',
+            'douban.com',
+            '58.com',
+            'alibaba.com',
+            '56.com',
+            'xunlei.com',
+            'bing.com',
+            'iqiyi.com',
+            'qiyi.com',
+            'csdn.net',
+            'soku.com',
+            'xinhuanet.com',
+            'ku6.com',
+            'aizhan.com',
+            '4399.com',
+            'yesky.com',
+            'soufun.com',
+            'youdao.com',
+            'china.com',
+            'hudong.com',
+            'ganji.com',
+            'kaixin001.com',
+            'paipai.com',
+            'live.com',
+            'alimama.com',
+            'mop.com',
+            '51.la',
+            '51job.com',
+            'dianping.com',
+            '126.com',
+            'admin5.com',
+            'it168.com',
+            '2345.com',
+            'huanqiu.com',
+            'arpg2.com',
+            '777wyx.com',
+            'chinanews.com',
+            'letv.com',
+            'jiayuan.com',
+            '39.net',
+            'twcczhu.com',
+            'cnblogs.com',
+            'microsoft.com',
+            'dangdang.com',
+            'pchome.net',
+            'pptv.com',
+            'vancl.com',
+            'zhaopin.com',
+            'apple.com',
+            'bitauto.com',
+            'etao.com',
+            'qunar.com',
+            'eastmoney.com',
+            'yihaodian.com',
+            '115.com',
+            '21cn.com',
+            'hupu.com',
+            'duowan.com'
+        ], [
+            '52pk.net',
+            'baixing.com',
+            'iteye.com',
+            'verycd.com',
+            'suning.com',
+            'discuz.net',
+            '7k7k.com',
+            'mtime.com',
+            'msn.com',
+            'ccb.com',
+            'hc360.com',
+            'cmbchina.com',
+            '51.com',
+            'yoka.com',
+            'seowhy.com',
+            'chinabyte.com',
+            'qidian.com',
+            'ctrip.com',
+            'cnbeta.com',
+            'tom.com',
+            'tenpay.com',
+            'tencent.com',
+            'meituan.com',
+            '120ask.com',
+            '51cto.com',
+            'sdo.com',
+            'meilishuo.com',
+            '17173.com',
+            'xyxy.net',
+            '19lou.com',
+            'yiqifa.com',
+            'nuomi.com',
+            'eastday.com',
+            'onlinedown.net',
+            'oschina.net',
+            'zhubajie.com',
+            'babytree.com',
+            'kdnet.net',
+            'docin.com',
+            'qq937.com',
+            'tgbus.com',
+            'im286.com',
+            'baomihua.com',
+            'doubleclick.com',
+            'dh818.com',
+            'ads8.com',
+            'hiapk.com',
+            'iapps.im',
+            'ynet.com',
+            'sootoo.com',
+            'mogujie.com',
+            'gfan.com',
+            'ppstream.com',
+            'pps.tv',
+            'a135.net',
+            'ip138.com',
+            'zx915.com',
+            'lashou.com',
+            'crsky.com',
+            'iciba.com',
+            'uuzu.com',
+            'tuan800.com',
+            'haodf.com',
+            'youboy.com',
+            'ulink.cc',
+            'qiyou.com',
+            '88db.com',
+            'tao123.com',
+            '178.com',
+            'ci123.com',
+            'yolk7.com',
+            'tiexue.net',
+            'stockstar.com',
+            'xici.net',
+            'pcpop.com',
+            'linkedin.com',
+            'weiphone.com',
+            'doc88.com',
+            'adobe.com',
+            'shangdu.com',
+            'aili.com',
+            'anjuke.com',
+            '360doc.com',
+            'cnxad.com',
+            'west263.com',
+            'jiathis.com',
+            'gougou.com',
+            'whlongda.com',
+            'mnwan.com',
+            'onetad.com',
+            'duote.com',
+            '55bbs.com',
+            'iloveyouxi.com',
+            'gongchang.com',
+            'meishichina.com',
+            'qire123.com',
+            '55tuan.com',
+            'cocoren.com',
+            'xiaomi.com',
+            'phpwind.net',
+            'abchina.com',
+            'thethirdmedia.com',
+            'coo8.com',
+            'aliexpress.com',
+            'onlylady.com',
+            'manzuo.com',
+            'elong.com',
+            'aibang.com',
+            '10010.com',
+            '3366.com',
+            '28tui.com',
+            'vipshop.com',
+            '1616.net',
+            'pp.cc',
+            'jumei.com',
+            'tui18.com',
+            '52tlbb.com',
+            'yinyuetai.com',
+            'eye.rs',
+            'baihe.com',
+            'iyaya.com',
+            'imanhua.com',
+            'lusongsong.com',
+            'leho.com',
+            '315che.com',
+            'donews.com',
+            'cqnews.net',
+            '591hx.com',
+            '114la.com',
+            'gamersky.com',
+            'tangdou.com',
+            '91.com',
+            'uuu9.com',
+            'xinnet.com',
+            'dedecms.com',
+            'cnmo.com',
+            '51fanli.com',
+            'liebiao.com',
+            'yyets.com',
+            'lady8844.com',
+            'newsmth.net',
+            'ucjoy.com',
+            'duba.net',
+            'cnki.net',
+            '70e.com',
+            'funshion.com',
+            'qjy168.com',
+            'paypal.com',
+            '3dmgame.com',
+            'm18.com',
+            'caixin.com',
+            'linezing.com',
+            '53kf.com',
+            'makepolo.com',
+            'dospy.com',
+            'xiami.com',
+            '5173.com',
+            'vjia.com',
+            'hotsales.net',
+            '4738.com'
+        ], [
+            'mydrivers.com',
+            'alisoft.com',
+            'titan24.com',
+            'u17.com',
+            'jb51.net',
+            'diandian.com',
+            'dzwww.com',
+            'hichina.com',
+            'abang.com',
+            'qianlong.com',
+            'm1905.com',
+            'chinahr.com',
+            'zhaodao123.com',
+            'daqi.com',
+            'yaolan.com',
+            '5d6d.net',
+            'fobshanghai.com',
+            'q150.com',
+            'l99.com',
+            'ccidnet.com',
+            'aifang.com',
+            'aol.com',
+            'theplanet.com',
+            'chinaunix.net',
+            'hf365.com',
+            'ad1111.com',
+            'zhihu.com',
+            'blueidea.com',
+            'net114.com',
+            '07073.com',
+            'alivv.com',
+            'mplife.com',
+            'allyes.com',
+            'jqw.com',
+            '1ting.com',
+            'yougou.com',
+            'dbank.com',
+            'made-in-china.com',
+            '36kr.com',
+            'wumii.com',
+            'zoosnet.net',
+            'xitek.com',
+            'ali213.net',
+            'exam8.com',
+            'jxedt.com',
+            'uniontoufang.com',
+            'zqgame.com',
+            '52kmh.com',
+            'yxlady.com',
+            'sznews.com',
+            'longhoo.net',
+            'game3737.com',
+            '51auto.com',
+            'booksky.org',
+            'iqilu.com',
+            'ddmap.com',
+            'cncn.com',
+            'ename.net',
+            '1778.com',
+            'blogchina.com',
+            '778669.com',
+            'dayoo.com',
+            'ct10000.com',
+            'zhibo8.cc',
+            'qingdaonews.com',
+            'zongheng.com',
+            '1o26.com',
+            'tiancity.com',
+            'jinti.com',
+            'si.kz',
+            'tuniu.com',
+            'xiu.com',
+            '265.com',
+            'gamestlbb.com',
+            '2hua.com',
+            'moonbasa.com',
+            'sf-express.com',
+            'qiushibaike.com',
+            'ztgame.com',
+            'yupoo.com',
+            'kimiss.com',
+            'cnhubei.com',
+            'pingan.com',
+            'lafaso.com',
+            'rakuten.co.jp',
+            'zhenai.com',
+            'tiao8.info',
+            '7c.com',
+            'tianji.com',
+            'kugou.com',
+            'house365.com',
+            'flickr.com',
+            'xiazaiba.com',
+            'aipai.com',
+            'sodu.org',
+            'bankcomm.com',
+            'lietou.com',
+            'toocle.com',
+            'fengniao.com',
+            '99bill.com',
+            'bendibao.com',
+            'mapbar.com',
+            'nowec.com',
+            'yingjiesheng.com',
+            'comsenz.com',
+            'meilele.com',
+            'otwan.com',
+            '61.com',
+            'meizu.com',
+            'readnovel.com',
+            'fenzhi.com',
+            'up2c.com',
+            '500wan.com',
+            'fx120.net',
+            'ftuan.com',
+            '17u.com',
+            'lehecai.com',
+            '28.com',
+            'acfun.tv',
+            'bilibili.tv',
+            'bogou.tv',
+            'fengyunzhibo.com',
+            'kukuplay.com',
+            'huaban.com',
+            'szhome.com',
+            'miercn.com',
+            'fblife.com',
+            'chinaw3.com',
+            'smzdm.com',
+            'b2b168.com',
+            '265g.com',
+            'anzhi.com',
+            'chuangelm.com',
+            'php100.com',
+            '100ye.com',
+            'hefei.cc',
+            'mumayi.com',
+            'sttlbb.com',
+            'mangocity.com',
+            'fantong.com',
+            'zoopda.com',
+            'zdmimg.com',
+            'appgame.com',
+            'cctv.com',
+            '0x110.com',
+            '100tjs.com',
+            '115img.com',
+            '123cha.com',
+            '1717388.com',
+            '17cdn.com',
+            '17kuxun.com',
+            '198game.com',
+            '1uuc.com',
+            '24quan.com',
+            '293.net',
+            '360tl.com',
+            '37see.com',
+            '5000pk.com',
+            '51img1.com',
+            '51jobcdn.com'
+        ], [
+            '51yes.com',
+            '5d6d.com',
+            '6dad.com',
+            '6rooms.com',
+            '701sou.com',
+            '766.com',
+            '859652.com',
+            '968tl.com',
+            '9787.com',
+            '99114.com',
+            'a963.com',
+            'aliimg.com',
+            'appinn.com',
+            'atpanel.com',
+            'bestb2b.com',
+            'bjbus.com',
+            'blogbus.com',
+            'bokee.net',
+            'boosj.com',
+            'brothersoft.com',
+            'caing.com',
+            'cdn20.com',
+            'changyou.com',
+            'chdbits.org',
+            'chetx.com',
+            'chinamobile.com',
+            'chinaren.com',
+            'chiphell.com',
+            'cnepub.com',
+            'cnfol.com',
+            'cngba.com',
+            'cntv.net',
+            'cnwest.com',
+            'cqtiyu.com',
+            'didatuan.com',
+            'dipan.com',
+            'dpfile.com',
+            'dream4ever.org',
+            'duapp.com',
+            'duomi.com',
+            'dy2018.com',
+            'dytt8.net',
+            'eb80.com',
+            'egou.com',
+            'et8.org',
+            'eyoudi.com',
+            'fastif.net',
+            'fat999.com',
+            'ffdy.cc',
+            'game3896.com',
+            'gamewan.net',
+            'gaopeng.com',
+            'getfirebug.com',
+            'gfw.io',
+            'ggmm777.com',
+            'go2map.com',
+            'goodbabygroup.com',
+            'gy9y.com',
+            'gzmama.com',
+            'haliyuya.com',
+            'hdslb.com',
+            'hi-pda.com',
+            'hlwan.net',
+            'huochepiao.com',
+            'idailyapp.com',
+            'ifengimg.com',
+            'ifensi.com',
+            'ijinshan.com',
+            'img-space.com',
+            'inc.gs',
+            'infzm.com',
+            'is686.com',
+            'iweek.ly',
+            'james520.com',
+            'jandan.net',
+            'jiatx.com',
+            'jiepang.com',
+            'jiuyaoyouxi.com',
+            'jjwxc.net',
+            'joqoo.com',
+            'jstv.com',
+            'junshijia.com',
+            'kandian.net',
+            'kanimg.com',
+            'kankan.com',
+            'keyunzhan.com',
+            'koudai8.com',
+            'kuaiwan.com',
+            'lampdrive.com',
+            'lashouimg.com',
+            'logmein.com',
+            'lohas.ly',
+            'loli.mg',
+            'loli.vg',
+            'lvping.com',
+            'mapabc.com',
+            'my.cl.ly',
+            'nbweekly.com',
+            'ngacn.cc',
+            'njobt.com',
+            'okbuy.com',
+            'okooo.com',
+            'p5w.net',
+            'pcbeta.com',
+            'pr56789.com',
+            'qiyipic.com',
+            'qqmail.com',
+            'qvbuy.com',
+            'ranwen.com',
+            'rrimg.com',
+            'sanguosha.com',
+            'sg560.com',
+            'shuangtv.net',
+            'sinaapp.com',
+            'sinaedge.com',
+            'sinaimg.com',
+            'sj-tl.com',
+            'skycn.com',
+            'snsfun.cc',
+            'soufunimg.com',
+            'synacast.com',
+            'tbcache.com',
+            'thawte.com',
+            'tianyaui.com',
+            'tlbb2.com',
+            'tlbb8.com',
+            'tlbbsifu.com',
+            'tvmao.com',
+            'umiwi.com',
+            'uusee.com',
+            'vcimg.com',
+            'wandoujia.com',
+            'wdjimg.com',
+            'web887.com',
+            'woniu.com',
+            'xi666.com',
+            'xiachufang.com',
+            'xiami.net',
+            'xiaonei.com',
+            'xilu.com',
+            'xiyou53.com',
+            'xiyou54.com',
+            'xlpan.com',
+            'xmfish.com',
+            'xp9365.com',
+            'xtltt.com',
+            'xungou.com',
+            'ydstatic.com',
+            'yihaodianimg.com',
+            'yintai.com',
+            'yiyi.cc',
+            'yocc.net',
+            'youwo123.com',
+            'zaobao.com',
+            'zaojiao.com',
+            'zbjimg.com',
+            'zdface.com',
+            'zhi.hu',
+            'zhibo8.com',
+            'zhongsou.net'
+        ]
+    ];
+    var vhost = host.toLowerCase();
+    for (var j = 0; j < rules.length; j++) {
+        var rule_list = rules[j];
+        for (var i = 0; i < rule_list.length; i++) {
+            var rule_entry = rule_list[i];
+            var rule_dot = '.' + rule_entry;
+            if (vhost === rule_entry || vhost.indexOf(rule_dot, vhost.length - rule_dot.length) !== -1) {
+                return 'DIRECT';
+            }
+        }
+    }
     return PROXY;
 }
