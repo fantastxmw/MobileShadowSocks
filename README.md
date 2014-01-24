@@ -38,10 +38,13 @@ Just open the *Shadow* app again and switch off "Enable Proxy".
 Yes, it is always available if the proxy settings are enabled. The icon badge of Shadow.app will also show "On" to indicate that proxy is available.
 
 #### 4. Is the shadowsocks daemon always running in the background and consuming my battery?
-No. The daemon uses the "__On Demand__" mechanism of `launchd`, which means it is battery-friendly. It starts up only when receiving proxy requests and will exit automatically if there is no request for several minutes. So, don't worry for battery life, __just leave it there__. :)
+No. The daemon uses the "__On Demand__" mechanism of `launchd`, which means it is battery-friendly. It starts up only when receiving proxy requests. So, don't worry for battery life, __just leave it there__. :)
 
 #### 5. I cannot find any proxy settings in *Settings*. Is the proxy actually enabled? And where are the proxy settings?
-The proxy settings are **indeed** set successfully if you don't see any alert views when turning on the switch. Sometimes they just don't show in the Settings. If you want to check it, call `scutil --proxy` in terminal.
+The proxy settings are **indeed** set successfully if you don't see any alert views when turning on the switch. Sometimes they just don't show in the Settings (or wrongly show in the proxy for VPN). If you want to check the status, call `scutil --proxy` in terminal.
+
+#### 6. I've uninstalled the app but forgotten to turn off the proxy. And my device cannot connect to the Internet any more? HALP!
+Don't panic. Just reset your network settings in Preferences and everything will be OK. Or you can re-install the app, disable the proxy and uninstall it again.
 
 ### Credits
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @[clowwindy](https://github.com/clowwindy)
