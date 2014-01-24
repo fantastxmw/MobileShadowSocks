@@ -42,6 +42,8 @@
     "Proxy Settings" = "Proxy Settings";
     "RC2 (CFB mode)" = "RC2 (CFB mode)";
     RC4 = RC4;
+    Repair = Repair;
+    "Repair Service" = "Repair Service";
     Rev = Rev;
     "SEED (CFB mode)" = "SEED (CFB mode)";
     Server = Server;
@@ -54,4 +56,5 @@
     "Use Default PAC File" = "Use Default PAC File";
     Version = Version;
     Warning = Warning;
+    "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?";
 }

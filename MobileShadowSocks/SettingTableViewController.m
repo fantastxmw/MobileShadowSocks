@@ -28,16 +28,19 @@
 #define ALERT_TAG_ABOUT 1
 #define ALERT_TAG_DEFAULT_PAC 2
 #define ALERT_TAG_NEW_PROFILE 3
+#define ALERT_TAG_REPAIR 4
 
 #define LOCAL_PORT 1983
 #define PAC_PORT 1993
 #define MAX_TRYTIMES 10
 #define LOCAL_TIMEOUT 60
 #define UPDATE_CONF "Update-Conf"
+#define FORCE_STOP "Force-Stop"
 #define SET_PROXY_PAC "SetProxy-Pac"
 #define SET_PROXY_SOCKS "SetProxy-Socks"
 #define SET_PROXY_NONE "SetProxy-None"
 
+#define PROXY_FORCE_STOP 4
 #define PROXY_PAC_STATUS 3
 #define PROXY_SOCKS_STATUS 2
 #define PROXY_NONE_STATUS 1
@@ -95,6 +98,7 @@ typedef enum {
 - (BOOL)isDefaultProfile;
 - (void)updateProfileList:(id)value;
 - (NSArray *)profileList;
+- (void)repairDaemon;
 @end
 
 @implementation SettingTableViewController
@@ -107,7 +111,7 @@ typedef enum {
     if (self) {
         _isPrefChanged = YES;
         _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
-         _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
+        _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
         
         NSArray *sysPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask, YES);
         NSString *prefsDirectory = [[sysPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Preferences"];
@@ -202,9 +206,12 @@ typedef enum {
     gestureRecognizer.cancelsTouchesInView = NO;
     [self.tableView addGestureRecognizer:gestureRecognizer];
     [gestureRecognizer release];
+    UIBarButtonItem *repairButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Repair", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(repairDaemon)];
     UIBarButtonItem *aboutButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"About", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(showAbout)];
+    [[self navigationItem] setLeftBarButtonItem:repairButton];
     [[self navigationItem] setRightBarButtonItem:aboutButton];
     [[self navigationItem] setTitle:NSLocalizedString(@"ShadowSocks", nil)];
+    [repairButton release];
     [aboutButton release];
 }
 
@@ -442,6 +449,18 @@ typedef enum {
     }
 }
 
+- (void)repairDaemon
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Repair Service", nil)
+                                                    message:NSLocalizedString(@"Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?", nil)
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                          otherButtonTitles:NSLocalizedString(@"Repair",nil), nil];
+    [alert setTag:ALERT_TAG_REPAIR];
+    [alert show];
+    [alert release];
+}
+
 - (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit
 {
     UITextField *textField = nil;
@@ -483,6 +502,8 @@ typedef enum {
         } else if ([alertView tag] == ALERT_TAG_NEW_PROFILE) {
             UITextField *textField = [self textFieldInAlertView:alertView isInit:NO];
             [self createProfile:[textField text]];
+        } else if ([alertView tag] == ALERT_TAG_REPAIR) {
+            [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_FORCE_STOP]];
         }
     }
 }
@@ -650,6 +671,9 @@ typedef enum {
             break;
         case PROXY_PAC_STATUS:
             messageHeader = SET_PROXY_PAC;
+            break;
+        case PROXY_FORCE_STOP:
+            messageHeader = FORCE_STOP;
             break;
         default:
             messageHeader = SET_PROXY_NONE;

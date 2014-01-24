@@ -11,7 +11,6 @@
 		<string>/Applications/MobileShadowSocks.app/shadowd</string>
 		<string>-n</string>
 		<string>-d</string>
-		<string>120</string>
 		<string>-c</string>
 		<string>/var/mobile/Library/Preferences/com.linusyang.shadowsocks.json</string>
 	</array>
