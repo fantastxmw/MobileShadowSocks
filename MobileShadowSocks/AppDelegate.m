@@ -30,6 +30,12 @@
     return YES;
 }
 
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    [_tabViewController scannerDidGetResult:[url absoluteString] willDismiss:NO];
+    return YES;
+}
+
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     [_tabViewController fixProxy];

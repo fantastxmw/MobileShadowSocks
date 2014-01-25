@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CodeScannerViewController.h"
 
-@interface SettingTableViewController : UITableViewController <UITextFieldDelegate, UIAlertViewDelegate> {
+@interface SettingTableViewController : UITableViewController <UITextFieldDelegate, UIAlertViewDelegate, UIActionSheetDelegate, CodeScannerDelegate> {
     CGFloat _cellWidth;
     NSInteger _tableSectionNumber;
     NSArray *_tableRowNumber;
@@ -19,11 +20,13 @@
     NSInteger _autoProxyCellTag;
     NSInteger _enableCellTag;
     NSMutableDictionary *_tagKey;
+    NSMutableDictionary *_alertViewUserInfo;
     NSString *_pacURL;
     NSString *_configPath;
     NSString *_pacDefaultFile;
     NSInteger _currentProfile;
     BOOL _isPrefChanged;
+    BOOL _legacySystem;
 }
 
 - (void)fixProxy;
@@ -36,6 +39,7 @@
 - (NSString *)nameOfProfile:(NSInteger)index;
 - (void)selectProfile:(NSInteger)profileIndex;
 - (void)removeProfile:(NSInteger)profileIndex;
+- (void)reorderProfile:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
 - (void)renameProfile:(NSInteger)index withName:(NSString *)name;
 
 - (void)saveObject:(id)value forKey:(NSString *)key;

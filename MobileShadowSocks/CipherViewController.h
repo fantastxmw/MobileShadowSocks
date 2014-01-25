@@ -18,5 +18,7 @@
 }
 
 - (id)initWithStyle:(UITableViewStyle)style withParentView:(SettingTableViewController *)parentView;
++ (BOOL)cipherIsValid:(NSString *)cipher;
++ (NSString *)defaultCipher;
 
 @end

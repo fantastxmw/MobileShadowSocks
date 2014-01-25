@@ -66,7 +66,7 @@ tar zxf "${PROJECT_DIR}/extra/ssl.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 tar zxf "${PROJECT_DIR}/extra/backport.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 
 # Build and bundle binary
-try_build_legacy
+# try_build_legacy
 build_launcher arm64 shadowd64
 build_launcher armv7 shadowd7
 mv -f makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks MobileShadowSocks7

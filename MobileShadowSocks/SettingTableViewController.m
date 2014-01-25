@@ -9,9 +9,13 @@
 #import "SettingTableViewController.h"
 #import "CipherViewController.h"
 #import "ProfileViewController.h"
+#import "CodeGeneratorViewController.h"
+#import "NSString+Base64.h"
 
 #define APP_VER @"0.2.5"
 #define APP_BUILD @"4"
+
+#define kURLPrefix @"ss://"
 
 #define CELL_INDEX_TITLE 0
 #define CELL_INDEX_KEY 1
@@ -29,6 +33,18 @@
 #define ALERT_TAG_DEFAULT_PAC 2
 #define ALERT_TAG_NEW_PROFILE 3
 #define ALERT_TAG_REPAIR 4
+
+typedef enum {
+    kActionSheetQRCode = 0,
+    
+    kActionSheetCount
+} ActionSheetTag;
+
+typedef enum {
+    QRCodeActionCamera = 0,
+    QRCodeActionLibrary,
+    QRCodeActionShare
+} QRCodeAction;
 
 #define LOCAL_PORT 1983
 #define PAC_PORT 1993
@@ -70,8 +86,6 @@ typedef enum {
 #define kblackColor [UIColor colorWithRed:0 green:0 blue:0 alpha:1.0]
 #define kblackColorDisabled [UIColor colorWithRed:0 green:0 blue:0 alpha:0.439216f]
 
-#define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
-
 @interface UISwitch (Addition)
 - (void)setAlternateColors:(BOOL)enabled;
 @end
@@ -88,7 +102,6 @@ typedef enum {
 @interface SettingTableViewController ()
 - (void)reloadProfile;
 - (BOOL)readBool:(NSString *)key;
-- (void)createProfile:(NSString *)rawName;
 - (void)saveBool:(BOOL)value forKey:(NSString *)key;
 - (BOOL)proxyEnabled;
 - (BOOL)setProxy:(ProxyStatus)status;
@@ -110,6 +123,8 @@ typedef enum {
     self = [super initWithStyle:style];
     if (self) {
         _isPrefChanged = YES;
+        _legacySystem = SYSTEM_VERSION_LESS_THAN(@"5.0");
+        
         _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
         _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
         
@@ -119,6 +134,8 @@ typedef enum {
         
         _currentProfile = PROFILE_DEFAULT_INDEX;
         [self reloadProfile];
+        
+        _alertViewUserInfo = [[NSMutableDictionary alloc] init];
        
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
             _cellWidth = 560.0f;
@@ -147,6 +164,11 @@ typedef enum {
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Create New Profile", nil),
                             @"NEW_PROFILE_BUTTON",
+                            @"",
+                            CELL_BUTTON, nil],
+                           [NSArray arrayWithObjects:
+                            NSLocalizedString(@"QR Code", nil),
+                            @"QRCODE_BUTTON",
                             @"",
                             CELL_BUTTON, nil],
                            nil],
@@ -220,6 +242,7 @@ typedef enum {
     [super viewWillAppear:animated];
     [self reloadProfile];
     [[self tableView] reloadData];
+    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -231,6 +254,11 @@ typedef enum {
     }
 }
 
+- (BOOL)shouldAutorotate
+{
+    return YES;
+}
+
 - (void)dealloc
 {
     [_pacURL release];
@@ -239,6 +267,7 @@ typedef enum {
     [_tableElements release];
     [_tagKey release];
     [_pacDefaultFile release];
+    [_alertViewUserInfo release];
     [super dealloc];
 }
 
@@ -251,7 +280,7 @@ typedef enum {
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[_tableElements objectAtIndex:section] count];
+    return [(NSArray *) [_tableElements objectAtIndex:section] count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -287,20 +316,20 @@ typedef enum {
             [alert show];
             [alert release];
         } else if ([cellKey isEqualToString:@"NEW_PROFILE_BUTTON"]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"New Profile", nil)
-                                                            message:@""
-                                                           delegate:self
-                                                  cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                                                  otherButtonTitles:NSLocalizedString(@"OK",nil),
-                                  nil];
-            UITextField *textField = [self textFieldInAlertView:alert isInit:YES];
-            [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
-            [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
-            [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
-            [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
-            [alert setTag:ALERT_TAG_NEW_PROFILE];
-            [alert show];
-            [alert release];
+            [self showNewProfile:nil withMessage:nil];
+        } else if ([cellKey isEqualToString:@"QRCODE_BUTTON"]) {
+            UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Import or Share Profiles by QR Code",nil)
+                                                                     delegate:self
+                                                            cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                       destructiveButtonTitle:nil
+                                                            otherButtonTitles:
+                                          NSLocalizedString(@"Import from Camera",nil),
+                                          NSLocalizedString(@"Import from Photo Library",nil),
+                                          NSLocalizedString(@"Share with QR Code",nil),
+                                          nil];
+            [actionSheet setTag:kActionSheetQRCode];
+            [actionSheet showInView:self.view];
+            [actionSheet release];
         }
     } else if ([cellType hasPrefix:CELL_VIEW]) {
         if ([cellKey isEqualToString:@"CRYPTO_METHOD"]) {
@@ -461,10 +490,35 @@ typedef enum {
     [alert release];
 }
 
+- (void)showNewProfile:(NSDictionary *)profileInfo withMessage:(NSString *)message
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"New Profile", nil)
+                                                    message:message
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                          otherButtonTitles:NSLocalizedString(@"OK",nil),
+                          nil];
+    UITextField *textField = [self textFieldInAlertView:alert isInit:YES];
+    [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
+    [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
+    [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
+    [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
+    [alert setTag:ALERT_TAG_NEW_PROFILE];
+    if (profileInfo) {
+        [_alertViewUserInfo setObject:profileInfo forKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
+        NSString *presetName = [NSString stringWithFormat:@"SS-%@", [profileInfo objectForKey:@"REMOTE_SERVER"]];
+        [textField setText:presetName];
+    } else {
+        [_alertViewUserInfo removeObjectForKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
+    }
+    [alert show];
+    [alert release];
+}
+
 - (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit
 {
     UITextField *textField = nil;
-    if (SYSTEM_VERSION_LESS_THAN(@"5.0")) {
+    if (_legacySystem) {
         if (isInit) {
             if ([alertView respondsToSelector:@selector(addTextFieldWithValue:label:)]) {
                 [alertView addTextFieldWithValue:@"" label:@""];
@@ -501,11 +555,90 @@ typedef enum {
             }
         } else if ([alertView tag] == ALERT_TAG_NEW_PROFILE) {
             UITextField *textField = [self textFieldInAlertView:alertView isInit:NO];
-            [self createProfile:[textField text]];
+            NSDictionary *userInfo = [_alertViewUserInfo objectForKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
+            [self createProfile:[textField text] withInfo:userInfo];
         } else if ([alertView tag] == ALERT_TAG_REPAIR) {
             [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_FORCE_STOP]];
         }
     }
+}
+
+#pragma mark - UIActionSheet Delegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    QRCodeAction action = (QRCodeAction) buttonIndex;
+    switch (action) {
+        case QRCodeActionCamera: {
+            CodeScannerViewController *scannerViewController = [[CodeScannerViewController alloc] init];
+            scannerViewController.delegate = self;
+            [self.navigationController pushViewController:scannerViewController animated:YES];
+            [scannerViewController release];
+            break;
+        }
+            
+        case QRCodeActionLibrary:
+            break;
+            
+        case QRCodeActionShare:
+            break;
+            
+        default:
+            break;
+    }
+}
+
+#pragma mark - Scanner Delegate
+
+- (void)scannerDidGetResult:(NSString *)resultText willDismiss:(BOOL)dismiss
+{
+    if (dismiss) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    do {
+        if (![resultText hasPrefix:kURLPrefix]) {
+            break;
+        }
+        NSString *decodedLink = [[resultText substringFromIndex:[kURLPrefix length]] base64DecodedString];
+        if (decodedLink == nil || [decodedLink length] == 0) {
+            decodedLink = [resultText substringFromIndex:[kURLPrefix length]];
+        }
+        NSRange firstColon = [decodedLink rangeOfString:@":"];
+        NSRange lastColon = [decodedLink rangeOfString:@":" options:NSBackwardsSearch];
+        NSRange separator = [decodedLink rangeOfString:@"@" options:NSBackwardsSearch];
+        if (firstColon.location == NSNotFound ||
+            lastColon.location == NSNotFound ||
+            separator.location == NSNotFound ||
+            lastColon.location == [decodedLink length] - 1) {
+            break;
+        }
+        
+        NSString *linkMethod = [decodedLink substringToIndex:firstColon.location];
+        NSString *linkPort = [decodedLink substringFromIndex:lastColon.location + 1];
+        NSString *linkPassword = [decodedLink substringWithRange:NSMakeRange(firstColon.location + 1, separator.location - firstColon.location - 1)];
+        NSString *linkAddress = [decodedLink substringWithRange:NSMakeRange(separator.location + 1, lastColon.location - separator.location - 1)];
+        if (linkMethod == nil || linkPort == nil || linkPassword == nil || linkAddress == nil) {
+            break;
+        }
+        
+        if (![CipherViewController cipherIsValid:linkMethod]) {
+            linkMethod = [CipherViewController defaultCipher];
+        }
+        
+        NSDictionary *linkInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  linkAddress, @"REMOTE_SERVER",
+                                  linkPort, @"REMOTE_PORT",
+                                  linkPassword, @"SOCKS_PASS",
+                                  linkMethod, @"CRYPTO_METHOD",
+                                  nil];
+        NSString *linkTitle = [NSString stringWithFormat:@"%@: %@:%@\n%@: %@\n %@: %@",
+                               NSLocalizedString(@"Server", nil), linkAddress, linkPort,
+                               NSLocalizedString(@"Password", nil), linkPassword,
+                               NSLocalizedString(@"Cipher", nil), linkMethod];
+        [self showNewProfile:linkInfo withMessage:linkTitle];
+        return;
+    } while (0);
+    [self showError:NSLocalizedString(@"Cannot parse given URL link.", nil)];
 }
 
 #pragma mark - Switch delegate
@@ -956,6 +1089,23 @@ typedef enum {
     }
 }
 
+- (void)reorderProfile:(NSInteger)fromIndex toIndex:(NSInteger)toIndex
+{
+    NSArray *profileList = [self profileList];
+    if (profileList == nil) {
+        return;
+    }
+    if (toIndex >= 0 && toIndex < [profileList count] &&
+        fromIndex >= 0 && fromIndex < [profileList count]) {
+        NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
+        id movingObject = [profileList objectAtIndex:fromIndex];
+        [newProfileList removeObjectAtIndex:fromIndex];
+        [newProfileList insertObject:movingObject atIndex:toIndex];
+        [self updateProfileList:newProfileList];
+        [self selectProfile:PROFILE_DEFAULT_INDEX];
+    }
+}
+
 - (void)reloadProfile
 {
     _currentProfile = [self readInt:GLOBAL_PROFILE_NOW_KEY];
@@ -964,15 +1114,19 @@ typedef enum {
     }
 }
 
-- (void)createProfile:(NSString *)rawName
+- (void)createProfile:(NSString *)rawName withInfo:(NSDictionary *)rawInfo
 {
     NSString *profileName = [rawName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if (profileName == nil || [profileName length] == 0) {
         return;
     }
+    NSMutableDictionary *profileInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:profileName, PROFILE_NAME_KEY, nil];
+    if (rawInfo) {
+        [profileInfo addEntriesFromDictionary:rawInfo];
+    }
     NSArray *profileList = [self profileList];
     NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
-    [newProfileList addObject:[NSDictionary dictionaryWithObjectsAndKeys:profileName, PROFILE_NAME_KEY, nil]];
+    [newProfileList addObject:profileInfo];
     [self updateProfileList:newProfileList];
     [self selectProfile:[newProfileList count] - 1];
     [[self tableView] reloadData];
