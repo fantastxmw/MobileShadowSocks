@@ -10,4 +10,6 @@
 
 @interface CodeGeneratorViewController : UIViewController
 
+- (id)initWithQRCodeLink:(NSString *)link;
+
 @end

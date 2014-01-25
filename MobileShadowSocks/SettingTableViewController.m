@@ -323,9 +323,9 @@ typedef enum {
                                                             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
                                                        destructiveButtonTitle:nil
                                                             otherButtonTitles:
-                                          NSLocalizedString(@"Import from Camera",nil),
-                                          NSLocalizedString(@"Import from Photo Library",nil),
-                                          NSLocalizedString(@"Share with QR Code",nil),
+                                          NSLocalizedString(@"From Camera",nil),
+                                          NSLocalizedString(@"From Photo Library",nil),
+                                          NSLocalizedString(@"Share",nil),
                                           nil];
             [actionSheet setTag:kActionSheetQRCode];
             [actionSheet showInView:self.view];
@@ -580,8 +580,18 @@ typedef enum {
         case QRCodeActionLibrary:
             break;
             
-        case QRCodeActionShare:
+        case QRCodeActionShare: {
+            NSString *remoteServer = [self fetchConfigForKey:@"REMOTE_SERVER" andDefault:@"127.0.0.1"];
+            NSString *remotePort = [self fetchConfigForKey:@"REMOTE_PORT" andDefault:@"8080"];
+            NSString *socksPass = [self fetchConfigForKey:@"SOCKS_PASS" andDefault:@"123456"];
+            NSString *cryptoMethod = [self fetchConfigForKey:@"CRYPTO_METHOD" andDefault:[CipherViewController defaultCipher]];
+            NSString *rawLink = [NSString stringWithFormat:@"%@:%@@%@:%@", cryptoMethod, socksPass, remoteServer, remotePort];
+            NSString *encodedLink = [NSString stringWithFormat:@"%@%@", kURLPrefix, [rawLink base64EncodedString]];
+            CodeGeneratorViewController *genViewController = [[CodeGeneratorViewController alloc] initWithQRCodeLink:encodedLink];
+            [self.navigationController pushViewController:genViewController animated:YES];
+            [genViewController release];
             break;
+        }
             
         default:
             break;
@@ -638,7 +648,9 @@ typedef enum {
         [self showNewProfile:linkInfo withMessage:linkTitle];
         return;
     } while (0);
-    [self showError:NSLocalizedString(@"Cannot parse given URL link.", nil)];
+    
+    // FIXME: Show in Safari
+    [self showError:[NSString stringWithFormat:@"%@:\n%@", NSLocalizedString(@"Cannot parse URL link", nil), resultText]];
 }
 
 #pragma mark - Switch delegate
@@ -1152,7 +1164,7 @@ typedef enum {
     NSString *localPort = [NSString stringWithFormat:@"%d", LOCAL_PORT];
     NSString *socksPass = [self fetchConfigForKey:@"SOCKS_PASS" andDefault:@"123456"];
     NSString *timeOut = [NSString stringWithFormat:@"%d", LOCAL_TIMEOUT];
-    NSString *cryptoMethod = [self fetchConfigForKey:@"CRYPTO_METHOD" andDefault:@"table"];
+    NSString *cryptoMethod = [self fetchConfigForKey:@"CRYPTO_METHOD" andDefault:[CipherViewController defaultCipher]];
     NSMutableString *exceptString = nil;
     NSString *pacFilePath = [self fetchConfigForKey:@"PAC_FILE" andDefault:nil];
     NSInteger i;
@@ -1175,6 +1187,10 @@ typedef enum {
         }
     }
     
+    if (![CipherViewController cipherIsValid:cryptoMethod]) {
+        cryptoMethod = [CipherViewController defaultCipher];
+    }
+
     NSMutableString *jsonConfigString = [NSMutableString stringWithString:@"{\n"];
     [self appendString:jsonConfigString key:@"server" value:remoteServer isString:YES];
     [self appendString:jsonConfigString key:@"server_port" value:remotePort isString:NO];

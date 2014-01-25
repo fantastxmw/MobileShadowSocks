@@ -8,17 +8,22 @@
 
 #import "CodeGeneratorViewController.h"
 
+#define kCodeSize 256.0f
+
 @interface CodeGeneratorViewController ()
+
+@property (nonatomic, retain) NSString *codeLink;
+@property (nonatomic, retain) UIImageView *codeImageView;
 
 @end
 
 @implementation CodeGeneratorViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithQRCodeLink:(NSString *)link
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    self = [super init];
     if (self) {
-        // Custom initialization
+        self.codeLink = link;
     }
     return self;
 }
@@ -26,13 +31,58 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
+    _codeImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, kCodeSize, kCodeSize)];
+    _codeImageView.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin |
+                                       UIViewAutoresizingFlexibleBottomMargin |
+                                       UIViewAutoresizingFlexibleLeftMargin |
+                                       UIViewAutoresizingFlexibleRightMargin);
+    _codeImageView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:_codeImageView];
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.title = NSLocalizedString(@"Share QR Code", nil);
+    UIBarButtonItem *shareButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Share", nil)
+                                                                    style:UIBarButtonItemStyleBordered
+                                                                   target:self
+                                                                   action:@selector(shareCodeImage)];
+    self.navigationItem.rightBarButtonItem = shareButton;
+    [shareButton release];
 }
 
-- (void)didReceiveMemoryWarning
+- (void)viewWillAppear:(BOOL)animated
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    [super viewWillAppear:animated];
+    self.codeImageView.center = self.view.center;
+    [self generateQRCode];
+}
+
+- (void)dealloc
+{
+    [_codeLink release];
+    _codeLink = nil;
+    [_codeImageView release];
+    _codeImageView = nil;
+    [super dealloc];
+}
+
+- (void)generateQRCode
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        ZXMultiFormatWriter *writer = [[ZXMultiFormatWriter alloc] init];
+        ZXBitMatrix *result = [writer encode:self.codeLink format:kBarcodeFormatQRCode width:kCodeSize height:kCodeSize error:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (result) {
+                self.codeImageView.image = [UIImage imageWithCGImage:[ZXImage imageWithMatrix:result].cgimage];
+            } else {
+                self.codeImageView.image = nil;
+            }
+        });
+    });
+}
+
+- (void)shareCodeImage
+{
+    
 }
 
 @end

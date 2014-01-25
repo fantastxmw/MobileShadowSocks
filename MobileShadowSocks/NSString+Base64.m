@@ -8,7 +8,7 @@
 
 #import "NSString+Base64.h"
 
-/* Base64 implementation from PolarSSL */
+/* Base64 implementation from PolarSSL 1.3.3 */
 
 #define POLARSSL_ERR_BASE64_BUFFER_TOO_SMALL               -0x002A  /**< Output buffer too small. */
 #define POLARSSL_ERR_BASE64_INVALID_CHARACTER              -0x002C  /**< Invalid character in input. */
@@ -182,11 +182,25 @@ int base64_decode( unsigned char *dst, size_t *dlen,
         
         NSData *inputData = [string dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
         NSUInteger inputLength = [inputData length];
-        const unsigned char *inputBytes = [inputData bytes];
         
-        NSUInteger maxOutputLength = encode ? (inputLength / 3 + 1) * 4 : (inputLength / 4 + 1) * 3;
-        size_t outputLength = maxOutputLength;
-        NSMutableData *outputData = [NSMutableData dataWithLength:maxOutputLength];
+        if (!encode) {
+            NSString *padding = nil;
+            if ((inputLength * 3) % 4 != 0) {
+                if ((inputLength * 3 + 1) % 4 == 0) {
+                    padding = @"=";
+                } else {
+                    padding = @"==";
+                }
+            }
+            if (padding) {
+                inputData = [[string stringByAppendingString:padding] dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+                inputLength = [inputData length];
+            }
+        }
+        
+        const unsigned char *inputBytes = [inputData bytes];
+        size_t outputLength = encode ? ((inputLength + 2) / 3) * 4 : (inputLength / 4 + 1) * 3;
+        NSMutableData *outputData = [NSMutableData dataWithLength:outputLength];
         unsigned char *outputBytes = (unsigned char *) [outputData mutableBytes];
         int ret;
         
@@ -194,6 +208,16 @@ int base64_decode( unsigned char *dst, size_t *dlen,
             ret = base64_encode(outputBytes, &outputLength, inputBytes, inputLength);
         } else {
             ret = base64_decode(outputBytes, &outputLength, inputBytes, inputLength);
+        }
+        
+        if (ret == POLARSSL_ERR_BASE64_BUFFER_TOO_SMALL) {
+            outputData = [NSMutableData dataWithLength:outputLength];
+            outputBytes = (unsigned char *) [outputData mutableBytes];
+            if (encode) {
+                ret = base64_encode(outputBytes, &outputLength, inputBytes, inputLength);
+            } else {
+                ret = base64_decode(outputBytes, &outputLength, inputBytes, inputLength);
+            }
         }
         
         if (ret == 0 && outputLength > 0) {
@@ -204,14 +228,19 @@ int base64_decode( unsigned char *dst, size_t *dlen,
     return nil;
 }
 
-- (NSString *)base64EncodedString;
+- (NSString *)base64EncodedString
 {
-    return [NSString stringWithBase64String:self encode:YES];
+    return [[NSString stringWithBase64String:self encode:YES] noPaddingString];
 }
 
-- (NSString *)base64DecodedString;
+- (NSString *)base64DecodedString
 {
-    return [NSString stringWithBase64String:self encode:NO];
+    return [NSString stringWithBase64String:[self noPaddingString] encode:NO];
+}
+
+- (NSString *)noPaddingString
+{
+    return [self stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"="]];
 }
 
 @end
