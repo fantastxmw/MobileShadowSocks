@@ -12,8 +12,8 @@
 #import "CodeGeneratorViewController.h"
 #import "NSString+Base64.h"
 
-#define APP_VER @"0.2.5"
-#define APP_BUILD @"4"
+#define APP_VER @"0.3"
+#define APP_BUILD @"1"
 
 #define kURLPrefix @"ss://"
 
@@ -33,6 +33,7 @@
 #define ALERT_TAG_DEFAULT_PAC 2
 #define ALERT_TAG_NEW_PROFILE 3
 #define ALERT_TAG_REPAIR 4
+#define ALERT_TAG_SCANERROR 5
 
 typedef enum {
     kActionSheetQRCode = 0,
@@ -515,6 +516,30 @@ typedef enum {
     [alert release];
 }
 
+- (void)showQRCodeError:(NSString *)rawLink
+{
+    NSString *baseHint = NSLocalizedString(@"Cannot parse URL link", nil);
+    NSString *message;
+    if (rawLink) {
+        message = [NSString stringWithFormat:@"%@:\n%@", baseHint, rawLink];
+    } else {
+        message = [baseHint stringByAppendingString:@"."];
+    }
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QR Code Error", nil)
+                                                    message:message
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                          otherButtonTitles:NSLocalizedString(@"Open in Safari",nil), nil];
+    [alert setTag:ALERT_TAG_SCANERROR];
+    if (rawLink) {
+        [_alertViewUserInfo setObject:rawLink forKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
+    } else {
+        [_alertViewUserInfo removeObjectForKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
+    }
+    [alert show];
+    [alert release];
+}
+
 - (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit
 {
     UITextField *textField = nil;
@@ -559,6 +584,11 @@ typedef enum {
             [self createProfile:[textField text] withInfo:userInfo];
         } else if ([alertView tag] == ALERT_TAG_REPAIR) {
             [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_FORCE_STOP]];
+        } else if ([alertView tag] == ALERT_TAG_SCANERROR) {
+            NSString *rawLink = [_alertViewUserInfo objectForKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
+            if (rawLink) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:rawLink]];
+            }
         }
     }
 }
@@ -649,8 +679,7 @@ typedef enum {
         return;
     } while (0);
     
-    // FIXME: Show in Safari
-    [self showError:[NSString stringWithFormat:@"%@:\n%@", NSLocalizedString(@"Cannot parse URL link", nil), resultText]];
+    [self showQRCodeError:resultText];
 }
 
 #pragma mark - Switch delegate
@@ -1104,7 +1133,7 @@ typedef enum {
 - (void)reorderProfile:(NSInteger)fromIndex toIndex:(NSInteger)toIndex
 {
     NSArray *profileList = [self profileList];
-    if (profileList == nil) {
+    if (profileList == nil || fromIndex == toIndex) {
         return;
     }
     if (toIndex >= 0 && toIndex < [profileList count] &&

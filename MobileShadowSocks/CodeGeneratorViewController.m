@@ -47,13 +47,14 @@
                                                                    action:@selector(shareCodeImage)];
     self.navigationItem.rightBarButtonItem = shareButton;
     [shareButton release];
+    
+    [self generateQRCode];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     self.codeImageView.center = self.view.center;
-    [self generateQRCode];
 }
 
 - (void)dealloc
