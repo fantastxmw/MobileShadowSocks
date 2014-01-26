@@ -67,6 +67,7 @@
 @property (nonatomic, retain) ZXCapture* capture;
 @property (nonatomic, retain) UIView *cameraView;
 @property (nonatomic, retain) CameraFocusSquare *focusSqure;
+@property (nonatomic, assign) BOOL isAutoFocus;
 
 @end
 
@@ -114,9 +115,13 @@
             [self.navigationController presentModalViewController:viewController animated:NO];
             [self.navigationController dismissModalViewControllerAnimated:NO];
         } else {
-            viewController.view.backgroundColor = [UIColor clearColor];
+            viewController.view.backgroundColor = [UIColor blackColor];
             [self.navigationController presentViewController:viewController animated:NO completion:^{
-                [self.navigationController dismissViewControllerAnimated:YES completion:^{}];
+                double delayInSeconds = 0.1;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                    [self.navigationController dismissViewControllerAnimated:YES completion:^{}];
+                });
             }];
         }
         [viewController release];
@@ -127,7 +132,12 @@
     self.capture.camera = self.capture.back;
     self.capture.layer.frame = self.view.bounds;
     
-    self.title = NSLocalizedString(@"Scan QR Code", nil);
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    [button setTitle:NSLocalizedString(@"Scan QR Code", nil) forState: UIControlStateNormal];
+    [button addTarget:self action:@selector(showUsage) forControlEvents:UIControlEventTouchUpInside];
+    [button sizeToFit];
+    self.navigationItem.titleView = button;
+    
     UIBarButtonItem *torchButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Torch", nil)
                                                                     style:UIBarButtonItemStyleBordered
                                                                    target:self
@@ -149,6 +159,8 @@
     _focusSqure = [[CameraFocusSquare alloc] initWithFrame:CGRectMake(0, 0, kFocusSize, kFocusSize)];
     _focusSqure.alpha = 0.0f;
     [self.view addSubview:_focusSqure];
+    
+    self.isAutoFocus = YES;
 
     UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapReset:)];
     doubleTapGesture.numberOfTapsRequired = 2;
@@ -177,8 +189,9 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     if (self.capture.torch == YES) {
-        [self toggleTorch];
+        self.capture.torch = NO;
     }
     self.capture.delegate = nil;
 #if !TARGET_IPHONE_SIMULATOR
@@ -223,14 +236,29 @@
     }
 }
 
+- (void)showUsage
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Camera Usage", nil)
+                                                    message:NSLocalizedString(@"Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight.", nil)
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                                          otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+}
+
+#if !TARGET_IPHONE_SIMULATOR
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if ([keyPath isEqual:@"adjustingFocus"] == NO ||
         [[change objectForKey:NSKeyValueChangeNewKey] boolValue]) {
         return;
     }
-    [self focusSquareAtPoint:self.view.center];
+    if (self.isAutoFocus) {
+        [self focusSquareAtPoint:self.view.center];
+    }
 }
+#endif
 
 - (void)focusSquareAtPoint:(CGPoint)point
 {
@@ -265,6 +293,7 @@
         NSError *error = nil;
         [currentDevice lockForConfiguration:&error];
         if (!error) {
+            self.isAutoFocus = NO;
             [currentDevice setFocusPointOfInterest:convertedPoint];
             [currentDevice setFocusMode:AVCaptureFocusModeAutoFocus];
             [currentDevice unlockForConfiguration];
@@ -281,6 +310,7 @@
         NSError *error = nil;
         [currentDevice lockForConfiguration:&error];
         if (!error) {
+            self.isAutoFocus = YES;
             [currentDevice setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
             [currentDevice unlockForConfiguration];
         }
@@ -296,8 +326,8 @@
 - (void)tapToFocus:(UITapGestureRecognizer *)singleTap
 {
     CGPoint touchPoint = [singleTap locationInView:self.cameraView];
-    [self focusSquareAtPoint:touchPoint];
     [self cameraFocusAtPoint:touchPoint];
+    [self focusSquareAtPoint:touchPoint];
 }
 
 #pragma mark - ZXCaptureDelegate Methods

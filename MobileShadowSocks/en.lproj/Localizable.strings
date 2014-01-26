@@ -10,6 +10,7 @@
     "Camellia (128-bit, CFB mode)" = "Camellia (128-bit, CFB mode)";
     "Camellia (192-bit, CFB mode)" = "Camellia (192-bit, CFB mode)";
     "Camellia (256-bit, CFB mode)" = "Camellia (256-bit, CFB mode)";
+    "Camera Usage" = "Camera Usage";
     Cancel = Cancel;
     "Cannot parse URL link" = "Cannot parse URL link";
     Cipher = Cipher;
@@ -70,6 +71,7 @@
     "Share to Twitter" = "Share to Twitter";
     "Share to Weibo" = "Share to Weibo";
     "Sina Weibo account is not available." = "Sina Weibo account is not available.";
+    "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight.";
     "Split with comma" = "Split with comma";
     "Table (Default)" = "Table (Default)";
     Torch = Torch;

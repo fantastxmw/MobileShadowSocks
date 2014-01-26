@@ -10,8 +10,9 @@
     "Camellia (128-bit, CFB mode)" = "Camellia (128 \U4f4d, CFB \U6a21\U5f0f)";
     "Camellia (192-bit, CFB mode)" = "Camellia (192 \U4f4d, CFB \U6a21\U5f0f)";
     "Camellia (256-bit, CFB mode)" = "Camellia (256 \U4f4d, CFB \U6a21\U5f0f)";
+    "Camera Usage" = "\U76f8\U6a5f\U7528\U6cd5";
     Cancel = "\U53d6\U6d88";
-    "Cannot parse URL link" = "\U7121\U6cd5\U89e3\U6790 URL \U9023\U7d50\U3002";
+    "Cannot parse URL link" = "\U7121\U6cd5\U89e3\U6790 URL \U9023\U7d50";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "Copy Link" = "\U62f7\U8c9d\U9023\U7d50";
     "Create New Profile" = "\U65b0\U589e\U914d\U7f6e";
@@ -70,6 +71,7 @@
     "Share to Twitter" = "\U5206\U4eab\U5230 Twitter";
     "Share to Weibo" = "\U5206\U4eab\U5230\U65b0\U6d6a\U5fae\U535a";
     "Sina Weibo account is not available." = "\U65b0\U6d6a\U5fae\U535a\U8cec\U6236\U672a\U555f\U7528\U3002";
+    "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "\U8f15\U62cd\U4e00\U4e0b\U53ef\U624b\U52d5\U5c0d\U7126\U3002\n\U8f15\U62cd\U5169\U4e0b\U53ef\U81ea\U52d5\U5c0d\U7126\U3002\n\U9ede\U6309\U624b\U96fb\U7b52\U6309\U9215\U53ef\U958b\U95dc\U9583\U5149\U71c8\U3002";
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U865f\U5206\U9694";
     "Table (Default)" = "Table (\U9ed8\U8a8d)";
     Torch = "\U624b\U96fb\U7b52";
