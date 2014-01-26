@@ -117,10 +117,10 @@
         } else {
             viewController.view.backgroundColor = [UIColor blackColor];
             [self.navigationController presentViewController:viewController animated:NO completion:^{
-                double delayInSeconds = 0.1;
+                double delayInSeconds = 0.2;
                 dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
                 dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                    [self.navigationController dismissViewControllerAnimated:YES completion:^{}];
+                    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
                 });
             }];
         }
@@ -138,12 +138,14 @@
     [button sizeToFit];
     self.navigationItem.titleView = button;
     
-    UIBarButtonItem *torchButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Torch", nil)
-                                                                    style:UIBarButtonItemStyleBordered
-                                                                   target:self
-                                                                   action:@selector(toggleTorch)];
-    self.navigationItem.rightBarButtonItem = torchButton;
-    [torchButton release];
+    if (self.capture.hasTorch) {
+        UIBarButtonItem *torchButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Torch", nil)
+                                                                        style:UIBarButtonItemStyleBordered
+                                                                       target:self
+                                                                       action:@selector(toggleTorch)];
+        self.navigationItem.rightBarButtonItem = torchButton;
+        [torchButton release];
+    }
     
     _cameraView = [[UIView alloc] initWithFrame:self.view.bounds];
     _cameraView.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin |
@@ -186,6 +188,12 @@
 #endif
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    self.capture.layer.frame = self.view.frame;
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
@@ -201,7 +209,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation != UIInterfaceOrientationPortrait);
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 #ifdef __IPHONE_6_0
@@ -287,7 +295,13 @@
 - (void)cameraFocusAtPoint:(CGPoint)point
 {
 #if !TARGET_IPHONE_SIMULATOR
-    CGPoint convertedPoint = [(AVCaptureVideoPreviewLayer *)self.capture.layer captureDevicePointOfInterestForPoint:point];
+    CGPoint convertedPoint = CGPointZero;
+    if (SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+        CGRect layerFrame = self.capture.layer.frame;
+        convertedPoint = CGPointMake(point.x / CGRectGetHeight(layerFrame), point.y / CGRectGetWidth(layerFrame));
+    } else {
+        convertedPoint = [(AVCaptureVideoPreviewLayer *)self.capture.layer captureDevicePointOfInterestForPoint:point];
+    }
     AVCaptureDevice *currentDevice = self.capture.captureDevice;
     if ([currentDevice isFocusPointOfInterestSupported] && [currentDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus]){
         NSError *error = nil;

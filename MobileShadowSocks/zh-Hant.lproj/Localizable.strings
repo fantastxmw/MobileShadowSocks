@@ -47,6 +47,7 @@
     "PAC File" = "PAC \U6a94\U6848";
     "PAC file not found. Redirect all traffic to proxy." = "PAC \U6a94\U6848\U672a\U627e\U5230\Uff0c\U6240\U6709\U9023\U7dda\U5c07\U901a\U904e\U4ee3\U7406\U3002";
     Password = "\U5bc6\U78bc";
+    "Photo library is not available." = "\U7121\U6cd5\U4f7f\U7528\U5716\U7247\U5eab\U3002";
     "Please specify file path" = "\U8acb\U6307\U5b9a\U6a94\U6848\U8def\U5f91";
     Port = "\U4f3a\U670d\U5668\U57e0";
     Profile = "\U914d\U7f6e";

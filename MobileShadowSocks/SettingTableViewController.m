@@ -100,19 +100,11 @@ typedef enum {
 - (UITextField *)textFieldAtIndex:(NSInteger)textFieldIndex;
 @end
 
-@interface SettingTableViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
-- (void)reloadProfile;
-- (BOOL)readBool:(NSString *)key;
-- (void)saveBool:(BOOL)value forKey:(NSString *)key;
-- (BOOL)proxyEnabled;
-- (BOOL)setProxy:(ProxyStatus)status;
-- (ProxyStatus)currentProxyStatus;
-- (void)setProxyEnabled:(BOOL)enabled;
-- (void)syncSettings;
-- (BOOL)isDefaultProfile;
-- (void)updateProfileList:(id)value;
-- (NSArray *)profileList;
-- (void)repairDaemon;
+@interface SettingTableViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverControllerDelegate>
+
+@property (nonatomic, retain) UIPopoverController *popController;
+@property (nonatomic, assign) BOOL isPoped;
+
 @end
 
 @implementation SettingTableViewController
@@ -138,7 +130,7 @@ typedef enum {
         
         _alertViewUserInfo = [[NSMutableDictionary alloc] init];
        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        if (DEVICE_IS_IPAD())
             _cellWidth = 560.0f;
         else
             _cellWidth = 180.0f;
@@ -248,7 +240,7 @@ typedef enum {
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    if (DEVICE_IS_IPAD()) {
         return YES;
     } else {
         return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
@@ -269,6 +261,8 @@ typedef enum {
     [_tagKey release];
     [_pacDefaultFile release];
     [_alertViewUserInfo release];
+    [_popController release];
+    _popController = nil;
     [super dealloc];
 }
 
@@ -605,7 +599,38 @@ typedef enum {
             [self showQRCodeError:nil];
         }
     }];
-    [picker dismissModalViewControllerAnimated:YES];
+    if (DEVICE_IS_IPAD()) {
+        [self.popController dismissPopoverAnimated:YES];
+        self.isPoped = NO;
+    } else {
+        [picker dismissModalViewControllerAnimated:YES];
+    }
+}
+
+#pragma mark - UIPopoverController Delegate
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+    self.popController = nil;
+    self.isPoped = NO;
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    if (DEVICE_IS_IPAD() && self.isPoped) {
+        [self showPopController];
+    }
+}
+
+- (void)showPopController
+{
+    CGRect popFrame;
+    popFrame.origin.x = CGRectGetWidth(self.view.frame) / 2.0f;
+    popFrame.origin.y = CGRectGetHeight(self.view.frame) / 2.0f - 50.0f;
+    popFrame.size.width = 1.0f;
+    popFrame.size.height = 1.0f;
+    [self.popController presentPopoverFromRect:popFrame inView:self.view permittedArrowDirections:0 animated:YES];
+    self.isPoped = YES;
 }
 
 #pragma mark - UIActionSheet Delegate
@@ -623,11 +648,23 @@ typedef enum {
         }
             
         case QRCodeActionLibrary: {
-            UIImagePickerController *pickerController = [[UIImagePickerController alloc] init];
-            pickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-            pickerController.delegate = self;
-            [self.navigationController presentModalViewController:pickerController animated:YES];
-            [pickerController release];
+            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+                UIImagePickerController *pickerController = [[UIImagePickerController alloc] init];
+                pickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                pickerController.delegate = self;
+                if (DEVICE_IS_IPAD()) {
+                    UIPopoverController *popController = [[UIPopoverController alloc] initWithContentViewController:pickerController];
+                    popController.delegate = self;
+                    self.popController = popController;
+                    [popController release];
+                    [self showPopController];
+                } else {
+                    [self presentModalViewController:pickerController animated:YES];
+                }
+                [pickerController release];
+            } else {
+                [self showError:NSLocalizedString(@"Photo library is not available.", nil)];
+            }
             break;
         }
             

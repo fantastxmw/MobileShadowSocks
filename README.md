@@ -10,9 +10,10 @@ By Linus Yang
 * __Secure__: Support plenty of ciphers, including AES, Blowfish and Camellia.
 * __Efficient__: Proxy services are triggered on demand.
 * __User-friendly__: Easy to set and use. Built-in auto-proxy feature.
+* __QR Code Support__: Share your profiles easily via QR Code.
 * __Universal__: System-wide proxy for either Wi-Fi or cellular network.
 * __All-in-one__: Only one Debian package with no dependency. No MobileSubstrate stuff.
-* __Compatibility__: All iDevices with iOS 3.0 and above.
+* __Compatibility__: All iDevices with iOS 3.0 and above (Some features need iOS 5 or above).
 
 ### Installation
 1. Open Cydia.app and refresh sources

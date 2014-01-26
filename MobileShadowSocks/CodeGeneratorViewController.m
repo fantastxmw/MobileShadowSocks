@@ -12,6 +12,10 @@
 #import <Social/Social.h>
 #endif
 
+#ifdef __IPHONE_5_0
+#import <Twitter/Twitter.h>
+#endif
+
 #define kCodeSize 256.0f
 
 typedef enum {
@@ -70,6 +74,15 @@ typedef enum {
 {
     [super viewWillAppear:animated];
     self.codeImageView.center = self.view.center;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    if (DEVICE_IS_IPAD()) {
+        return YES;
+    } else {
+        return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    }
 }
 
 - (void)dealloc
@@ -154,6 +167,16 @@ typedef enum {
     }
 #endif
     
+#ifdef __IPHONE_5_0
+    if (!isTwitterAvailable && SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+        if ([TWTweetComposeViewController class]) {
+            if ([TWTweetComposeViewController canSendTweet]) {
+                isTwitterAvailable = YES;
+            }
+        }
+    }
+#endif
+    
     ShareAction action = (ShareAction) buttonIndex;
     switch (action) {
         case ShareActionCopy: {
@@ -173,13 +196,27 @@ typedef enum {
             
         case ShareActionTwitter: {
             if (isTwitterAvailable) {
-                SLComposeViewController *composeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
-                if (composeViewController) {
+                if (SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+#ifdef __IPHONE_5_0
+                    TWTweetComposeViewController *composeViewController = [[TWTweetComposeViewController alloc] init];
                     if (self.codeImageView.image) {
                         [composeViewController addImage:self.codeImageView.image];
                     }
                     [composeViewController setInitialText:NSLocalizedString(@"I've shared a #ShadowSocks profile with QR Code.", nil)];
                     [self presentViewController:composeViewController animated:YES completion:nil];
+                    [composeViewController release];
+#endif
+                } else {
+#ifdef __IPHONE_6_0
+                    SLComposeViewController *composeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+                    if (composeViewController) {
+                        if (self.codeImageView.image) {
+                            [composeViewController addImage:self.codeImageView.image];
+                        }
+                        [composeViewController setInitialText:NSLocalizedString(@"I've shared a #ShadowSocks profile with QR Code.", nil)];
+                        [self presentViewController:composeViewController animated:YES completion:nil];
+                    }
+#endif
                 }
             } else {
                 [self showShareMessage:NSLocalizedString(@"Twitter account is not available.", nil)];
@@ -189,6 +226,7 @@ typedef enum {
             
         case ShareActionWeibo: {
             if (isWeiboAvailable) {
+#ifdef __IPHONE_6_0
                 SLComposeViewController *composeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeSinaWeibo];
                 if (composeViewController) {
                     if (self.codeImageView.image) {
@@ -197,6 +235,7 @@ typedef enum {
                     [composeViewController setInitialText:NSLocalizedString(@"I've shared a #ShadowSocks# profile with QR Code.", nil)];
                     [self presentViewController:composeViewController animated:YES completion:nil];
                 }
+#endif
             } else {
                 [self showShareMessage:NSLocalizedString(@"Sina Weibo account is not available.", nil)];
             }

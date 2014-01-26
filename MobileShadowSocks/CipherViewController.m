@@ -93,6 +93,15 @@
     [[self tableView] scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    if (DEVICE_IS_IPAD()) {
+        return YES;
+    } else {
+        return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    }
+}
+
 - (void)dealloc
 {
     [_cipherNameArray release];

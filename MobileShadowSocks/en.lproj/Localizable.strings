@@ -47,6 +47,7 @@
     "PAC File" = "PAC File";
     "PAC file not found. Redirect all traffic to proxy." = "PAC file not found. Redirect all traffic to proxy.";
     Password = Password;
+    "Photo library is not available." = "Photo library is not available.";
     "Please specify file path" = "Please specify file path";
     Port = Port;
     Profile = Profile;
