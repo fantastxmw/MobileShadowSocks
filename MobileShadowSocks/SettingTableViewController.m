@@ -100,7 +100,7 @@ typedef enum {
 - (UITextField *)textFieldAtIndex:(NSInteger)textFieldIndex;
 @end
 
-@interface SettingTableViewController ()
+@interface SettingTableViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 - (void)reloadProfile;
 - (BOOL)readBool:(NSString *)key;
 - (void)saveBool:(BOOL)value forKey:(NSString *)key;
@@ -593,6 +593,21 @@ typedef enum {
     }
 }
 
+#pragma mark - UIImagePickerController Delegate
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+    [CodeScannerViewController scanImage:image completion:^(BOOL success, NSString *resultText) {
+        if (success) {
+            [self scannerDidGetResult:resultText willDismiss:NO];
+        } else {
+            [self showQRCodeError:nil];
+        }
+    }];
+    [picker dismissModalViewControllerAnimated:YES];
+}
+
 #pragma mark - UIActionSheet Delegate
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -607,8 +622,14 @@ typedef enum {
             break;
         }
             
-        case QRCodeActionLibrary:
+        case QRCodeActionLibrary: {
+            UIImagePickerController *pickerController = [[UIImagePickerController alloc] init];
+            pickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+            pickerController.delegate = self;
+            [self.navigationController presentModalViewController:pickerController animated:YES];
+            [pickerController release];
             break;
+        }
             
         case QRCodeActionShare: {
             NSString *remoteServer = [self fetchConfigForKey:@"REMOTE_SERVER" andDefault:@"127.0.0.1"];

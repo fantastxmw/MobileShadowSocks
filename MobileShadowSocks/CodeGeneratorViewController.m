@@ -25,7 +25,7 @@ typedef enum {
 
 @interface CodeGeneratorViewController () <UIActionSheetDelegate>
 
-@property (nonatomic, retain) NSString *codeLink;
+@property (nonatomic, copy) NSString *codeLink;
 @property (nonatomic, retain) UIImageView *codeImageView;
 
 @end

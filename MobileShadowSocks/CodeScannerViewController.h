@@ -18,5 +18,7 @@
 
 @property (nonatomic, assign) id<CodeScannerDelegate> delegate;
 
++ (void)scanImage:(UIImage *)image completion:(void (^)(BOOL success, NSString *resultText))handler;
+
 @end
 

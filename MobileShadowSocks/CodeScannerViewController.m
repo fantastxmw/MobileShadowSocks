@@ -72,6 +72,35 @@
 
 @implementation CodeScannerViewController
 
+#pragma mark - Class Methods
+
++ (void)scanImage:(UIImage *)image completion:(void (^)(BOOL success, NSString *resultText))handler
+{
+    if (image == nil || handler == nil) {
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        ZXMultiFormatReader *reader = [ZXMultiFormatReader reader];
+        ZXDecodeHints *hints = [ZXDecodeHints hints];
+        
+        ZXCGImageLuminanceSource *source = [[ZXCGImageLuminanceSource alloc] initWithCGImage:image.CGImage];
+        ZXHybridBinarizer *binarizer = [ZXHybridBinarizer binarizerWithSource:source];
+        ZXBinaryBitmap *bitmap = [ZXBinaryBitmap binaryBitmapWithBinarizer:binarizer];
+        
+        NSError *error = nil;
+        ZXResult *result = [reader decode:bitmap hints:hints error:&error];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (result) {
+                handler(YES, result.text);
+            } else {
+                handler(NO, nil);
+            }
+        });
+        
+        [source release];
+    });
+}
+
 #pragma mark - View Controller Methods
 
 - (void)viewDidLoad
