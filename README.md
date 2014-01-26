@@ -51,6 +51,7 @@ Don't panic. Just reset your network settings in Preferences and everything will
 * [Shadowsocks](https://github.com/clowwindy/shadowsocks) project created by @[clowwindy](https://github.com/clowwindy)
 * Based on [Shadowsocks-libev](https://github.com/linusyang/shadowsocks-libev) from @[madeye](https://github.com/madeye)
 * App icon by @[madeye](https://github.com/madeye) from [Shadowsocks Android](https://github.com/shadowsocks/shadowsocks-android) (Too lazy to draw one by myself :P)
+* QR Code encoding and decoding by [ZXingObjC](https://github.com/TheLevelUp/ZXingObjC)
 
 ### Development
 
