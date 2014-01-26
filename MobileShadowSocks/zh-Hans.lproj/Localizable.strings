@@ -27,13 +27,13 @@
     "Failed to change proxy settings.\nMaybe no network access available." = "\U66f4\U6539\U4ee3\U7406\U8bbe\U7f6e\U5931\U8d25\U3002\n\U53ef\U80fd\U65e0\U7f51\U7edc\U8fde\U63a5\U3002";
     "Failed to save QR code image." = "\U65e0\U6cd5\U5b58\U50a8\U4e8c\U7ef4\U7801\U56fe\U50cf\U3002";
     "From Camera" = "\U4ece\U76f8\U673a\U83b7\U53d6";
-    "From Photo Library" = "\U4ece\U56fe\U7247\U5e93\U83b7\U53d6";
+    "From Photo Library" = "\U4ece\U56fe\U5e93\U83b7\U53d6";
     General = "\U901a\U7528";
     "Help Page" = "\U5e2e\U52a9\U9875\U9762";
     "I've shared a #ShadowSocks profile with QR Code." = "\U6211\U7528\U4e8c\U7ef4\U7801\U5206\U4eab\U4e86\U4e00\U4e2a #\U5f71\U68ad \U914d\U7f6e\U3002";
     "I've shared a #ShadowSocks# profile with QR Code." = "\U6211\U7528\U4e8c\U7ef4\U7801\U5206\U4eab\U4e86\U4e00\U4e2a#\U5f71\U68ad#\U914d\U7f6e\U3002";
     "IDEA (CFB mode)" = "IDEA (CFB \U6a21\U5f0f)";
-    "Image is saved to photo library." = "\U4e8c\U7ef4\U7801\U5df2\U5b58\U50a8\U5230\U56fe\U7247\U5e93\U3002";
+    "Image is saved to photo library." = "\U4e8c\U7ef4\U7801\U5df2\U5b58\U50a8\U5230\U56fe\U5e93\U3002";
     "Import or Share Profiles by QR Code" = "\U7528\U4e8c\U7ef4\U7801\U5bfc\U5165\U6216\U5206\U4eab\U914d\U7f6e";
     "Link is copied to pasteboard" = "\U94fe\U63a5\U5df2\U62f7\U8d1d\U5230\U526a\U5207\U677f";
     "Localization by Linus Yang" = "\U4e2d\U6587\U672c\U5730\U5316\Uff1aLinus Yang";
@@ -59,7 +59,7 @@
     "Repair Service" = "\U4fee\U590d\U670d\U52a1";
     Rev = "\U6784\U5efa";
     "SEED (CFB mode)" = "SEED (CFB \U6a21\U5f0f)";
-    "Save to Photo Library" = "\U5b58\U50a8\U5230\U56fe\U7247\U5e93";
+    "Save to Photo Library" = "\U5b58\U50a8\U5230\U56fe\U5e93";
     "Scan QR Code" = "\U626b\U63cf\U4e8c\U7ef4\U7801";
     Server = "\U670d\U52a1\U5668\U5730\U5740";
     "Server Information" = "\U670d\U52a1\U5668\U8bbe\U7f6e";
