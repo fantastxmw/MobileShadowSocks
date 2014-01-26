@@ -106,7 +106,7 @@ typedef enum {
 - (void)generateQRCode
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        ZXMultiFormatWriter *writer = [[ZXMultiFormatWriter alloc] init];
+        ZXMultiFormatWriter *writer = [ZXMultiFormatWriter writer];
         ZXBitMatrix *result = [writer encode:self.codeLink format:kBarcodeFormatQRCode width:kCodeSize height:kCodeSize error:nil];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (result) {

@@ -114,7 +114,7 @@
             [self.navigationController presentModalViewController:viewController animated:NO];
             [self.navigationController dismissModalViewControllerAnimated:NO];
         } else {
-            viewController.view.backgroundColor = [UIColor blackColor];
+            viewController.view.backgroundColor = [UIColor clearColor];
             [self.navigationController presentViewController:viewController animated:NO completion:^{
                 [self.navigationController dismissViewControllerAnimated:YES completion:^{}];
             }];
@@ -147,9 +147,19 @@
     [self.view addSubview:_cameraView];
     
     _focusSqure = [[CameraFocusSquare alloc] initWithFrame:CGRectMake(0, 0, kFocusSize, kFocusSize)];
+    _focusSqure.alpha = 0.0f;
+    [self.view addSubview:_focusSqure];
 
+    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapReset:)];
+    doubleTapGesture.numberOfTapsRequired = 2;
+    [self.cameraView addGestureRecognizer:doubleTapGesture];
+    
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToFocus:)];
+    tapGesture.numberOfTapsRequired = 1;
+    [tapGesture requireGestureRecognizerToFail:doubleTapGesture];
     [self.cameraView addGestureRecognizer:tapGesture];
+    
+    [doubleTapGesture release];
     [tapGesture release];
 }
 
@@ -158,6 +168,10 @@
     [super viewWillAppear:animated];
     self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     self.capture.delegate = self;
+    [self cameraResetAutoFocus];
+#if !TARGET_IPHONE_SIMULATOR
+    [self.capture.captureDevice addObserver:self forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil];
+#endif
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -167,6 +181,9 @@
         [self toggleTorch];
     }
     self.capture.delegate = nil;
+#if !TARGET_IPHONE_SIMULATOR
+    [self.capture.captureDevice removeObserver:self forKeyPath:@"adjustingFocus"];
+#endif
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -206,17 +223,23 @@
     }
 }
 
-- (void)tapToFocus:(UITapGestureRecognizer *)singleTap
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    
-    CGPoint touchPoint = [singleTap locationInView:self.cameraView];
-    CGRect focusFrame = CGRectMake(touchPoint.x - kFocusSize / 2.0, touchPoint.y - kFocusSize / 2.0, kFocusSize, kFocusSize);
+    if ([keyPath isEqual:@"adjustingFocus"] == NO ||
+        [[change objectForKey:NSKeyValueChangeNewKey] boolValue]) {
+        return;
+    }
+    [self focusSquareAtPoint:self.view.center];
+}
+
+- (void)focusSquareAtPoint:(CGPoint)point
+{
+    CGRect focusFrame = CGRectMake(point.x - kFocusSize / 2.0, point.y - kFocusSize / 2.0, kFocusSize, kFocusSize);
     
     self.focusSqure.frame = CGRectMake(0, 0, kFocusBigSize, kFocusBigSize);
-    self.focusSqure.center = touchPoint;
+    self.focusSqure.center = point;
     self.focusSqure.alpha = 0.0f;
     
-    [self.view addSubview:self.focusSqure];
     [self.focusSqure animate];
     [self.focusSqure setNeedsDisplay];
     
@@ -229,15 +252,15 @@
                             options:UIViewAnimationCurveEaseInOut
                          animations:^{
                              self.focusSqure.alpha = 0.0f;
-                         } completion:^(BOOL finished) {
-                             [self.focusSqure removeFromSuperview];
-                         }];
+                         } completion:^(BOOL finished) {}];
     }];
-    
+}
+
+- (void)cameraFocusAtPoint:(CGPoint)point
+{
 #if !TARGET_IPHONE_SIMULATOR
-    CGPoint convertedPoint = [(AVCaptureVideoPreviewLayer *)self.capture.layer captureDevicePointOfInterestForPoint:touchPoint];
+    CGPoint convertedPoint = [(AVCaptureVideoPreviewLayer *)self.capture.layer captureDevicePointOfInterestForPoint:point];
     AVCaptureDevice *currentDevice = self.capture.captureDevice;
-    
     if ([currentDevice isFocusPointOfInterestSupported] && [currentDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus]){
         NSError *error = nil;
         [currentDevice lockForConfiguration:&error];
@@ -250,6 +273,32 @@
 #endif
 }
 
+- (void)cameraResetAutoFocus
+{
+#if !TARGET_IPHONE_SIMULATOR
+    AVCaptureDevice *currentDevice = self.capture.captureDevice;
+    if ([currentDevice isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]){
+        NSError *error = nil;
+        [currentDevice lockForConfiguration:&error];
+        if (!error) {
+            [currentDevice setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
+            [currentDevice unlockForConfiguration];
+        }
+    }
+#endif
+}
+
+- (void)doubleTapReset:(UITapGestureRecognizer *)doubleTap
+{
+    [self cameraResetAutoFocus];
+}
+
+- (void)tapToFocus:(UITapGestureRecognizer *)singleTap
+{
+    CGPoint touchPoint = [singleTap locationInView:self.cameraView];
+    [self focusSquareAtPoint:touchPoint];
+    [self cameraFocusAtPoint:touchPoint];
+}
 
 #pragma mark - ZXCaptureDelegate Methods
 
