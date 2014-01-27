@@ -42,7 +42,7 @@
     "New Profile" = "New Profile";
     OK = OK;
     On = On;
-    "Open in Safari" = "Open in Safari";
+    "Open Link" = "Open Link";
     "Operation failed.\nPlease try again later." = "Operation failed.\nPlease try again later.";
     "PAC File" = "PAC File";
     "PAC file not found. Redirect all traffic to proxy." = "PAC file not found. Redirect all traffic to proxy.";
@@ -82,4 +82,5 @@
     Version = Version;
     Warning = Warning;
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?";
+    "is not supported" = "is not supported";
 }

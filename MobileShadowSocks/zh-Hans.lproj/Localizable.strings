@@ -42,7 +42,7 @@
     "New Profile" = "\U65b0\U589e\U914d\U7f6e";
     OK = "\U597d";
     On = "\U5f00";
-    "Open in Safari" = "\U7528 Safari \U6253\U5f00";
+    "Open Link" = "\U6253\U5f00\U94fe\U63a5";
     "Operation failed.\nPlease try again later." = "\U64cd\U4f5c\U5931\U8d25\Uff0c\U8bf7\U91cd\U8bd5\U3002";
     "PAC File" = "PAC \U6587\U4ef6";
     "PAC file not found. Redirect all traffic to proxy." = "PAC \U6587\U4ef6\U672a\U627e\U5230\Uff0c\U9ed8\U8ba4\U6240\U6709\U8fde\U63a5\U4f7f\U7528\U4ee3\U7406\U3002";
@@ -72,7 +72,7 @@
     "Share to Twitter" = "\U5206\U4eab\U5230\U63a8\U7279";
     "Share to Weibo" = "\U5206\U4eab\U5230\U65b0\U6d6a\U5fae\U535a";
     "Sina Weibo account is not available." = "\U65b0\U6d6a\U5fae\U535a\U8d26\U6237\U672a\U542f\U7528\U3002";
-    "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "\U8f7b\U62cd\U4e00\U4e0b\U53ef\U624b\U52a8\U5bf9\U7126\U3002\n\U8f7b\U62cd\U4e24\U4e0b\U53ef\U81ea\U52a8\U5bf9\U7126\U3002\n\U70b9\U51fb\U624b\U7535\U7b52\U6309\U94ae\U53ef\U5f00\U5173\U95ea\U5149\U706f\U3002";
+    "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "\U70b9\U51fb\U4e00\U4e0b\U624b\U52a8\U5bf9\U7126\U3002\n\U8fde\U70b9\U4e24\U4e0b\U81ea\U52a8\U5bf9\U7126\U3002\n\U70b9\U51fb\U624b\U7535\U7b52\U6309\U94ae\U5f00\U5173\U95ea\U5149\U706f\U3002";
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U53f7\U5206\U9694";
     "Table (Default)" = "Table (\U9ed8\U8ba4)";
     Torch = "\U624b\U7535\U7b52";
@@ -82,4 +82,5 @@
     Version = "\U7248\U672c";
     Warning = "\U8b66\U544a";
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "\U6ce8\U610f\Uff1a\U4fee\U590d\U670d\U52a1\U4f1a\U4e2d\U65ad\U6240\U6709\U7684\U4ee3\U7406\U8fde\U63a5\Uff0c\U4ec5\U5f53\U60a8\U65e0\U6cd5\U542f\U7528\U4ee3\U7406\U65f6\U624d\U9700\U8981\U4fee\U590d\U3002\U786e\U5b9a\U7ee7\U7eed\U5417\Uff1f";
+    "is not supported" = "\U4e0d\U53d7\U652f\U6301";
 }

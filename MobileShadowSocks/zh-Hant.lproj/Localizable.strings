@@ -42,7 +42,7 @@
     "New Profile" = "\U65b0\U589e\U914d\U7f6e";
     OK = "\U597d";
     On = "\U958b";
-    "Open in Safari" = "\U7528 Safari \U958b\U555f";
+    "Open Link" = "\U6253\U958b\U9023\U7d50";
     "Operation failed.\nPlease try again later." = "\U64cd\U4f5c\U5931\U6557\Uff0c\U8acb\U91cd\U8a66\U3002";
     "PAC File" = "PAC \U6a94\U6848";
     "PAC file not found. Redirect all traffic to proxy." = "PAC \U6a94\U6848\U672a\U627e\U5230\Uff0c\U6240\U6709\U9023\U7dda\U5c07\U901a\U904e\U4ee3\U7406\U3002";
@@ -72,9 +72,9 @@
     "Share to Twitter" = "\U5206\U4eab\U5230 Twitter";
     "Share to Weibo" = "\U5206\U4eab\U5230\U65b0\U6d6a\U5fae\U535a";
     "Sina Weibo account is not available." = "\U65b0\U6d6a\U5fae\U535a\U8cec\U6236\U672a\U555f\U7528\U3002";
-    "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "\U8f15\U62cd\U4e00\U4e0b\U53ef\U624b\U52d5\U5c0d\U7126\U3002\n\U8f15\U62cd\U5169\U4e0b\U53ef\U81ea\U52d5\U5c0d\U7126\U3002\n\U9ede\U6309\U624b\U96fb\U7b52\U6309\U9215\U53ef\U958b\U95dc\U9583\U5149\U71c8\U3002";
+    "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "\U8f15\U62cd\U4e00\U4e0b\U624b\U52d5\U5c0d\U7126\U3002\n\U8f15\U62cd\U5169\U4e0b\U81ea\U52d5\U5c0d\U7126\U3002\n\U9ede\U6309\U624b\U96fb\U7b52\U6309\U9215\U53ef\U958b\U95dc\U9583\U5149\U71c8\U3002";
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U865f\U5206\U9694";
-    "Table (Default)" = "Table (\U9ed8\U8a8d)";
+    "Table (Default)" = "Table (\U9810\U8a2d)";
     Torch = "\U624b\U96fb\U7b52";
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter \U8cec\U6236\U672a\U555f\U7528\U3002";
@@ -82,4 +82,5 @@
     Version = "\U7248\U672c";
     Warning = "\U8b66\U544a";
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "\U6ce8\U610f\Uff1a\U4fee\U5fa9\U670d\U52d9\U6703\U4e2d\U65b7\U6240\U6709\U7684\U4ee3\U7406\U9023\U7dda\Uff0c\U50c5\U7576\U60a8\U7121\U6cd5\U555f\U7528\U4ee3\U7406\U6642\U624d\U9700\U8981\U4fee\U5fa9\U3002\U78ba\U5b9a\U7e7c\U7e8c\U55ce\Uff1f";
+    "is not supported" = "\U4e0d\U88ab\U652f\U63f4";
 }

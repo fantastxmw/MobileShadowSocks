@@ -13,7 +13,7 @@
 #import "NSString+Base64.h"
 
 #define APP_VER @"0.3"
-#define APP_BUILD @"2"
+#define APP_BUILD @"3"
 
 #define kURLPrefix @"ss://"
 
@@ -512,7 +512,11 @@ typedef enum {
 
 - (void)showQRCodeError:(NSString *)rawLink
 {
-    NSString *baseHint = NSLocalizedString(@"Cannot parse URL link", nil);
+    [self showQRCodeError:rawLink baseHint:NSLocalizedString(@"Cannot parse URL link", nil)];
+}
+
+- (void)showQRCodeError:(NSString *)rawLink baseHint:(NSString *)baseHint
+{
     NSString *message;
     if (rawLink) {
         message = [NSString stringWithFormat:@"%@:\n%@", baseHint, rawLink];
@@ -523,7 +527,7 @@ typedef enum {
                                                     message:message
                                                    delegate:self
                                           cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                                          otherButtonTitles:NSLocalizedString(@"Open in Safari",nil), nil];
+                                          otherButtonTitles:NSLocalizedString(@"Open Link",nil), nil];
     [alert setTag:ALERT_TAG_SCANERROR];
     if (rawLink) {
         [_alertViewUserInfo setObject:rawLink forKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
@@ -589,6 +593,16 @@ typedef enum {
 
 #pragma mark - UIImagePickerController Delegate
 
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    if (DEVICE_IS_IPAD()) {
+        [self.popController dismissPopoverAnimated:YES];
+        self.isPoped = NO;
+    } else {
+        [picker dismissModalViewControllerAnimated:YES];
+    }
+}
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
@@ -599,12 +613,7 @@ typedef enum {
             [self showQRCodeError:nil];
         }
     }];
-    if (DEVICE_IS_IPAD()) {
-        [self.popController dismissPopoverAnimated:YES];
-        self.isPoped = NO;
-    } else {
-        [picker dismissModalViewControllerAnimated:YES];
-    }
+    [self imagePickerControllerDidCancel:picker];
 }
 
 #pragma mark - UIPopoverController Delegate
@@ -701,6 +710,8 @@ typedef enum {
         if (decodedLink == nil || [decodedLink length] == 0) {
             decodedLink = [resultText substringFromIndex:[kURLPrefix length]];
         }
+        resultText = [kURLPrefix stringByAppendingString:decodedLink];
+        
         NSRange firstColon = [decodedLink rangeOfString:@":"];
         NSRange lastColon = [decodedLink rangeOfString:@":" options:NSBackwardsSearch];
         NSRange separator = [decodedLink rangeOfString:@"@" options:NSBackwardsSearch];
@@ -711,7 +722,7 @@ typedef enum {
             break;
         }
         
-        NSString *linkMethod = [decodedLink substringToIndex:firstColon.location];
+        NSString *linkMethod = [[decodedLink substringToIndex:firstColon.location] lowercaseString];
         NSString *linkPort = [decodedLink substringFromIndex:lastColon.location + 1];
         NSString *linkPassword = [decodedLink substringWithRange:NSMakeRange(firstColon.location + 1, separator.location - firstColon.location - 1)];
         NSString *linkAddress = [decodedLink substringWithRange:NSMakeRange(separator.location + 1, lastColon.location - separator.location - 1)];
@@ -720,7 +731,12 @@ typedef enum {
         }
         
         if (![CipherViewController cipherIsValid:linkMethod]) {
-            linkMethod = [CipherViewController defaultCipher];
+            NSString *message = [NSString stringWithFormat:@"%@ \"%@\" %@",
+                                 NSLocalizedString(@"Cipher", nil),
+                                 linkMethod,
+                                 NSLocalizedString(@"is not supported", nil)];
+            [self showQRCodeError:resultText baseHint:message];
+            return;
         }
         
         NSDictionary *linkInfo = [NSDictionary dictionaryWithObjectsAndKeys:
