@@ -185,8 +185,8 @@ int base64_decode( unsigned char *dst, size_t *dlen,
         
         if (!encode) {
             NSString *padding = nil;
-            if ((inputLength * 3) % 4 != 0) {
-                if ((inputLength * 3 + 1) % 4 == 0) {
+            if (inputLength % 4 != 0) {
+                if (inputLength % 4 == 3) {
                     padding = @"=";
                 } else {
                     padding = @"==";

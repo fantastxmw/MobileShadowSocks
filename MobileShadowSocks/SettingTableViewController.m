@@ -13,7 +13,7 @@
 #import "NSString+Base64.h"
 
 #define APP_VER @"0.3"
-#define APP_BUILD @"1"
+#define APP_BUILD @"2"
 
 #define kURLPrefix @"ss://"
 
