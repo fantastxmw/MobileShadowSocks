@@ -24,11 +24,12 @@ try_build_legacy() {
         export CODESIGN_ALLOCATE="${LEGACY_TC}/codesign_allocate"
         SRCDIR="${PROJECT_DIR}/shadowsocks-libev"
         GUIDIR="${PROJECT_DIR}/MobileShadowSocks"
-        rm -f "${LEGACY_DAEMON}" "${LEGACY_GUI}"
+        rm -f "${LEGACY_DAEMON}"
         "${LEGACY_TC}/clang" -arch armv6 -Os -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${LEGACY_SDK}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${LEGACY_SDK}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=3.0 -isysroot "${LEGACY_SDK}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "${LEGACY_DAEMON}"
         "${PROJECT_DIR}/extra/ldid" -S "${LEGACY_DAEMON}"
-        "${LEGACY_TC}/clang" -arch armv6 -x objective-c -Os -I"${GUIDIR}" -I"${LEGACY_SDK}/usr/include" -L"${LEGACY_SDK}/usr/lib" -miphoneos-version-min=3.0 -isysroot "${LEGACY_SDK}" -framework Foundation -framework CFNetwork -framework UIKit -framework Foundation -framework CoreGraphics -framework CoreFoundation "${GUIDIR}/AppDelegate.m" "${GUIDIR}/CipherViewController.m" "${GUIDIR}/ProfileViewController.m" "${GUIDIR}/SettingTableViewController.m" "${GUIDIR}/main.m" -o "${LEGACY_GUI}"
-        "${PROJECT_DIR}/extra/ldid" -S "${LEGACY_GUI}"
+        # rm -f "${LEGACY_GUI}"
+        # "${LEGACY_TC}/clang" -arch armv6 -x objective-c -Os -I"${GUIDIR}" -I"${LEGACY_SDK}/usr/include" -L"${LEGACY_SDK}/usr/lib" -miphoneos-version-min=3.0 -isysroot "${LEGACY_SDK}" -framework Foundation -framework CFNetwork -framework UIKit -framework Foundation -framework CoreGraphics -framework CoreFoundation "${GUIDIR}/AppDelegate.m" "${GUIDIR}/CipherViewController.m" "${GUIDIR}/ProfileViewController.m" "${GUIDIR}/SettingTableViewController.m" "${GUIDIR}/main.m" -o "${LEGACY_GUI}"
+        # "${PROJECT_DIR}/extra/ldid" -S "${LEGACY_GUI}"
     fi
 }
 
@@ -66,21 +67,20 @@ tar zxf "${PROJECT_DIR}/extra/ssl.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 tar zxf "${PROJECT_DIR}/extra/backport.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 
 # Build and bundle binary
-# try_build_legacy
+try_build_legacy
 build_launcher arm64 shadowd64
 build_launcher armv7 shadowd7
-mv -f makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks MobileShadowSocks7
 lipo -create -output shadowd shadowd64 shadowd7 backport/shadowd-armv6
-lipo -create -output MobileShadowSocks MobileShadowSocks7 backport/MobileShadowSocks-armv6
 mv -f shadowd makedeb/Applications/MobileShadowSocks.app/
-mv -f MobileShadowSocks makedeb/Applications/MobileShadowSocks.app/
+mv -f backport/MobileShadowSocks-armv6 makedeb/Applications/MobileShadowSocks.app/ShadowSocks
 chmod 755 makedeb/Applications/MobileShadowSocks.app/shadowd
 chmod 755 makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks
+chmod 755 makedeb/Applications/MobileShadowSocks.app/ShadowSocks
 
 # Clean temp files
 rm -rf "${BUILT_PRODUCTS_DIR}/ssl/"
 rm -rf "${BUILT_PRODUCTS_DIR}/backport/"
-rm -f shadowd64 shadowd7 MobileShadowSocks7
+rm -f shadowd64 shadowd7
 
 # Prepare app
 /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 3.0" makedeb/Applications/MobileShadowSocks.app/Info.plist
@@ -96,15 +96,12 @@ chmod 644 makedeb/Library/LaunchDaemons/com.linusyang.shadowsocks.plist
 find . -name .DS_Store -type f -delete
 NOWSIZE="$(du -s -k makedeb | awk '{print $1}')"
 CTRLFILE="Package: com.linusyang.shadowsocks\nSection: Networking\nInstalled-Size: $NOWSIZE\nAuthor: Linus Yang <laokongzi@gmail.com>\nArchitecture: iphoneos-arm\nVersion: $NOWVER-$NOWBUILD\nDescription: shadowsocks client for iOS\nName: ShadowSocks\nHomepage: https://github.com/linusyang/MobileShadowSocks\nIcon: file:///Applications/MobileShadowSocks.app/Icon.png\nTag: purpose::uikit\n"
-POSTFILE='#!/bin/sh\nBUNDLE="/Applications/MobileShadowSocks.app"\nchmod 755 "${BUNDLE}/MobileShadowSocks"\nchmod 755 "${BUNDLE}/shadowd"\nchown -R 0:0 "${BUNDLE}"\nexit 0\n'
-EXTRA='#!/bin/sh\n\nchmod 644 /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\nchown 0:0 /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\n\nif [[ $1 == upgrade ]]; then\n    /bin/launchctl unload -w /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\nfi\n\nif [[ $1 == install || $1 == upgrade ]]; then\n    /bin/launchctl load -w /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\nfi\n\nexit 0\n'
-PRERM='#!/bin/sh\n\nif [[ $1 == remove || $1 == purge ]]; then\n    /bin/launchctl unload -w /Library/LaunchDaemons/com.linusyang.shadowsocks.plist\nfi\n\nexit 0\n'
 DEBNAME="com.linusyang.shadowsocks_$NOWVER-$NOWBUILD"
 mkdir -p makedeb/DEBIAN
 echo -ne "${CTRLFILE}" > makedeb/DEBIAN/control
-echo -ne "${POSTFILE}" > makedeb/DEBIAN/postinst
-echo -ne "${PRERM}" > makedeb/DEBIAN/prerm
-echo -ne "${EXTRA}" > makedeb/DEBIAN/extrainst_
+cp -f "${PROJECT_DIR}/extra/postinst.sh" makedeb/DEBIAN/postinst
+cp -f "${PROJECT_DIR}/extra/prerm.sh" makedeb/DEBIAN/prerm
+cp -f "${PROJECT_DIR}/extra/extrainst.sh" makedeb/DEBIAN/extrainst_
 chmod 755 makedeb/DEBIAN/postinst
 chmod 755 makedeb/DEBIAN/prerm
 chmod 755 makedeb/DEBIAN/extrainst_
