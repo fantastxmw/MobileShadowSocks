@@ -13,7 +13,7 @@
 #import "NSString+Base64.h"
 
 #define APP_VER @"0.3"
-#define APP_BUILD @"3"
+#define APP_BUILD @"4"
 
 #define kURLPrefix @"ss://"
 
@@ -787,9 +787,9 @@ typedef enum {
     }
 }
 
-- (void)setBadge:(BOOL)isEnabled
+- (void)setBadge:(NSNumber *)enabledObject
 {
-    if (isEnabled) {
+    if ([enabledObject boolValue]) {
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(setApplicationBadgeString:)])
             [[UIApplication sharedApplication] setApplicationBadgeString:NSLocalizedString(@"On", nil)];
         else
@@ -868,6 +868,10 @@ typedef enum {
         }
     } else {
         willStartProxy = !willStartProxy;
+        if ([[NSFileManager defaultManager] isDeletableFileAtPath:_configPath]) {
+            NSError *error = nil;
+            [[NSFileManager defaultManager] removeItemAtPath:_configPath error:&error];
+        }
         [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
     }
     [self setProxyEnabled:willStartProxy];
@@ -927,6 +931,11 @@ typedef enum {
             messageHeader = SET_PROXY_NONE;
             break;
     }
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:_configPath] || messageId == PROXY_FORCE_STOP) {
+        [self syncSettings];
+    }
+    
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_pacURL]];
     [request setValue:@"True" forHTTPHeaderField:[NSString stringWithFormat:@"%s", messageHeader]];
     [request setTimeoutInterval:5.0];
@@ -978,7 +987,7 @@ typedef enum {
 - (void)setProxyEnabled:(BOOL)enabled
 {
     [self saveBool:enabled forKey:GLOBAL_PROXY_ENABLE_KEY];
-    [self setBadge:enabled];
+    [self performSelectorOnMainThread:@selector(setBadge:) withObject:[NSNumber numberWithBool:enabled] waitUntilDone:NO];
     [self performSelectorOnMainThread:@selector(setProxySwitcher:) withObject:[NSNumber numberWithBool:enabled] waitUntilDone:NO];
 }
 
@@ -1029,9 +1038,6 @@ typedef enum {
         default:
             statusId = PROXY_NONE_STATUS;
             break;
-    }
-    if (![[NSFileManager defaultManager] fileExistsAtPath:_configPath]) {
-        [self syncSettings];
     }
     return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];
 }
@@ -1257,7 +1263,17 @@ typedef enum {
     static NSString *stringFormat =  @"    \"%@\":\"%@\",\n";
     static NSString *normalFormat = @"    \"%@\":%@,\n";
     NSString *trimmedValue = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if (isString) {
+        trimmedValue = [self escapeString:trimmedValue];
+    }
     [string appendFormat:isString ? stringFormat : normalFormat, key, trimmedValue];
+}
+
+- (NSString *)escapeString:(NSString *)string
+{
+    NSString *escapedValue = [string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
+    escapedValue = [escapedValue stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    return escapedValue;
 }
 
 - (void)syncSettings
@@ -1282,9 +1298,9 @@ typedef enum {
             }
         }
         if ([exceptArray count] > 0) {
-            exceptString = [NSMutableString stringWithFormat:@"[\"%@\"", [exceptArray objectAtIndex:0]];
+            exceptString = [NSMutableString stringWithFormat:@"[\"%@\"", [self escapeString:[exceptArray objectAtIndex:0]]];
             for (i = 1; i < [exceptArray count]; i++) {
-                [exceptString appendFormat:@",\"%@\"", [exceptArray objectAtIndex:i]];
+                [exceptString appendFormat:@",\"%@\"", [self escapeString:[exceptArray objectAtIndex:i]]];
             }
             [exceptString appendFormat:@"]"];
         }
