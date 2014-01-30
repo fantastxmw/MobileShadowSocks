@@ -118,6 +118,7 @@ typedef enum {
     if (self) {
         _isPrefChanged = YES;
         _legacySystem = SYSTEM_VERSION_LESS_THAN(@"5.0");
+        _isBuggyPhotoPicker = !DEVICE_IS_IPAD() && SYSTEM_VERSION_LESS_THAN(@"7.0") && !SYSTEM_VERSION_LESS_THAN(@"6.0");
         
         _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
         _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
@@ -660,7 +661,7 @@ typedef enum {
         case QRCodeActionLibrary: {
             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
                 UIImagePickerController *pickerController;
-                if (SYSTEM_VERSION_LESS_THAN(@"7.0") && !SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+                if (_isBuggyPhotoPicker) {
                     pickerController = [[ImagePickerViewController alloc] init];
                 } else {
                     pickerController = [[UIImagePickerController alloc] init];

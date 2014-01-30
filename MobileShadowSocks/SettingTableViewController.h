@@ -27,6 +27,7 @@
     NSInteger _currentProfile;
     BOOL _isPrefChanged;
     BOOL _legacySystem;
+    BOOL _isBuggyPhotoPicker;
 }
 
 - (void)fixProxy;
