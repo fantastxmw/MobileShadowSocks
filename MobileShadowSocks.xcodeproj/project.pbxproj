@@ -49,6 +49,7 @@
 		4B84A9F8189571D900188A2B /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B84A9F7189571D900188A2B /* Twitter.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE04A361751E9AF0019AAB1 /* CipherViewController.m */; };
 		4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF38F10186DD07F008C4EF1 /* ProfileViewController.m */; };
+		4BF45D731899FD670026F956 /* ImagePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF45D721899FD670026F956 /* ImagePickerViewController.m */; };
 		4BF521F01893FEED0031D309 /* UINavigationController+Orientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF521EF1893FEED0031D309 /* UINavigationController+Orientation.m */; };
 		4BF7CE9616C0775900713EC9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BF7CE9516C0775900713EC9 /* CFNetwork.framework */; };
 		4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */; };
@@ -171,6 +172,8 @@
 		4BE04A361751E9AF0019AAB1 /* CipherViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CipherViewController.m; sourceTree = "<group>"; };
 		4BF38F0F186DD07F008C4EF1 /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		4BF38F10186DD07F008C4EF1 /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
+		4BF45D711899FD670026F956 /* ImagePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerViewController.h; sourceTree = "<group>"; };
+		4BF45D721899FD670026F956 /* ImagePickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePickerViewController.m; sourceTree = "<group>"; };
 		4BF521EE1893FEED0031D309 /* UINavigationController+Orientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+Orientation.h"; sourceTree = "<group>"; };
 		4BF521EF1893FEED0031D309 /* UINavigationController+Orientation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+Orientation.m"; sourceTree = "<group>"; };
 		4BF7CE9516C0775900713EC9 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -269,6 +272,8 @@
 				4B07BADE189391B0003600C0 /* NSString+Base64.m */,
 				4BF521EE1893FEED0031D309 /* UINavigationController+Orientation.h */,
 				4BF521EF1893FEED0031D309 /* UINavigationController+Orientation.m */,
+				4BF45D711899FD670026F956 /* ImagePickerViewController.h */,
+				4BF45D721899FD670026F956 /* ImagePickerViewController.m */,
 				4B07BAA318937ACA003600C0 /* ZXingObjC.xcodeproj */,
 				4B3A811416BA4A2C00BE1B4C /* Supporting Files */,
 			);
@@ -480,6 +485,7 @@
 				4B07BADF189391B0003600C0 /* NSString+Base64.m in Sources */,
 				4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */,
 				4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */,
+				4BF45D731899FD670026F956 /* ImagePickerViewController.m in Sources */,
 				4B07BADB18938059003600C0 /* CodeGeneratorViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

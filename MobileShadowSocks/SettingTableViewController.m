@@ -11,9 +11,10 @@
 #import "ProfileViewController.h"
 #import "CodeGeneratorViewController.h"
 #import "NSString+Base64.h"
+#import "ImagePickerViewController.h"
 
 #define APP_VER @"0.3"
-#define APP_BUILD @"4"
+#define APP_BUILD @"5"
 
 #define kURLPrefix @"ss://"
 
@@ -599,7 +600,7 @@ typedef enum {
         [self.popController dismissPopoverAnimated:YES];
         self.isPoped = NO;
     } else {
-        [picker dismissModalViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
@@ -658,7 +659,12 @@ typedef enum {
             
         case QRCodeActionLibrary: {
             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-                UIImagePickerController *pickerController = [[UIImagePickerController alloc] init];
+                UIImagePickerController *pickerController;
+                if (SYSTEM_VERSION_LESS_THAN(@"7.0") && !SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+                    pickerController = [[ImagePickerViewController alloc] init];
+                } else {
+                    pickerController = [[UIImagePickerController alloc] init];
+                }
                 pickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
                 pickerController.delegate = self;
                 if (DEVICE_IS_IPAD()) {
@@ -668,7 +674,7 @@ typedef enum {
                     [popController release];
                     [self showPopController];
                 } else {
-                    [self presentModalViewController:pickerController animated:YES];
+                    [self presentViewController:pickerController animated:YES completion:nil];
                 }
                 [pickerController release];
             } else {
