@@ -9,7 +9,21 @@
 #import <UIKit/UIKit.h>
 #import "CodeScannerViewController.h"
 
-@interface SettingTableViewController : UITableViewController <UITextFieldDelegate, UIAlertViewDelegate, UIActionSheetDelegate, CodeScannerDelegate> {
+#define LOCAL_PORT 1983
+#define PAC_PORT 1993
+#define LOCAL_TIMEOUT 60
+
+@protocol SettingTableViewControllerDelegate <NSObject>
+
+- (void)showError:(NSString *)error;
+- (void)setBadge:(BOOL)enabled;
+- (void)setProxySwitcher:(BOOL)enabled;
+- (void)setAutoProxySwitcher:(BOOL)enabled;
+- (void)checkFileNotFound;
+
+@end
+
+@interface SettingTableViewController : UITableViewController <UITextFieldDelegate, UIAlertViewDelegate, UIActionSheetDelegate, CodeScannerDelegate, SettingTableViewControllerDelegate> {
     CGFloat _cellWidth;
     NSInteger _tableSectionNumber;
     NSArray *_tableRowNumber;
@@ -21,31 +35,11 @@
     NSInteger _enableCellTag;
     NSMutableDictionary *_tagKey;
     NSMutableDictionary *_alertViewUserInfo;
-    NSString *_pacURL;
-    NSString *_configPath;
     NSString *_pacDefaultFile;
-    NSInteger _currentProfile;
-    BOOL _isPrefChanged;
-    BOOL _legacySystem;
     BOOL _isBuggyPhotoPicker;
 }
 
 - (void)fixProxy;
-- (void)setPrefChanged;
-- (void)notifyChanged:(BOOL)isForce;
-- (void)saveSettings;
-
-- (NSInteger)currentProfile;
-- (NSInteger)profileListCount;
-- (NSString *)nameOfProfile:(NSInteger)index;
-- (void)selectProfile:(NSInteger)profileIndex;
-- (void)removeProfile:(NSInteger)profileIndex;
-- (void)reorderProfile:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
-- (void)renameProfile:(NSInteger)index withName:(NSString *)name;
-
-- (void)saveObject:(id)value forKey:(NSString *)key;
-- (id)readObject:(NSString *)key;
-
-- (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit;
+- (void)updateProxy;
 
 @end

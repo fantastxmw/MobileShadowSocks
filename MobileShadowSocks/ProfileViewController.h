@@ -10,10 +10,9 @@
 #import "SettingTableViewController.h"
 
 @interface ProfileViewController : UITableViewController <UIAlertViewDelegate> {
-    SettingTableViewController *_parentView;
     NSInteger _selectedIndex;
 }
 
-- (id)initWithStyle:(UITableViewStyle)style withParentView:(SettingTableViewController *)parentView;
+- (id)initWithStyle:(UITableViewStyle)style;
 
 @end

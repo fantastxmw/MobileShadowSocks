@@ -7,73 +7,66 @@
 //
 
 #import "CipherViewController.h"
+#import "ProfileManager.h"
+
+#define kCipherDefault @"table"
 
 @implementation CipherViewController
 
++ (NSArray *)cipherArray
+{
+    static NSArray *cipherArray = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cipherArray = [[NSArray alloc] initWithArray:@[kCipherDefault,
+                                                      @"rc4",
+                                                      @"aes-128-cfb",
+                                                      @"aes-192-cfb",
+                                                      @"aes-256-cfb",
+                                                      @"bf-cfb",
+                                                      @"camellia-128-cfb",
+                                                      @"camellia-192-cfb",
+                                                      @"camellia-256-cfb",
+                                                      @"cast5-cfb",
+                                                      @"des-cfb",
+                                                      @"idea-cfb",
+                                                      @"rc2-cfb",
+                                                      @"seed-cfb"]];
+    });
+    return cipherArray;
+}
+
++ (NSArray *)cipherNameArray
+{
+    static NSArray *cipherNameArray = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cipherNameArray = [[NSArray alloc] initWithArray:@[NSLocalizedString(@"Table (Default)", nil),
+                                                           NSLocalizedString(@"RC4", nil),
+                                                           NSLocalizedString(@"AES 128-bit", nil),
+                                                           NSLocalizedString(@"AES 192-bit", nil),
+                                                           NSLocalizedString(@"AES 256-bit (Recommended)", nil),
+                                                           NSLocalizedString(@"Blowfish", nil),
+                                                           NSLocalizedString(@"Camellia 128-bit", nil),
+                                                           NSLocalizedString(@"Camellia 192-bit", nil),
+                                                           NSLocalizedString(@"Camellia 256-bit", nil),
+                                                           NSLocalizedString(@"CAST5", nil),
+                                                           NSLocalizedString(@"DES", nil),
+                                                           NSLocalizedString(@"IDEA", nil),
+                                                           NSLocalizedString(@"RC2", nil),
+                                                           NSLocalizedString(@"SEED", nil)]];
+    });
+    return cipherNameArray;
+}
+
 + (BOOL)cipherIsValid:(NSString *)cipher
 {
-    NSArray *cipherArray = @[@"table",
-                             @"rc4",
-                             @"aes-128-cfb",
-                             @"aes-192-cfb",
-                             @"aes-256-cfb",
-                             @"bf-cfb",
-                             @"camellia-128-cfb",
-                             @"camellia-192-cfb",
-                             @"camellia-256-cfb",
-                             @"cast5-cfb",
-                             @"des-cfb",
-                             @"idea-cfb",
-                             @"rc2-cfb",
-                             @"seed-cfb"];
-    return [cipherArray containsObject:cipher];
+    return [[self cipherArray] containsObject:cipher];
 }
 
 + (NSString *)defaultCipher
 {
-    return @"table";
-}
-
-- (id)initWithStyle:(UITableViewStyle)style withParentView:(SettingTableViewController *)parentView
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        _parentView = parentView;
-        _cipherNumber = 14;
-        _cipherKeyArray = [[NSArray alloc] initWithObjects:
-                           @"table",
-                           @"rc4",
-                           @"aes-128-cfb",
-                           @"aes-192-cfb",
-                           @"aes-256-cfb",
-                           @"bf-cfb",
-                           @"camellia-128-cfb",
-                           @"camellia-192-cfb",
-                           @"camellia-256-cfb",
-                           @"cast5-cfb",
-                           @"des-cfb",
-                           @"idea-cfb",
-                           @"rc2-cfb",
-                           @"seed-cfb",
-                           nil];
-        _cipherNameArray = [[NSArray alloc] initWithObjects:
-                            NSLocalizedString(@"Table (Default)", nil),
-                            NSLocalizedString(@"RC4", nil),
-                            NSLocalizedString(@"AES (128-bit, CFB mode)", nil),
-                            NSLocalizedString(@"AES (192-bit, CFB mode)", nil),
-                            NSLocalizedString(@"AES (256-bit, CFB mode)", nil),
-                            NSLocalizedString(@"Blowfish (CFB mode)", nil),
-                            NSLocalizedString(@"Camellia (128-bit, CFB mode)", nil),
-                            NSLocalizedString(@"Camellia (192-bit, CFB mode)", nil),
-                            NSLocalizedString(@"Camellia (256-bit, CFB mode)", nil),
-                            NSLocalizedString(@"CAST5 (CFB mode)", nil),
-                            NSLocalizedString(@"DES (CFB mode)", nil),
-                            NSLocalizedString(@"IDEA (CFB mode)", nil),
-                            NSLocalizedString(@"RC2 (CFB mode)", nil),
-                            NSLocalizedString(@"SEED (CFB mode)", nil),
-                            nil];
-    }
-    return self;
+    return kCipherDefault;
 }
 
 - (void)viewDidLoad
@@ -85,8 +78,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    NSString *currentSetting = [_parentView readObject:@"CRYPTO_METHOD"];
-    NSUInteger index = [_cipherKeyArray indexOfObject:currentSetting ? currentSetting : @"table"];
+    NSString *currentSetting = [[ProfileManager sharedProfileManager] readObject:kProfileCrypto];
+    NSUInteger index = [[CipherViewController cipherArray] indexOfObject:currentSetting ? currentSetting : kCipherDefault];
     _selectedCipher = (index == NSNotFound) ? 0 : index;
     [[self tableView] reloadData];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:_selectedCipher inSection:0];
@@ -100,13 +93,6 @@
     } else {
         return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
     }
-}
-
-- (void)dealloc
-{
-    [_cipherNameArray release];
-    [_cipherKeyArray release];
-    [super dealloc];
 }
 
 #pragma mark - Table view data source
@@ -129,7 +115,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return _cipherNumber;
+    return [[CipherViewController cipherArray] count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
@@ -147,7 +133,7 @@
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
     }
-    [[cell textLabel] setText:[_cipherNameArray objectAtIndex:[indexPath row]]];
+    [[cell textLabel] setText:[[CipherViewController cipherNameArray] objectAtIndex:[indexPath row]]];
     if ([indexPath row] == _selectedCipher) {
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
     } else {
@@ -162,8 +148,8 @@
 {
     if ([indexPath row] != _selectedCipher) {
         [self checkRow:[indexPath row]];
-        [_parentView saveObject:[_cipherKeyArray objectAtIndex:_selectedCipher] forKey:@"CRYPTO_METHOD"];
-        [_parentView setPrefChanged];
+        [[ProfileManager sharedProfileManager] saveObject:[[CipherViewController cipherArray] objectAtIndex:_selectedCipher]
+                                                   forKey:kProfileCrypto];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }

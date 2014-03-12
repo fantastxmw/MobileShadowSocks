@@ -12,11 +12,16 @@
 #import "CodeGeneratorViewController.h"
 #import "NSString+Base64.h"
 #import "ImagePickerViewController.h"
+#import "ProxyManager.h"
+#import "ProfileManager.h"
+#import "UIAlertView+TextField.h"
 
-#define APP_VER @"0.3"
-#define APP_BUILD @"5"
+#define APP_VER @"0.3.1"
+#define APP_BUILD @"1"
 
 #define kURLPrefix @"ss://"
+#define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"
+#define PAC_DEFAULT_NAME @"auto.pac"
 
 #define CELL_INDEX_TITLE 0
 #define CELL_INDEX_KEY 1
@@ -48,41 +53,6 @@ typedef enum {
     QRCodeActionShare
 } QRCodeAction;
 
-#define LOCAL_PORT 1983
-#define PAC_PORT 1993
-#define MAX_TRYTIMES 10
-#define LOCAL_TIMEOUT 60
-#define UPDATE_CONF "Update-Conf"
-#define FORCE_STOP "Force-Stop"
-#define SET_PROXY_PAC "SetProxy-Pac"
-#define SET_PROXY_SOCKS "SetProxy-Socks"
-#define SET_PROXY_NONE "SetProxy-None"
-
-#define PROXY_FORCE_STOP 4
-#define PROXY_PAC_STATUS 3
-#define PROXY_SOCKS_STATUS 2
-#define PROXY_NONE_STATUS 1
-#define PROXY_UPDATE_CONF 0
-
-typedef enum {
-    kProxyPac,
-    kProxySocks,
-    kProxyNone
-} ProxyStatus;
-
-#define JSON_CONFIG_NAME @"com.linusyang.shadowsocks.json"
-#define PAC_DEFAULT_NAME @"auto.pac"
-#define RESPONSE_SUCC @"Updated."
-#define RESPONSE_FAIL @"Failed."
-
-#define GLOBAL_PROFILE_NOW_KEY @"SELECTED_PROFILE"
-#define GLOBAL_PROFILE_LIST_KEY @"PROFILE_LIST"
-#define GLOBAL_PROXY_ENABLE_KEY @"PROXY_ENABLED"
-
-#define PROFILE_DEFAULT_NAME NSLocalizedString(@"Default", nil)
-#define PROFILE_DEFAULT_INDEX -1
-#define PROFILE_NAME_KEY @"PROFILE_NAME"
-
 #define kgrayBlueColor [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:1.0]
 #define kgrayBlueColorDisabled [UIColor colorWithRed:0.318 green:0.4 blue:0.569 alpha:0.439216f]
 #define kblackColor [UIColor colorWithRed:0 green:0 blue:0 alpha:1.0]
@@ -96,15 +66,11 @@ typedef enum {
 - (void)setApplicationBadgeString:(NSString *)badgeString;
 @end
 
-@interface UIAlertView (Addition)
-- (void)addTextFieldWithValue:(NSString *)value label:(NSString *)label;
-- (UITextField *)textFieldAtIndex:(NSInteger)textFieldIndex;
-@end
-
 @interface SettingTableViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverControllerDelegate>
 
 @property (nonatomic, retain) UIPopoverController *popController;
 @property (nonatomic, assign) BOOL isPoped;
+@property (nonatomic, retain) ProxyManager *proxyManager;
 
 @end
 
@@ -116,21 +82,11 @@ typedef enum {
 {
     self = [super initWithStyle:style];
     if (self) {
-        _isPrefChanged = YES;
-        _legacySystem = SYSTEM_VERSION_LESS_THAN(@"5.0");
         _isBuggyPhotoPicker = !DEVICE_IS_IPAD() && SYSTEM_VERSION_LESS_THAN(@"7.0") && !SYSTEM_VERSION_LESS_THAN(@"6.0");
-        
-        _pacURL = [[NSString alloc] initWithFormat:@"http://127.0.0.1:%d/proxy.pac", PAC_PORT];
         _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
-        
-        NSArray *sysPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask, YES);
-        NSString *prefsDirectory = [[sysPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Preferences"];
-        _configPath = [[NSString alloc] initWithFormat:@"%@/%@", prefsDirectory, JSON_CONFIG_NAME];
-        
-        _currentProfile = PROFILE_DEFAULT_INDEX;
-        [self reloadProfile];
-        
         _alertViewUserInfo = [[NSMutableDictionary alloc] init];
+        _proxyManager = [[ProxyManager alloc] init];
+        _proxyManager.delegate = self;
        
         if (DEVICE_IS_IPAD())
             _cellWidth = 560.0f;
@@ -170,39 +126,39 @@ typedef enum {
                           [NSArray arrayWithObjects:
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Server", nil),
-                            @"REMOTE_SERVER",
+                            kProfileServer,
                             @"127.0.0.1",
                             CELL_TEXT, nil],
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Port", nil),
-                            @"REMOTE_PORT",
+                            kProfilePort,
                             @"8080",
                             CELL_TEXT CELL_NUM, nil],
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Password", nil),
-                            @"SOCKS_PASS",
+                            kProfilePass,
                             @"123456",
                             CELL_TEXT CELL_PASS, nil],
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Cipher", nil),
-                            @"CRYPTO_METHOD",
+                            kProfileCrypto,
                             @"table",
                             CELL_VIEW, nil],
                            nil],
                           [NSArray arrayWithObjects:
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Auto Proxy", nil),
-                            @"AUTO_PROXY",
+                            kProfileAutoProxy,
                             @"NO",
                             CELL_SWITCH, nil],
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"PAC File", nil),
-                            @"PAC_FILE",
+                            kProfilePac,
                             NSLocalizedString(@"Please specify file path", nil),
                             CELL_TEXT, nil],
                            [NSArray arrayWithObjects:
                             NSLocalizedString(@"Exceptions", nil),
-                            @"EXCEPTION_LIST",
+                            kProfileExcept,
                             NSLocalizedString(@"Split with comma", nil),
                             CELL_TEXT, nil],
                            [NSArray arrayWithObjects:
@@ -235,7 +191,7 @@ typedef enum {
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self reloadProfile];
+    [[ProfileManager sharedProfileManager] reloadProfile];
     [[self tableView] reloadData];
     self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 }
@@ -256,8 +212,6 @@ typedef enum {
 
 - (void)dealloc
 {
-    [_pacURL release];
-    [_configPath release];
     [_tableSectionTitle release];
     [_tableElements release];
     [_tagKey release];
@@ -265,6 +219,8 @@ typedef enum {
     [_alertViewUserInfo release];
     [_popController release];
     _popController = nil;
+    [_proxyManager release];
+    _proxyManager = nil;
     [super dealloc];
 }
 
@@ -329,12 +285,12 @@ typedef enum {
             [actionSheet release];
         }
     } else if ([cellType hasPrefix:CELL_VIEW]) {
-        if ([cellKey isEqualToString:@"CRYPTO_METHOD"]) {
-            CipherViewController *cipherViewController = [[CipherViewController alloc] initWithStyle:UITableViewStyleGrouped withParentView:self];
+        if ([cellKey isEqualToString:kProfileCrypto]) {
+            CipherViewController *cipherViewController = [[CipherViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [self.navigationController pushViewController:cipherViewController animated:YES];
             [cipherViewController release];
         } else if ([cellKey isEqualToString:GLOBAL_PROFILE_NOW_KEY]) {
-            ProfileViewController *profileViewController = [[ProfileViewController alloc] initWithStyle:UITableViewStyleGrouped withParentView:self];
+            ProfileViewController *profileViewController = [[ProfileViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [self.navigationController pushViewController:profileViewController animated:YES];
             [profileViewController release];
         }
@@ -378,7 +334,7 @@ typedef enum {
             [textField setDelegate:self];
             [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
             [textField setTag:_tagNumber];
-            if ([cellKey isEqualToString:@"PAC_FILE"]) {
+            if ([cellKey isEqualToString:kProfilePac]) {
                 _pacFileCellTag = _tagNumber;
             }
             [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
@@ -395,7 +351,7 @@ typedef enum {
                 _enableCellTag = _tagNumber;
                 if ([switcher respondsToSelector:@selector(setAlternateColors:)])
                     [switcher setAlternateColors:YES];
-            } else if ([cellKey isEqualToString:@"AUTO_PROXY"]) {
+            } else if ([cellKey isEqualToString:kProfileAutoProxy]) {
                 _autoProxyCellTag = _tagNumber;
             }
             [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
@@ -418,10 +374,10 @@ typedef enum {
     
     if ([cellType hasPrefix:CELL_TEXT]) {
         UITextField *textField = (UITextField *) [cell accessoryView];
-        NSString *currentSetting = [self readObject:cellKey];
+        NSString *currentSetting = [[ProfileManager sharedProfileManager] readObject:cellKey];
         [textField setText:currentSetting ? currentSetting : @""];
-        if ([cellKey isEqualToString:@"PAC_FILE"]) {
-            BOOL isEnabled = [self readBool:@"AUTO_PROXY"];
+        if ([cellKey isEqualToString:kProfilePac]) {
+            BOOL isEnabled = [[ProfileManager sharedProfileManager] readBool:kProfileAutoProxy];
             [textField setEnabled:isEnabled];
             [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
             [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
@@ -429,14 +385,14 @@ typedef enum {
         }
     } else if ([cellType hasPrefix:CELL_SWITCH]) {
         UISwitch *switcher = (UISwitch *) [cell accessoryView];
-        BOOL switchValue = [self readBool:cellKey];
+        BOOL switchValue = [[ProfileManager sharedProfileManager] readBool:cellKey];
         [switcher setOn:switchValue animated:NO];
     } else if ([cellType hasPrefix:CELL_VIEW]) {
         NSString *currentSetting = nil;
         if ([cellKey isEqualToString:GLOBAL_PROFILE_NOW_KEY]) {
-            currentSetting = [self nameOfProfile:_currentProfile];
+            currentSetting = [[ProfileManager sharedProfileManager] nameOfCurrentProfile];
         } else {
-            currentSetting = [self readObject:cellKey];
+            currentSetting = [[ProfileManager sharedProfileManager] readObject:cellKey];
         }
         NSString *labelString = currentSetting ? currentSetting : cellDefaultValue;
         [[cell detailTextLabel] setText:labelString];
@@ -467,7 +423,7 @@ typedef enum {
 
 - (void)checkFileNotFound
 {
-    NSString *pacFile = [[self readObject:@"PAC_FILE"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSString *pacFile = [[[ProfileManager sharedProfileManager] readObject:kProfilePac] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if ([pacFile length] == 0 || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) message:NSLocalizedString(@"PAC file not found. Redirect all traffic to proxy.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
         [alert show];
@@ -495,7 +451,7 @@ typedef enum {
                                           cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
                                           otherButtonTitles:NSLocalizedString(@"OK",nil),
                           nil];
-    UITextField *textField = [self textFieldInAlertView:alert isInit:YES];
+    UITextField *textField = [alert textFieldInitAtFirstIndex];
     [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
     [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
     [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
@@ -503,7 +459,7 @@ typedef enum {
     [alert setTag:ALERT_TAG_NEW_PROFILE];
     if (profileInfo) {
         [_alertViewUserInfo setObject:profileInfo forKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
-        NSString *presetName = [NSString stringWithFormat:@"SS-%@", [profileInfo objectForKey:@"REMOTE_SERVER"]];
+        NSString *presetName = [NSString stringWithFormat:@"SS-%@", [profileInfo objectForKey:kProfileServer]];
         [textField setText:presetName];
     } else {
         [_alertViewUserInfo removeObjectForKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
@@ -540,50 +496,29 @@ typedef enum {
     [alert release];
 }
 
-- (UITextField *)textFieldInAlertView:(UIAlertView *)alertView isInit:(BOOL)isInit
-{
-    UITextField *textField = nil;
-    if (_legacySystem) {
-        if (isInit) {
-            if ([alertView respondsToSelector:@selector(addTextFieldWithValue:label:)]) {
-                [alertView addTextFieldWithValue:@"" label:@""];
-            }
-        }
-        if ([alertView respondsToSelector:@selector(textFieldAtIndex:)]) {
-            textField = [alertView textFieldAtIndex:0];
-        }
-    } else {
-        if (isInit) {
-            [alertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
-        }
-        textField = [alertView textFieldAtIndex:0];
-    }
-    return textField;
-}
-
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex != [alertView cancelButtonIndex]) {
         if ([alertView tag] == ALERT_TAG_ABOUT)
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"]];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLHelpFile]];
         else if ([alertView tag] == ALERT_TAG_DEFAULT_PAC) {
             for (UITableViewCell *cell in self.tableView.visibleCells) {
                 if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
                     UITextField *textField = (UITextField *) cell.accessoryView;
                     if ([textField tag] == _pacFileCellTag) {
                         [textField setText:_pacDefaultFile];
-                        [self saveObject:_pacDefaultFile forKey:@"PAC_FILE"];
-                        [self setPrefChanged];
+                        [[ProfileManager sharedProfileManager] saveObject:_pacDefaultFile forKey:kProfilePac];
                         break;
                     }
                 }
             }
         } else if ([alertView tag] == ALERT_TAG_NEW_PROFILE) {
-            UITextField *textField = [self textFieldInAlertView:alertView isInit:NO];
+            UITextField *textField = [alertView textFieldAtFirstIndex];
             NSDictionary *userInfo = [_alertViewUserInfo objectForKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
-            [self createProfile:[textField text] withInfo:userInfo];
+            [[ProfileManager sharedProfileManager] createProfile:[textField text] withInfo:userInfo];
+            [[self tableView] reloadData];
         } else if ([alertView tag] == ALERT_TAG_REPAIR) {
-            [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_FORCE_STOP]];
+            [self.proxyManager forceStopProxyDaemon];
         } else if ([alertView tag] == ALERT_TAG_SCANERROR) {
             NSString *rawLink = [_alertViewUserInfo objectForKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
             if (rawLink) {
@@ -685,10 +620,10 @@ typedef enum {
         }
             
         case QRCodeActionShare: {
-            NSString *remoteServer = [self fetchConfigForKey:@"REMOTE_SERVER" andDefault:@"127.0.0.1"];
-            NSString *remotePort = [self fetchConfigForKey:@"REMOTE_PORT" andDefault:@"8080"];
-            NSString *socksPass = [self fetchConfigForKey:@"SOCKS_PASS" andDefault:@"123456"];
-            NSString *cryptoMethod = [self fetchConfigForKey:@"CRYPTO_METHOD" andDefault:[CipherViewController defaultCipher]];
+            NSString *remoteServer = [[ProfileManager sharedProfileManager] fetchConfigForKey:kProfileServer andDefault:@"127.0.0.1"];
+            NSString *remotePort = [[ProfileManager sharedProfileManager] fetchConfigForKey:kProfilePort andDefault:@"8080"];
+            NSString *socksPass = [[ProfileManager sharedProfileManager] fetchConfigForKey:kProfilePass andDefault:@"123456"];
+            NSString *cryptoMethod = [[ProfileManager sharedProfileManager] fetchConfigForKey:kProfileCrypto andDefault:[CipherViewController defaultCipher]];
             NSString *rawLink = [NSString stringWithFormat:@"%@:%@@%@:%@", cryptoMethod, socksPass, remoteServer, remotePort];
             NSString *encodedLink = [NSString stringWithFormat:@"%@%@", kURLPrefix, [rawLink base64EncodedString]];
             CodeGeneratorViewController *genViewController = [[CodeGeneratorViewController alloc] initWithQRCodeLink:encodedLink];
@@ -747,10 +682,10 @@ typedef enum {
         }
         
         NSDictionary *linkInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  linkAddress, @"REMOTE_SERVER",
-                                  linkPort, @"REMOTE_PORT",
-                                  linkPassword, @"SOCKS_PASS",
-                                  linkMethod, @"CRYPTO_METHOD",
+                                  linkAddress, kProfileServer,
+                                  linkPort, kProfilePort,
+                                  linkPassword, kProfilePass,
+                                  linkMethod, kProfileCrypto,
                                   nil];
         NSString *linkTitle = [NSString stringWithFormat:@"%@: %@:%@\n%@: %@\n %@: %@",
                                NSLocalizedString(@"Server", nil), linkAddress, linkPort,
@@ -781,52 +716,57 @@ typedef enum {
     }
 }
 
-- (void)setProxySwitcher:(NSNumber *)enabledObject
+- (void)setProxySwitcher:(BOOL)enabled
 {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([switcher tag] == _enableCellTag) {
-                [switcher setOn:[enabledObject boolValue]];
+                [switcher setOn:enabled];
                 break;
             }
         }
     }
 }
 
-- (void)setBadge:(NSNumber *)enabledObject
+- (void)setAutoProxySwitcher:(BOOL)enabled
 {
-    if ([enabledObject boolValue]) {
-        if ([[UIApplication sharedApplication] respondsToSelector:@selector(setApplicationBadgeString:)])
-            [[UIApplication sharedApplication] setApplicationBadgeString:NSLocalizedString(@"On", nil)];
-        else
-            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
+    for (UITableViewCell *cell in self.tableView.visibleCells) {
+        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+            UISwitch *switcher = (UISwitch *) cell.accessoryView;
+            if ([switcher tag] == _autoProxyCellTag) {
+                [switcher setOn:enabled];
+                break;
+            }
+        }
     }
-    else
+}
+
+- (void)setBadge:(BOOL)enabled
+{
+    if (enabled) {
+        if ([[UIApplication sharedApplication] respondsToSelector:@selector(setApplicationBadgeString:)]) {
+            [[UIApplication sharedApplication] setApplicationBadgeString:NSLocalizedString(@"On", nil)];
+        } else {
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
+        }
+    } else {
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    }
 }
 
 - (void)switchChanged:(id)sender
 {
     UISwitch* switcher = sender;
     if ([switcher tag] == _enableCellTag) {
-        [NSThread detachNewThreadSelector:@selector(threadRunProxy:) 
-                                 toTarget:self 
-                               withObject:[NSNumber numberWithBool:switcher.on]];
+        [self.proxyManager setProxyEnabled:switcher.on];
         return;
     }
     NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[switcher tag]]];
-    [self saveBool:switcher.on forKey:key];
+    [[ProfileManager sharedProfileManager] saveBool:switcher.on forKey:key];
     if ([switcher tag] == _autoProxyCellTag) {
         [self setPacFileCellEnabled:switcher.on];
-        if ([self proxyEnabled]) {
-            if (switcher.on) {
-                [self checkFileNotFound];
-            }
-            [NSThread detachNewThreadSelector:@selector(threadChangeProxyStatus:) 
-                                     toTarget:self 
-                                   withObject:[NSNumber numberWithBool:switcher.on]];
-        }
+        [self.proxyManager syncAutoProxy];
     }
 }
 
@@ -849,485 +789,20 @@ typedef enum {
 - (void)textFieldDidChange:(UITextField *)textField
 {
     NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[textField tag]]];
-    [self saveObject:[textField text] forKey:key];
-    [self setPrefChanged];
+    [[ProfileManager sharedProfileManager] saveObject:[textField text] forKey:key];
 }
 
-#pragma mark - Proxy threads
-
-- (void)threadRunProxy:(NSNumber *)willStart
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    BOOL willStartProxy = [willStart boolValue];
-    ProxyStatus status = kProxyNone;
-    if (willStartProxy) {
-        BOOL isAuto = [self readBool:@"AUTO_PROXY"];
-        if (isAuto) {
-            status = kProxyPac;
-            [self performSelectorOnMainThread:@selector(checkFileNotFound) withObject:nil waitUntilDone:NO];
-        } else {
-            status = kProxySocks;
-        }
-    }
-    if ([self setProxy:status]) {
-        if (willStartProxy) {
-            [self notifyChanged:YES];
-        }
-    } else {
-        willStartProxy = !willStartProxy;
-        if ([[NSFileManager defaultManager] isDeletableFileAtPath:_configPath]) {
-            NSError *error = nil;
-            [[NSFileManager defaultManager] removeItemAtPath:_configPath error:&error];
-        }
-        [self performSelectorOnMainThread:@selector(showError:) withObject:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil) waitUntilDone:NO];
-    }
-    [self setProxyEnabled:willStartProxy];
-    [pool release];
-}
-
-- (void)threadFixProxy
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    ProxyStatus nowStatus = [self currentProxyStatus];
-    BOOL nowEnabled = (nowStatus != kProxyNone) ? YES : NO;
-    BOOL prefEnabled = [self readBool:GLOBAL_PROXY_ENABLE_KEY];
-    BOOL prefAuto = [self readBool:@"AUTO_PROXY"];
-    ProxyStatus prefStatus = kProxyNone;
-    if (prefEnabled)
-        prefStatus = prefAuto ? kProxyPac : kProxySocks;
-    
-    BOOL proxyEnabled = prefEnabled;
-    if (nowStatus != prefStatus) {
-        if ([self setProxy:prefStatus] == NO) {
-            proxyEnabled = nowEnabled;
-        }
-    }
-    [self setProxyEnabled:proxyEnabled];
-    [pool release];
-}
-
-- (void)threadChangeProxyStatus:(NSNumber *)isAutoProxy
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [self setProxy:([isAutoProxy boolValue] ? kProxyPac : kProxySocks)];
-    [pool release];
-}
-
-- (BOOL)threadSendNotifyMessage:(NSNumber *)messageNumber
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    const char *messageHeader = UPDATE_CONF;
-    int messageId = [messageNumber intValue];
-    switch (messageId) {
-        case PROXY_UPDATE_CONF:
-            messageHeader = UPDATE_CONF;
-            break;
-        case PROXY_NONE_STATUS:
-            messageHeader = SET_PROXY_NONE;
-            break;
-        case PROXY_SOCKS_STATUS:
-            messageHeader = SET_PROXY_SOCKS;
-            break;
-        case PROXY_PAC_STATUS:
-            messageHeader = SET_PROXY_PAC;
-            break;
-        case PROXY_FORCE_STOP:
-            messageHeader = FORCE_STOP;
-            break;
-        default:
-            messageHeader = SET_PROXY_NONE;
-            break;
-    }
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:_configPath] || messageId == PROXY_FORCE_STOP) {
-        [self syncSettings];
-    }
-    
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_pacURL]];
-    [request setValue:@"True" forHTTPHeaderField:[NSString stringWithFormat:@"%s", messageHeader]];
-    [request setTimeoutInterval:5.0];
-    BOOL ret = NO;
-    int i;
-    for (i = 0; i < MAX_TRYTIMES; i++) {
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-        if (data == nil) {
-            continue;
-        }
-        NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if ([str hasPrefix:RESPONSE_SUCC]) {
-            ret = YES;
-            [str release];
-            break;
-        } else if ([str hasPrefix:RESPONSE_FAIL]) {
-            [str release];
-            break;
-        }
-        [str release];
-    }
-    if (messageId == PROXY_UPDATE_CONF && ret == YES) {
-        _isPrefChanged = NO;
-    }
-    [pool release];
-    return ret;
-}
-
-#pragma mark - Proxy functions
-
-- (ProxyStatus)currentProxyStatus
-{
-    ProxyStatus status = kProxyNone;
-    CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
-    BOOL pacEnabled = [[(NSDictionary *) proxyDict objectForKey:@"ProxyAutoConfigEnable"] boolValue];
-    BOOL socksEnabled = [[(NSDictionary *) proxyDict objectForKey:@"SOCKSEnable"] boolValue];
-    if (socksEnabled || pacEnabled) {
-        status = pacEnabled ? kProxyPac : kProxySocks;
-    }
-    CFRelease(proxyDict);
-    return status;
-}
-
-- (BOOL)proxyEnabled
-{
-    return [self readBool:GLOBAL_PROXY_ENABLE_KEY];
-}
-
-- (void)setProxyEnabled:(BOOL)enabled
-{
-    [self saveBool:enabled forKey:GLOBAL_PROXY_ENABLE_KEY];
-    [self performSelectorOnMainThread:@selector(setBadge:) withObject:[NSNumber numberWithBool:enabled] waitUntilDone:NO];
-    [self performSelectorOnMainThread:@selector(setProxySwitcher:) withObject:[NSNumber numberWithBool:enabled] waitUntilDone:NO];
-}
+#pragma mark - Proxy methods
 
 - (void)fixProxy
 {
-    [NSThread detachNewThreadSelector:@selector(threadFixProxy) toTarget:self withObject:nil];
+    [self.proxyManager syncProxyStatus:YES];
 }
 
-- (void)setPrefChanged
+- (void)updateProxy
 {
-    _isPrefChanged = YES;
+    [self.proxyManager syncProxyStatus:NO];
 }
 
-- (void)notifyChanged:(BOOL)isForce
-{
-    BOOL proxyEnabled = [self proxyEnabled];
-    if (!isForce && !proxyEnabled) {
-        return;
-    }
-    if (_isPrefChanged) {
-        [self syncSettings];
-        if (!isForce) {
-            [NSThread detachNewThreadSelector:@selector(threadChangeProxyStatus:)
-                                     toTarget:self
-                                   withObject:[NSNumber numberWithBool:[self readBool:@"AUTO_PROXY"]]];
-        }
-        [NSThread detachNewThreadSelector:@selector(threadSendNotifyMessage:) toTarget:self withObject:[NSNumber numberWithInt:PROXY_UPDATE_CONF]];
-    }
-}
-
-- (void)saveSettings
-{
-    if (_isPrefChanged) {
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-}
-
-- (BOOL)setProxy:(ProxyStatus)status
-{
-    int statusId = PROXY_NONE_STATUS;
-    switch (status) {
-        case kProxySocks:
-            statusId = PROXY_SOCKS_STATUS;
-            break;
-        case kProxyPac:
-            statusId = PROXY_PAC_STATUS;
-            break;
-        default:
-            statusId = PROXY_NONE_STATUS;
-            break;
-    }
-    return [self threadSendNotifyMessage:[NSNumber numberWithInt:statusId]];
-}
-
-#pragma mark - Profile read settings
-
-- (void)saveObject:(id)value forKey:(NSString *)key
-{
-    if (key == nil) {
-        return;
-    }
-    if ([self isDefaultProfile] || \
-        [key isEqualToString:GLOBAL_PROXY_ENABLE_KEY] || \
-        [key isEqualToString:GLOBAL_PROFILE_NOW_KEY] || \
-        [key isEqualToString:GLOBAL_PROFILE_LIST_KEY]) {
-        [[NSUserDefaults standardUserDefaults] setObject:value forKey:key];
-    } else {
-        NSArray *profileList = [self profileList];
-        NSDictionary *currentDict = [profileList objectAtIndex:_currentProfile];
-        if (currentDict == nil) {
-            return;
-        }
-        NSMutableDictionary *newDict = [NSMutableDictionary dictionaryWithDictionary:currentDict];
-        [newDict setObject:value forKey:key];
-        NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
-        [newProfileList replaceObjectAtIndex:_currentProfile withObject:newDict];
-        [self updateProfileList:newProfileList];
-    }
-}
-
-- (id)readObject:(NSString *)key
-{
-    id value = nil;
-    if (key == nil) {
-        return nil;
-    }
-    if ([self isDefaultProfile] || \
-        [key isEqualToString:GLOBAL_PROXY_ENABLE_KEY] || \
-        [key isEqualToString:GLOBAL_PROFILE_NOW_KEY] || \
-        [key isEqualToString:GLOBAL_PROFILE_LIST_KEY]) {
-        value = [[NSUserDefaults standardUserDefaults] objectForKey:key];
-    } else {
-        NSArray *profileList = [self profileList];
-        NSDictionary *currentDict = [profileList objectAtIndex:_currentProfile];
-        value = [currentDict objectForKey:key];
-    }
-    return value;
-}
-
-- (void)saveBool:(BOOL)value forKey:(NSString *)key
-{
-    [self saveObject:[NSNumber numberWithBool:value] forKey:key];
-}
-
-- (BOOL)readBool:(NSString *)key
-{
-    return [[self readObject:key] boolValue];
-}
-
-- (void)saveInt:(NSInteger)value forKey:(NSString *)key
-{
-    [self saveObject:[NSNumber numberWithInteger:value] forKey:key];
-}
-
-- (NSInteger)readInt:(NSString *)key
-{
-    NSNumber *value = [self readObject:key];
-    if (value == nil || ![value isKindOfClass:[NSNumber class]]) {
-        return PROFILE_DEFAULT_INDEX;
-    }
-    return [value integerValue];
-}
-
-- (NSString *)fetchConfigForKey:(NSString *)key andDefault:(NSString *)defaultValue
-{
-    NSString *config = [self readObject:key];
-    NSString *trimmedConfig = [config stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    if (config == nil || [config length] == 0 || [trimmedConfig length] == 0) {
-        config = defaultValue;
-    }
-    return config;
-}
-
-- (BOOL)isDefaultProfile
-{
-    return _currentProfile == PROFILE_DEFAULT_INDEX;
-}
-
-#pragma mark - Profile operations
-
-- (NSInteger)currentProfile
-{
-    return _currentProfile;
-}
-
-- (NSArray *)profileList
-{
-    NSArray *profileList = [[NSUserDefaults standardUserDefaults] objectForKey:GLOBAL_PROFILE_LIST_KEY];
-    if ([profileList isKindOfClass:[NSArray class]]) {
-        return profileList;
-    }
-    return nil;
-}
-
-- (NSInteger)profileListCount
-{
-    return [[self profileList] count];
-}
-
-- (NSString *)nameOfProfile:(NSInteger)index
-{
-    NSString *name = nil;
-    NSArray *profileList = [self profileList];
-    if (index == PROFILE_DEFAULT_INDEX) {
-        name = PROFILE_DEFAULT_NAME;
-    } else if (profileList != nil && index >= 0 && index < [profileList count]) {
-        NSDictionary *profile = [profileList objectAtIndex:index];
-        if ([profile isKindOfClass:[NSDictionary class]]) {
-            name = [profile objectForKey:PROFILE_NAME_KEY];
-        }
-    }
-    return name;
-}
-
-- (void)renameProfile:(NSInteger)index withName:(NSString *)name
-{
-    NSArray *profileList = [self profileList];
-    if (profileList == nil) {
-        return;
-    }
-    NSString *finalName = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    if (finalName == nil || [finalName length] == 0) {
-        return;
-    }
-    if (index >= 0 && index < [profileList count]) {
-        NSDictionary *profile = [profileList objectAtIndex:index];
-        if ([profile isKindOfClass:[NSDictionary class]]) {
-            NSMutableDictionary *newProfile = [NSMutableDictionary dictionaryWithDictionary:profile];
-            [newProfile setObject:finalName forKey:PROFILE_NAME_KEY];
-            NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
-            [newProfileList replaceObjectAtIndex:index withObject:newProfile];
-            [self updateProfileList:newProfileList];
-        }
-    }
-}
-
-- (void)updateProfileList:(id)value
-{
-    [[NSUserDefaults standardUserDefaults] setObject:value forKey:GLOBAL_PROFILE_LIST_KEY];
-}
-
-- (void)selectProfile:(NSInteger)profileIndex
-{
-    [self saveInt:profileIndex forKey:GLOBAL_PROFILE_NOW_KEY];
-    _currentProfile = profileIndex;
-    [self setPrefChanged];
-}
-
-- (void)removeProfile:(NSInteger)profileIndex
-{
-    NSArray *profileList = [self profileList];
-    if (profileList == nil) {
-        return;
-    }
-    if (profileIndex >= 0 && profileIndex < [profileList count]) {
-        NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
-        [newProfileList removeObjectAtIndex:profileIndex];
-        [self updateProfileList:newProfileList];
-        [self selectProfile:PROFILE_DEFAULT_INDEX];
-    }
-}
-
-- (void)reorderProfile:(NSInteger)fromIndex toIndex:(NSInteger)toIndex
-{
-    NSArray *profileList = [self profileList];
-    if (profileList == nil || fromIndex == toIndex) {
-        return;
-    }
-    if (toIndex >= 0 && toIndex < [profileList count] &&
-        fromIndex >= 0 && fromIndex < [profileList count]) {
-        NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
-        id movingObject = [profileList objectAtIndex:fromIndex];
-        [newProfileList removeObjectAtIndex:fromIndex];
-        [newProfileList insertObject:movingObject atIndex:toIndex];
-        [self updateProfileList:newProfileList];
-        [self selectProfile:PROFILE_DEFAULT_INDEX];
-    }
-}
-
-- (void)reloadProfile
-{
-    _currentProfile = [self readInt:GLOBAL_PROFILE_NOW_KEY];
-    if (_currentProfile < 0 || _currentProfile >= [self profileListCount]) {
-        _currentProfile = PROFILE_DEFAULT_INDEX;
-    }
-}
-
-- (void)createProfile:(NSString *)rawName withInfo:(NSDictionary *)rawInfo
-{
-    NSString *profileName = [rawName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    if (profileName == nil || [profileName length] == 0) {
-        return;
-    }
-    NSMutableDictionary *profileInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:profileName, PROFILE_NAME_KEY, nil];
-    if (rawInfo) {
-        [profileInfo addEntriesFromDictionary:rawInfo];
-    }
-    NSArray *profileList = [self profileList];
-    NSMutableArray *newProfileList = [NSMutableArray arrayWithArray:profileList];
-    [newProfileList addObject:profileInfo];
-    [self updateProfileList:newProfileList];
-    [self selectProfile:[newProfileList count] - 1];
-    [[self tableView] reloadData];
-}
-
-#pragma mark - JSON settings sync
-
-- (void)appendString:(NSMutableString *)string key:(NSString *)key value:(NSString *)value isString:(BOOL)isString
-{
-    if (value == nil) {
-        return;
-    }
-    static NSString *stringFormat =  @"    \"%@\":\"%@\",\n";
-    static NSString *normalFormat = @"    \"%@\":%@,\n";
-    NSString *trimmedValue = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    if (isString) {
-        trimmedValue = [self escapeString:trimmedValue];
-    }
-    [string appendFormat:isString ? stringFormat : normalFormat, key, trimmedValue];
-}
-
-- (NSString *)escapeString:(NSString *)string
-{
-    NSString *escapedValue = [string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
-    escapedValue = [escapedValue stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
-    return escapedValue;
-}
-
-- (void)syncSettings
-{
-    NSString *remoteServer = [self fetchConfigForKey:@"REMOTE_SERVER" andDefault:@"127.0.0.1"];
-    NSString *remotePort = [self fetchConfigForKey:@"REMOTE_PORT" andDefault:@"8080"];
-    NSString *localPort = [NSString stringWithFormat:@"%d", LOCAL_PORT];
-    NSString *socksPass = [self fetchConfigForKey:@"SOCKS_PASS" andDefault:@"123456"];
-    NSString *timeOut = [NSString stringWithFormat:@"%d", LOCAL_TIMEOUT];
-    NSString *cryptoMethod = [self fetchConfigForKey:@"CRYPTO_METHOD" andDefault:[CipherViewController defaultCipher]];
-    NSMutableString *exceptString = nil;
-    NSString *pacFilePath = [self fetchConfigForKey:@"PAC_FILE" andDefault:nil];
-    NSInteger i;
-    
-    NSString *excepts = [self fetchConfigForKey:@"EXCEPTION_LIST" andDefault:nil];
-    if (excepts) {
-        NSMutableArray *exceptArray = [NSMutableArray array];
-        NSArray *origArray = [excepts componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]];
-        for (NSString *s in origArray) {
-            if (![s isEqualToString:@""]) {
-                [exceptArray addObject:s];
-            }
-        }
-        if ([exceptArray count] > 0) {
-            exceptString = [NSMutableString stringWithFormat:@"[\"%@\"", [self escapeString:[exceptArray objectAtIndex:0]]];
-            for (i = 1; i < [exceptArray count]; i++) {
-                [exceptString appendFormat:@",\"%@\"", [self escapeString:[exceptArray objectAtIndex:i]]];
-            }
-            [exceptString appendFormat:@"]"];
-        }
-    }
-    
-    if (![CipherViewController cipherIsValid:cryptoMethod]) {
-        cryptoMethod = [CipherViewController defaultCipher];
-    }
-
-    NSMutableString *jsonConfigString = [NSMutableString stringWithString:@"{\n"];
-    [self appendString:jsonConfigString key:@"server" value:remoteServer isString:YES];
-    [self appendString:jsonConfigString key:@"server_port" value:remotePort isString:NO];
-    [self appendString:jsonConfigString key:@"local_port" value:localPort isString:NO];
-    [self appendString:jsonConfigString key:@"password" value:socksPass isString:YES];
-    [self appendString:jsonConfigString key:@"timeout" value:timeOut isString:NO];
-    [self appendString:jsonConfigString key:@"method" value:cryptoMethod isString:YES];
-    [self appendString:jsonConfigString key:@"except_list" value:exceptString isString:NO];
-    [self appendString:jsonConfigString key:@"pac_path" value:pacFilePath isString:YES];
-    [jsonConfigString appendFormat:@"    \"pac_port\":%d\n}\n", PAC_PORT];
-    [jsonConfigString writeToFile:_configPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-}
 
 @end

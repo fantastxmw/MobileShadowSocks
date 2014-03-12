@@ -7,6 +7,8 @@
 //
 
 #import "ProfileViewController.h"
+#import "ProfileManager.h"
+#import "UIAlertView+TextField.h"
 
 @interface ProfileViewController ()
 - (void)exitEditMode;
@@ -14,12 +16,11 @@
 
 @implementation ProfileViewController
 
-- (id)initWithStyle:(UITableViewStyle)style withParentView:(SettingTableViewController *)parentView
+- (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
     if (self) {
-        _parentView = parentView;
-        _selectedIndex = [_parentView currentProfile] + 1;
+        _selectedIndex = [[ProfileManager sharedProfileManager] currentProfile] + 1;
     }
     return self;
 }
@@ -35,7 +36,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    _selectedIndex = [_parentView currentProfile] + 1;
+    _selectedIndex = [[ProfileManager sharedProfileManager] currentProfile] + 1;
     [[self tableView] reloadData];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:_selectedIndex inSection:0];
     [[self tableView] scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
@@ -48,11 +49,6 @@
     } else {
         return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
     }
-}
-
-- (void)dealloc
-{
-    [super dealloc];
 }
 
 #pragma mark - Table view data source
@@ -75,7 +71,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [_parentView profileListCount] + 1;
+    return [[ProfileManager sharedProfileManager] profileListCount] + 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -86,7 +82,7 @@
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
     }
-    [[cell textLabel] setText:[_parentView nameOfProfile:[indexPath row] - 1]];
+    [[cell textLabel] setText:[[ProfileManager sharedProfileManager] nameOfProfile:[indexPath row] - 1]];
     if ([indexPath row] == _selectedIndex) {
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
     } else {
@@ -124,7 +120,7 @@
     if (_selectedIndex != 0) {
         [self checkRow:0];
     }
-    [_parentView reorderProfile:[sourceIndexPath row] - 1 toIndex:[destinationIndexPath row] - 1];
+    [[ProfileManager sharedProfileManager] reorderProfile:[sourceIndexPath row] - 1 toIndex:[destinationIndexPath row] - 1];
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -138,7 +134,7 @@
         if (_selectedIndex != 0) {
             [self checkRow:0];
         }
-        [_parentView removeProfile:[indexPath row] - 1];
+        [[ProfileManager sharedProfileManager] removeProfile:[indexPath row] - 1];
         [tableView beginUpdates];
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
         [tableView endUpdates];
@@ -173,8 +169,8 @@
                                                   cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
                                                   otherButtonTitles:NSLocalizedString(@"OK",nil),
                                   nil];
-            UITextField *textField = [_parentView textFieldInAlertView:alert isInit:YES];
-            [textField setText:[_parentView nameOfProfile:[indexPath row] - 1]];
+            UITextField *textField = [alert textFieldInitAtFirstIndex];
+            [textField setText:[[ProfileManager sharedProfileManager] nameOfProfile:[indexPath row] - 1]];
             [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
             [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
             [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
@@ -185,7 +181,7 @@
         }
     } else if ([indexPath row] != _selectedIndex) {
         [self checkRow:[indexPath row]];
-        [_parentView selectProfile:_selectedIndex - 1];
+        [[ProfileManager sharedProfileManager] selectProfile:_selectedIndex - 1];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -195,8 +191,8 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex != [alertView cancelButtonIndex]) {
-        UITextField *textField = [_parentView textFieldInAlertView:alertView isInit:NO];
-        [_parentView renameProfile:[alertView tag] withName:[textField text]];
+        UITextField *textField = [alertView textFieldAtFirstIndex];
+        [[ProfileManager sharedProfileManager] renameProfile:[alertView tag] withName:[textField text]];
         [[self tableView] reloadData];
     }
 }

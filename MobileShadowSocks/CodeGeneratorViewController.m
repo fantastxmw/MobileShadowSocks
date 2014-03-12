@@ -31,6 +31,7 @@ typedef enum {
 
 @property (nonatomic, copy) NSString *codeLink;
 @property (nonatomic, retain) UIImageView *codeImageView;
+@property (nonatomic, assign) BOOL legacyLibrary;
 
 @end
 
@@ -43,6 +44,7 @@ typedef enum {
     self = [super init];
     if (self) {
         self.codeLink = link;
+        self.legacyLibrary = SYSTEM_VERSION_LESS_THAN(@"6.0");
     }
     return self;
 }
@@ -168,7 +170,7 @@ typedef enum {
 #endif
     
 #ifdef __IPHONE_5_0
-    if (!isTwitterAvailable && SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+    if (!isTwitterAvailable && self.legacyLibrary) {
         if ([TWTweetComposeViewController class]) {
             if ([TWTweetComposeViewController canSendTweet]) {
                 isTwitterAvailable = YES;
@@ -196,7 +198,7 @@ typedef enum {
             
         case ShareActionTwitter: {
             if (isTwitterAvailable) {
-                if (SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+                if (self.legacyLibrary) {
 #ifdef __IPHONE_5_0
                     TWTweetComposeViewController *composeViewController = [[TWTweetComposeViewController alloc] init];
                     if (self.codeImageView.image) {

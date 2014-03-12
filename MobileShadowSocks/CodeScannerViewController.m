@@ -8,6 +8,7 @@
 
 #import "CodeScannerViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import "AppDelegate.h"
 
 #define kFocusBigSize 80.0f
 #define kFocusSize 60.0f
@@ -111,7 +112,7 @@
     /* Portrait Orientation Workaround */
     if ([UIApplication sharedApplication].statusBarOrientation != UIInterfaceOrientationPortrait) {
         UIViewController *viewController = [[UIViewController alloc] init];
-        if (SYSTEM_VERSION_LESS_THAN(@"5.0")) {
+        if ([AppDelegate isLegacySystem]) {
             [self.navigationController presentModalViewController:viewController animated:NO];
             [self.navigationController dismissModalViewControllerAnimated:NO];
         } else {

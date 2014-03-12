@@ -23,6 +23,9 @@
 		4B3A811216BA4A2C00BE1B4C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B3A811116BA4A2C00BE1B4C /* CoreGraphics.framework */; };
 		4B3A811A16BA4A2C00BE1B4C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811916BA4A2C00BE1B4C /* main.m */; };
 		4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */; };
+		4B4A094E18D08DF2008A5BF0 /* ProfileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A094D18D08DF2008A5BF0 /* ProfileManager.m */; };
+		4B4A095518D08E0F008A5BF0 /* ProxyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A095418D08E0F008A5BF0 /* ProxyManager.m */; };
+		4B4A095818D09B6B008A5BF0 /* UIAlertView+TextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */; };
 		4B5E2BBB1894D572000455C5 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B5E2BBA1894D572000455C5 /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4B6097791869FDC300A5FB30 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B60977B1869FDC300A5FB30 /* InfoPlist.strings */; };
 		4B6CD067189191AF00360A26 /* AppIcon29x29.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CD053189191AF00360A26 /* AppIcon29x29.png */; };
@@ -140,6 +143,12 @@
 		4B3A811C16BA4A2C00BE1B4C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B3A811D16BA4A2C00BE1B4C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4B3A812416BA4ABE00BE1B4C /* SettingTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SettingTableViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		4B4A094C18D08DF2008A5BF0 /* ProfileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileManager.h; sourceTree = "<group>"; };
+		4B4A094D18D08DF2008A5BF0 /* ProfileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileManager.m; sourceTree = "<group>"; };
+		4B4A095318D08E0F008A5BF0 /* ProxyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProxyManager.h; sourceTree = "<group>"; };
+		4B4A095418D08E0F008A5BF0 /* ProxyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProxyManager.m; sourceTree = "<group>"; };
+		4B4A095618D09B6B008A5BF0 /* UIAlertView+TextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+TextField.h"; sourceTree = "<group>"; };
+		4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+TextField.m"; sourceTree = "<group>"; };
 		4B4B50BE1892BD2900118736 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		4B4B50BF1892BD2900118736 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4B55FD1F176468800062BA97 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -268,10 +277,16 @@
 				4B07BAD718937D16003600C0 /* CodeScannerViewController.m */,
 				4B07BAD918938059003600C0 /* CodeGeneratorViewController.h */,
 				4B07BADA18938059003600C0 /* CodeGeneratorViewController.m */,
+				4B4A094C18D08DF2008A5BF0 /* ProfileManager.h */,
+				4B4A094D18D08DF2008A5BF0 /* ProfileManager.m */,
+				4B4A095318D08E0F008A5BF0 /* ProxyManager.h */,
+				4B4A095418D08E0F008A5BF0 /* ProxyManager.m */,
 				4B07BADD189391B0003600C0 /* NSString+Base64.h */,
 				4B07BADE189391B0003600C0 /* NSString+Base64.m */,
 				4BF521EE1893FEED0031D309 /* UINavigationController+Orientation.h */,
 				4BF521EF1893FEED0031D309 /* UINavigationController+Orientation.m */,
+				4B4A095618D09B6B008A5BF0 /* UIAlertView+TextField.h */,
+				4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */,
 				4BF45D711899FD670026F956 /* ImagePickerViewController.h */,
 				4BF45D721899FD670026F956 /* ImagePickerViewController.m */,
 				4B07BAA318937ACA003600C0 /* ZXingObjC.xcodeproj */,
@@ -479,13 +494,16 @@
 			files = (
 				4B3A811A16BA4A2C00BE1B4C /* main.m in Sources */,
 				4BF521F01893FEED0031D309 /* UINavigationController+Orientation.m in Sources */,
+				4B4A094E18D08DF2008A5BF0 /* ProfileManager.m in Sources */,
 				4B3A811E16BA4A2C00BE1B4C /* AppDelegate.m in Sources */,
 				4B07BAD818937D16003600C0 /* CodeScannerViewController.m in Sources */,
+				4B4A095818D09B6B008A5BF0 /* UIAlertView+TextField.m in Sources */,
 				4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */,
 				4B07BADF189391B0003600C0 /* NSString+Base64.m in Sources */,
 				4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */,
 				4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */,
 				4BF45D731899FD670026F956 /* ImagePickerViewController.m in Sources */,
+				4B4A095518D08E0F008A5BF0 /* ProxyManager.m in Sources */,
 				4B07BADB18938059003600C0 /* CodeGeneratorViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

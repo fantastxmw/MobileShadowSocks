@@ -12,6 +12,16 @@
 
 @synthesize window = _window;
 
++ (BOOL)isLegacySystem
+{
+    static BOOL isLegacySystem = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        isLegacySystem = SYSTEM_VERSION_LESS_THAN(@"5.0");
+    });
+    return isLegacySystem;
+}
+
 - (void)dealloc
 {
     [_window release];
@@ -43,12 +53,12 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-    [_tabViewController notifyChanged:NO];
+    [_tabViewController updateProxy];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    [_tabViewController saveSettings];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end

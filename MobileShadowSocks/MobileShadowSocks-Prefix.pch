@@ -16,4 +16,13 @@
 
     #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
     #define DEVICE_IS_IPAD() (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    #define SINGLETON_FOR_CLASS(classname)\
+    + (id)shared##classname {\
+        static dispatch_once_t pred = 0;\
+        static id _sharedObject = nil;\
+        dispatch_once(&pred, ^{\
+            _sharedObject = [[self alloc] init];\
+        });\
+        return _sharedObject;\
+    }
 #endif
