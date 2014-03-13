@@ -240,10 +240,16 @@ SINGLETON_FOR_CLASS(ProfileManager)
     }
 }
 
-- (void)createProfile:(NSString *)rawName withInfo:(NSDictionary *)rawInfo
+- (void)createProfile:(NSString *)profileName withInfo:(NSDictionary *)rawInfo
 {
-    NSString *profileName = [rawName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if (profileName == nil || [profileName length] == 0) {
+        // Overwrite `default' profile
+        if (rawInfo != nil) {
+            [rawInfo enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [[NSUserDefaults standardUserDefaults] setObject:obj forKey:key];
+            }];
+            [self selectProfile:PROFILE_DEFAULT_INDEX];
+        }
         return;
     }
     NSMutableDictionary *profileInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:profileName, PROFILE_NAME_KEY, nil];

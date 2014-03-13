@@ -1,3 +1,6 @@
 [submodule "shadowsocks-libev"]
 	path = shadowsocks-libev
 	url = git://github.com/linusyang/shadowsocks-libev.git
+[submodule "MobileShadowSocks/UIAlertView-Blocks"]
+	path = MobileShadowSocks/UIAlertView-Blocks
+	url = https://github.com/ryanmaxwell/UIAlertView-Blocks.git

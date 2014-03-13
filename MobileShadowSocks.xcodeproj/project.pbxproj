@@ -26,6 +26,7 @@
 		4B4A094E18D08DF2008A5BF0 /* ProfileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A094D18D08DF2008A5BF0 /* ProfileManager.m */; };
 		4B4A095518D08E0F008A5BF0 /* ProxyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A095418D08E0F008A5BF0 /* ProxyManager.m */; };
 		4B4A095818D09B6B008A5BF0 /* UIAlertView+TextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */; };
+		4B4A095C18D1D1DF008A5BF0 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B4A095B18D1D1DF008A5BF0 /* UIAlertView+Blocks.m */; };
 		4B5E2BBB1894D572000455C5 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B5E2BBA1894D572000455C5 /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4B6097791869FDC300A5FB30 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B60977B1869FDC300A5FB30 /* InfoPlist.strings */; };
 		4B6CD067189191AF00360A26 /* AppIcon29x29.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CD053189191AF00360A26 /* AppIcon29x29.png */; };
@@ -149,6 +150,8 @@
 		4B4A095418D08E0F008A5BF0 /* ProxyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProxyManager.m; sourceTree = "<group>"; };
 		4B4A095618D09B6B008A5BF0 /* UIAlertView+TextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+TextField.h"; sourceTree = "<group>"; };
 		4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+TextField.m"; sourceTree = "<group>"; };
+		4B4A095A18D1D1DF008A5BF0 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertView+Blocks.h"; path = "UIAlertView-Blocks/UIAlertView+Blocks.h"; sourceTree = "<group>"; };
+		4B4A095B18D1D1DF008A5BF0 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertView+Blocks.m"; path = "UIAlertView-Blocks/UIAlertView+Blocks.m"; sourceTree = "<group>"; };
 		4B4B50BE1892BD2900118736 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		4B4B50BF1892BD2900118736 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4B55FD1F176468800062BA97 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -287,6 +290,8 @@
 				4BF521EF1893FEED0031D309 /* UINavigationController+Orientation.m */,
 				4B4A095618D09B6B008A5BF0 /* UIAlertView+TextField.h */,
 				4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */,
+				4B4A095A18D1D1DF008A5BF0 /* UIAlertView+Blocks.h */,
+				4B4A095B18D1D1DF008A5BF0 /* UIAlertView+Blocks.m */,
 				4BF45D711899FD670026F956 /* ImagePickerViewController.h */,
 				4BF45D721899FD670026F956 /* ImagePickerViewController.m */,
 				4B07BAA318937ACA003600C0 /* ZXingObjC.xcodeproj */,
@@ -503,6 +508,7 @@
 				4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */,
 				4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */,
 				4BF45D731899FD670026F956 /* ImagePickerViewController.m in Sources */,
+				4B4A095C18D1D1DF008A5BF0 /* UIAlertView+Blocks.m in Sources */,
 				4B4A095518D08E0F008A5BF0 /* ProxyManager.m in Sources */,
 				4B07BADB18938059003600C0 /* CodeGeneratorViewController.m in Sources */,
 			);

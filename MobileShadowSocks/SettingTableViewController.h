@@ -34,7 +34,6 @@
     NSInteger _autoProxyCellTag;
     NSInteger _enableCellTag;
     NSMutableDictionary *_tagKey;
-    NSMutableDictionary *_alertViewUserInfo;
     NSString *_pacDefaultFile;
     BOOL _isBuggyPhotoPicker;
 }

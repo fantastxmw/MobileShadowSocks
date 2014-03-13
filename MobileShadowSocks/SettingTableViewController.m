@@ -15,6 +15,7 @@
 #import "ProxyManager.h"
 #import "ProfileManager.h"
 #import "UIAlertView+TextField.h"
+#import "UIAlertView+Blocks.h"
 
 #define APP_VER @"0.3.1"
 #define APP_BUILD @"1"
@@ -35,17 +36,22 @@
 #define CELL_NOTIFY @"Notify"
 #define CELL_BUTTON @"Button"
 #define CELL_VIEW @"View"
-#define ALERT_TAG_ABOUT 1
-#define ALERT_TAG_DEFAULT_PAC 2
-#define ALERT_TAG_NEW_PROFILE 3
-#define ALERT_TAG_REPAIR 4
-#define ALERT_TAG_SCANERROR 5
 
 typedef enum {
     kActionSheetQRCode = 0,
     
     kActionSheetCount
 } ActionSheetTag;
+
+typedef enum {
+    kAlertViewTagAbout = 100,
+    kAlertViewTagDefaultPac,
+    kAlertViewTagNewProfile,
+    kAlertViewTagRepair,
+    kAlertViewTagScanError,
+
+    kAlertViewTagCount
+} AlertViewTag;
 
 typedef enum {
     QRCodeActionCamera = 0,
@@ -84,7 +90,6 @@ typedef enum {
     if (self) {
         _isBuggyPhotoPicker = !DEVICE_IS_IPAD() && SYSTEM_VERSION_LESS_THAN(@"7.0") && !SYSTEM_VERSION_LESS_THAN(@"6.0");
         _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
-        _alertViewUserInfo = [[NSMutableDictionary alloc] init];
         _proxyManager = [[ProxyManager alloc] init];
         _proxyManager.delegate = self;
        
@@ -216,7 +221,6 @@ typedef enum {
     [_tableElements release];
     [_tagKey release];
     [_pacDefaultFile release];
-    [_alertViewUserInfo release];
     [_popController release];
     _popController = nil;
     [_proxyManager release];
@@ -265,7 +269,7 @@ typedef enum {
                                                   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) 
                                                   otherButtonTitles:NSLocalizedString(@"OK",nil), 
                                   nil];
-            [alert setTag:ALERT_TAG_DEFAULT_PAC];
+            [alert setTag:kAlertViewTagDefaultPac];
             [alert show];
             [alert release];
         } else if ([cellKey isEqualToString:@"NEW_PROFILE_BUTTON"]) {
@@ -405,11 +409,12 @@ typedef enum {
 
 - (void)showAbout
 {
-    NSString *aboutMessage = [NSString stringWithFormat:@"%@ %@ (%@ %@)\n%@: @linusyang\nhttp://linusyang.com/\n\n%@",
+    NSString *aboutMessage = [NSString stringWithFormat:@"%@ %@ (%@ %@)\n%@: @linusyang\n\n%@\n%@",
                               NSLocalizedString(@"Version", nil), APP_VER, NSLocalizedString(@"Rev", nil), APP_BUILD,
-                              NSLocalizedString(@"Twitter", nil), NSLocalizedString(@"ShadowSocks is created by @clowwindy", nil)];
+                              NSLocalizedString(@"Twitter", nil), NSLocalizedString(@"ShadowSocks is created by @clowwindy", nil),
+                              NSLocalizedString(@"Icon and ShadowSocks (libev) by @madeye", nil)];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:aboutMessage delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:NSLocalizedString(@"Help Page",nil), nil];
-    [alert setTag:ALERT_TAG_ABOUT];
+    [alert setTag:kAlertViewTagAbout];
     [alert show];
     [alert release];
 }
@@ -438,7 +443,7 @@ typedef enum {
                                                    delegate:self
                                           cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
                                           otherButtonTitles:NSLocalizedString(@"Repair",nil), nil];
-    [alert setTag:ALERT_TAG_REPAIR];
+    [alert setTag:kAlertViewTagRepair];
     [alert show];
     [alert release];
 }
@@ -452,17 +457,19 @@ typedef enum {
                                           otherButtonTitles:NSLocalizedString(@"OK",nil),
                           nil];
     UITextField *textField = [alert textFieldInitAtFirstIndex];
-    [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
+    if (message) {
+        textField.placeholder = PROFILE_DEFAULT_NAME;
+    } else {
+        [textField setPlaceholder:NSLocalizedString(@"Name", nil)];
+    }
     [textField setAutocorrectionType:UITextAutocorrectionTypeNo];
     [textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
     [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
-    [alert setTag:ALERT_TAG_NEW_PROFILE];
+    [alert setTag:kAlertViewTagNewProfile];
+    alert.userInfo = profileInfo;
     if (profileInfo) {
-        [_alertViewUserInfo setObject:profileInfo forKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
-        NSString *presetName = [NSString stringWithFormat:@"SS-%@", [profileInfo objectForKey:kProfileServer]];
+        NSString *presetName = [NSString stringWithFormat:@"%@", [profileInfo objectForKey:kProfileServer]];
         [textField setText:presetName];
-    } else {
-        [_alertViewUserInfo removeObjectForKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
     }
     [alert show];
     [alert release];
@@ -485,13 +492,10 @@ typedef enum {
                                                     message:message
                                                    delegate:self
                                           cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                                          otherButtonTitles:NSLocalizedString(@"Open Link",nil), nil];
-    [alert setTag:ALERT_TAG_SCANERROR];
-    if (rawLink) {
-        [_alertViewUserInfo setObject:rawLink forKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
-    } else {
-        [_alertViewUserInfo removeObjectForKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
-    }
+                                          otherButtonTitles:NSLocalizedString(@"Copy Link",nil),
+                          NSLocalizedString(@"Open Link",nil), nil];
+    [alert setTag:kAlertViewTagScanError];
+    alert.userInfo = rawLink;
     [alert show];
     [alert release];
 }
@@ -499,31 +503,91 @@ typedef enum {
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex != [alertView cancelButtonIndex]) {
-        if ([alertView tag] == ALERT_TAG_ABOUT)
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLHelpFile]];
-        else if ([alertView tag] == ALERT_TAG_DEFAULT_PAC) {
-            for (UITableViewCell *cell in self.tableView.visibleCells) {
-                if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
-                    UITextField *textField = (UITextField *) cell.accessoryView;
-                    if ([textField tag] == _pacFileCellTag) {
-                        [textField setText:_pacDefaultFile];
-                        [[ProfileManager sharedProfileManager] saveObject:_pacDefaultFile forKey:kProfilePac];
-                        break;
+        AlertViewTag tag = (AlertViewTag) [alertView tag];
+
+        switch (tag) {
+            case kAlertViewTagAbout: {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLHelpFile]];
+                break;
+            }
+                
+            case kAlertViewTagDefaultPac: {
+                for (UITableViewCell *cell in self.tableView.visibleCells) {
+                    if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
+                        UITextField *textField = (UITextField *) cell.accessoryView;
+                        if ([textField tag] == _pacFileCellTag) {
+                            [textField setText:_pacDefaultFile];
+                            [[ProfileManager sharedProfileManager] saveObject:_pacDefaultFile forKey:kProfilePac];
+                            break;
+                        }
                     }
                 }
+                break;
             }
-        } else if ([alertView tag] == ALERT_TAG_NEW_PROFILE) {
-            UITextField *textField = [alertView textFieldAtFirstIndex];
-            NSDictionary *userInfo = [_alertViewUserInfo objectForKey:[NSNumber numberWithInteger:ALERT_TAG_NEW_PROFILE]];
-            [[ProfileManager sharedProfileManager] createProfile:[textField text] withInfo:userInfo];
-            [[self tableView] reloadData];
-        } else if ([alertView tag] == ALERT_TAG_REPAIR) {
-            [self.proxyManager forceStopProxyDaemon];
-        } else if ([alertView tag] == ALERT_TAG_SCANERROR) {
-            NSString *rawLink = [_alertViewUserInfo objectForKey:[NSNumber numberWithInteger:ALERT_TAG_SCANERROR]];
-            if (rawLink) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:rawLink]];
+                
+            case kAlertViewTagNewProfile: {
+                UITextField *textField = [alertView textFieldAtFirstIndex];
+                NSDictionary *userInfo = alertView.userInfo;
+                NSString *profileName = [textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                if (profileName == nil || profileName.length == 0) {
+                    if (userInfo != nil) {
+                        NSString *alertViewMessage = alertView.message;
+                        [UIAlertView showWithTitle:NSLocalizedString(@"Warning", nil)
+                                           message:NSLocalizedString(@"Profile name is empty. Do you want to overwrite the default profile, or retry with a new name?", nil)
+                                 cancelButtonTitle:NSLocalizedString(@"Retry", nil)
+                                 otherButtonTitles:@[NSLocalizedString(@"Save to Default", nil)]
+                                          tapBlock:
+                         ^(UIAlertView *alertView, NSInteger buttonIndex) {
+                             if (buttonIndex != alertView.cancelButtonIndex) {
+                                 // Save to default
+                                 [self setProfile:profileName withInfo:userInfo];
+                             } else {
+                                 // Retry
+                                 [self showNewProfile:userInfo withMessage:alertViewMessage];
+                             }
+                         }];
+                        
+                    } else {
+                        NSString *alertViewMessage = alertView.message;
+                        [UIAlertView showWithTitle:NSLocalizedString(@"Error", nil)
+                                           message:NSLocalizedString(@"Profile name cannot be empty. Do you want to retry?", nil)
+                                 cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                 otherButtonTitles:@[NSLocalizedString(@"Retry", nil)]
+                                          tapBlock:
+                         ^(UIAlertView *alertView, NSInteger buttonIndex) {
+                             if (buttonIndex != alertView.cancelButtonIndex) {
+                                 // Retry
+                                 [self showNewProfile:userInfo withMessage:alertViewMessage];
+                             }
+                         }];
+                    }
+                } else {
+                    [self setProfile:profileName withInfo:userInfo];
+                }
+                break;
             }
+                
+            case kAlertViewTagRepair: {
+                [self.proxyManager forceStopProxyDaemon];
+                break;
+            }
+                
+            case kAlertViewTagScanError: {
+                NSString *rawLink = alertView.userInfo;
+                if (rawLink == nil) {
+                    break;
+                }
+                if (buttonIndex == [alertView firstOtherButtonIndex]) {
+                    UIPasteboard *pasteBoard = [UIPasteboard generalPasteboard];
+                    pasteBoard.string = rawLink;
+                } else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:rawLink]];
+                }
+                break;
+            }
+                
+            default:
+                break;
         }
     }
 }
@@ -791,6 +855,14 @@ typedef enum {
 {
     NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[textField tag]]];
     [[ProfileManager sharedProfileManager] saveObject:[textField text] forKey:key];
+}
+
+#pragma mark - Profile methods
+
+- (void)setProfile:(NSString *)profileName withInfo:(NSDictionary *)userInfo
+{
+    [[ProfileManager sharedProfileManager] createProfile:profileName withInfo:userInfo];
+    [[self tableView] reloadData];
 }
 
 #pragma mark - Proxy methods

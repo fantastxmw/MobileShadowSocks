@@ -44,7 +44,7 @@
 - (void)reorderProfile:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
 - (void)renameProfile:(NSInteger)index withName:(NSString *)name;
 - (void)reloadProfile;
-- (void)createProfile:(NSString *)rawName withInfo:(NSDictionary *)rawInfo;
+- (void)createProfile:(NSString *)profileName withInfo:(NSDictionary *)rawInfo;
 
 - (void)saveObject:(id)value forKey:(NSString *)key;
 - (id)readObject:(NSString *)key;
