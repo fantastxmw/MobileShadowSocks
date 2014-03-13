@@ -15,7 +15,7 @@
 
 - (void)setProxyEnabled:(BOOL)enabled;
 - (void)syncAutoProxy;
-- (void)syncProxyStatus:(BOOL)isForce updateOnlyChanged:(BOOL)updateOnlyChanged;
+- (void)syncProxyStatus:(BOOL)isForce;
 - (void)forceStopProxyDaemon;
 
 @end

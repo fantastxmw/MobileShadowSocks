@@ -51,7 +51,7 @@ typedef enum {
 
 #pragma mark - Private methods
 
-- (void)_setProxyEnabled:(BOOL)enabled showAlert:(BOOL)showAlert updateConf:(BOOL)isUpdateConf updateOnlyChanged:(BOOL)updateOnlyChanged
+- (void)_setProxyEnabled:(BOOL)enabled showAlert:(BOOL)showAlert updateConf:(BOOL)isUpdateConf
 {
     // Set default operation
     ProxyOperation op = kProxyOperationDisableProxy;
@@ -78,7 +78,14 @@ typedef enum {
 
         // Update config only if proxy enabled
         if (isUpdateConf) {
-            [self _sendProxyOperation:kProxyOperationUpdateConf updateOnlyChanged:updateOnlyChanged];
+            static BOOL firstUpdate = YES;
+            static dispatch_once_t onceToken;
+            
+            // Only update when changed, except first time
+            [self _sendProxyOperation:kProxyOperationUpdateConf updateOnlyChanged:!firstUpdate];
+            dispatch_once(&onceToken, ^{
+                firstUpdate = NO;
+            });
         }
     }
     
@@ -226,7 +233,7 @@ typedef enum {
 - (void)setProxyEnabled:(BOOL)enabled
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self _setProxyEnabled:enabled showAlert:YES updateConf:YES updateOnlyChanged:NO];
+        [self _setProxyEnabled:enabled showAlert:YES updateConf:YES];
     });
 }
 
@@ -238,7 +245,7 @@ typedef enum {
     }
 }
 
-- (void)syncProxyStatus:(BOOL)isForce updateOnlyChanged:(BOOL)updateOnlyChanged
+- (void)syncProxyStatus:(BOOL)isForce
 {
     BOOL prefEnabled = [self _prefProxyEnabled];
     
@@ -246,7 +253,7 @@ typedef enum {
     if (isForce || prefEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             // No updating config when fixing proxy
-            [self _setProxyEnabled:prefEnabled showAlert:isForce updateConf:!isForce updateOnlyChanged:updateOnlyChanged];
+            [self _setProxyEnabled:prefEnabled showAlert:isForce updateConf:!isForce];
         });
     }
 }
