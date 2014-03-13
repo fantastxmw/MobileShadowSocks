@@ -736,6 +736,7 @@ typedef enum {
             UISwitch *switcher = (UISwitch *) cell.accessoryView;
             if ([switcher tag] == _autoProxyCellTag) {
                 [switcher setOn:enabled];
+                [self setPacFileCellEnabled:enabled];
                 break;
             }
         }

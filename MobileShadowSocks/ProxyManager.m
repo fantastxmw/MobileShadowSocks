@@ -51,7 +51,7 @@ typedef enum {
 
 #pragma mark - Private methods
 
-- (ProxyOperationStatus)_setProxyEnabled:(BOOL)enabled checkPacFile:(BOOL)isCheckFile
+- (void)_setProxyEnabled:(BOOL)enabled checkPacFile:(BOOL)isCheckFile updateConf:(BOOL)isUpdateConf
 {
     // Set default operation
     ProxyOperation op = kProxyOperationDisableProxy;
@@ -75,6 +75,11 @@ typedef enum {
             // Set operation to Socks
             op = kProxyOperationEnableSocks;
         }
+
+        // Update config only if proxy enabled
+        if (isUpdateConf) {
+            [self _sendProxyOperation:kProxyOperationUpdateConf];
+        }
     }
     
     // Get current proxy operation
@@ -86,32 +91,19 @@ typedef enum {
         status = [self _sendProxyOperation:op];
     }
     
-    // Enumerate return status
-    switch (status) {
-        case kProxyOperationSuccess: {
-            // Update config only if proxy enabled
-            if (enabled) {
-                status = [self _sendProxyOperation:kProxyOperationUpdateConf];
-            }
-            break;
-        }
-        
-        case kProxyOperationError: {
-            // Get actual current proxy status
-            currentOp = [self _currentProxyOperation];
-            isAutoProxy = (currentOp == kProxyOperationEnablePac);
-            enabled = (currentOp == kProxyOperationEnablePac || currentOp == kProxyOperationEnableSocks);
-            
-            // Alert error
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate showError:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil)];
-            });
-            
-            break;
-        }
-            
-        default:
-            break;
+    // Show alert when error
+    if (status == kProxyOperationError) {
+        currentOp = [self _currentProxyOperation];
+        isAutoProxy = (currentOp == kProxyOperationEnablePac);
+        enabled = (currentOp == kProxyOperationEnablePac || currentOp == kProxyOperationEnableSocks);
+
+        // Sync auto proxy settings
+        [[ProfileManager sharedProfileManager] saveBool:isAutoProxy forKey:kProfileAutoProxy];
+
+        // Alert error
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate showError:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil)];
+        });
     }
     
     // save enable status
@@ -123,8 +115,6 @@ typedef enum {
         [self.delegate setProxySwitcher:enabled];
         [self.delegate setAutoProxySwitcher:isAutoProxy];
     });
-    
-    return status;
 }
 
 - (ProxyOperationStatus)_sendProxyOperation:(ProxyOperation)op
@@ -224,7 +214,7 @@ typedef enum {
 - (void)setProxyEnabled:(BOOL)enabled
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self _setProxyEnabled:enabled checkPacFile:YES];
+        [self _setProxyEnabled:enabled checkPacFile:YES updateConf:YES];
     });
 }
 
@@ -240,9 +230,11 @@ typedef enum {
 {
     BOOL prefEnabled = [self _prefProxyEnabled];
     
+    // Sync when enabled or trying to proxy
     if (isForce || prefEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self _setProxyEnabled:prefEnabled checkPacFile:NO];
+            // No updating config when fixing proxy
+            [self _setProxyEnabled:prefEnabled checkPacFile:NO updateConf:!isForce];
         });
     }
 }
