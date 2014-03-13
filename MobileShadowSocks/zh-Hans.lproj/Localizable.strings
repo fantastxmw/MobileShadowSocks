@@ -52,6 +52,7 @@
     "Profile name is empty. Do you want to overwrite the default profile, or retry with a new name?" = "\U914d\U7f6e\U540d\U4e3a\U7a7a\U3002\U60a8\U8981\U8986\U76d6\U9ed8\U8ba4\U914d\U7f6e\Uff0c\U8fd8\U662f\U91cd\U65b0\U8f93\U5165\U65b0\U540d\U79f0\Uff1f";
     Profiles = "\U914d\U7f6e";
     "Proxy Settings" = "\U4ee3\U7406\U8bbe\U7f6e";
+    "Public Accounts" = "\U516c\U76ca\U8d26\U53f7";
     "QR Code" = "\U4e8c\U7ef4\U7801";
     "QR Code Error" = "\U4e8c\U7ef4\U7801\U9519\U8bef";
     Repair = "\U4fee\U590d";

@@ -22,6 +22,7 @@
 
 #define kURLPrefix @"ss://"
 #define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"
+#define kURLPubAccounts @"https://www.shadowsocks.net/"
 #define PAC_DEFAULT_NAME @"auto.pac"
 
 #define CELL_INDEX_TITLE 0
@@ -413,7 +414,7 @@ typedef enum {
                               NSLocalizedString(@"Version", nil), APP_VER, NSLocalizedString(@"Rev", nil), APP_BUILD,
                               NSLocalizedString(@"Twitter", nil), NSLocalizedString(@"ShadowSocks is created by @clowwindy", nil),
                               NSLocalizedString(@"Icon and ShadowSocks (libev) by @madeye", nil)];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:aboutMessage delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:NSLocalizedString(@"Help Page",nil), nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"About", nil) message:aboutMessage delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:NSLocalizedString(@"Help Page",nil), NSLocalizedString(@"Public Accounts",nil), nil];
     [alert setTag:kAlertViewTagAbout];
     [alert show];
     [alert release];
@@ -507,7 +508,11 @@ typedef enum {
 
         switch (tag) {
             case kAlertViewTagAbout: {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLHelpFile]];
+                NSString *targetURL = kURLHelpFile;
+                if (buttonIndex != alertView.firstOtherButtonIndex) {
+                    targetURL = kURLPubAccounts;
+                }
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:targetURL]];
                 break;
             }
                 
