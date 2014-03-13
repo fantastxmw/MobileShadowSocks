@@ -48,8 +48,6 @@
 		4B6CD077189191AF00360A26 /* Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CD063189191AF00360A26 /* Icon-Small.png */; };
 		4B6CD078189191AF00360A26 /* Icon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CD064189191AF00360A26 /* Icon-Small@2x.png */; };
 		4B6CD079189191AF00360A26 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CD065189191AF00360A26 /* Icon.png */; };
-		4B6CD07A189191AF00360A26 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CD066189191AF00360A26 /* Icon@2x.png */; };
-		4B84A9F218955D4000188A2B /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B84A9F118955D4000188A2B /* Icon-72@2x.png */; };
 		4B84A9F8189571D900188A2B /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B84A9F7189571D900188A2B /* Twitter.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE04A361751E9AF0019AAB1 /* CipherViewController.m */; };
 		4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF38F10186DD07F008C4EF1 /* ProfileViewController.m */; };
@@ -177,8 +175,6 @@
 		4B6CD063189191AF00360A26 /* Icon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small.png"; path = "Icons/Icon-Small.png"; sourceTree = "<group>"; };
 		4B6CD064189191AF00360A26 /* Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small@2x.png"; path = "Icons/Icon-Small@2x.png"; sourceTree = "<group>"; };
 		4B6CD065189191AF00360A26 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Icons/Icon.png; sourceTree = "<group>"; };
-		4B6CD066189191AF00360A26 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "Icons/Icon@2x.png"; sourceTree = "<group>"; };
-		4B84A9F118955D4000188A2B /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72@2x.png"; path = "Icons/Icon-72@2x.png"; sourceTree = "<group>"; };
 		4B84A9F7189571D900188A2B /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
 		4BE04A351751E9AF0019AAB1 /* CipherViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CipherViewController.h; sourceTree = "<group>"; };
 		4BE04A361751E9AF0019AAB1 /* CipherViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CipherViewController.m; sourceTree = "<group>"; };
@@ -334,12 +330,10 @@
 				4B6CD05F189191AF00360A26 /* AppIcon76x76.png */,
 				4B6CD060189191AF00360A26 /* AppIcon76x76@2x.png */,
 				4B6CD061189191AF00360A26 /* Icon-72.png */,
-				4B84A9F118955D4000188A2B /* Icon-72@2x.png */,
 				4B6CD062189191AF00360A26 /* Icon-Small-50.png */,
 				4B6CD063189191AF00360A26 /* Icon-Small.png */,
 				4B6CD064189191AF00360A26 /* Icon-Small@2x.png */,
 				4B6CD065189191AF00360A26 /* Icon.png */,
-				4B6CD066189191AF00360A26 /* Icon@2x.png */,
 			);
 			name = Icons;
 			sourceTree = "<group>";
@@ -456,7 +450,6 @@
 				4B6CD06B189191AF00360A26 /* AppIcon50x50.png in Resources */,
 				4B6CD071189191AF00360A26 /* AppIcon72x72.png in Resources */,
 				4B080C8416FB2B6900DE1EE3 /* auto.pac in Resources */,
-				4B84A9F218955D4000188A2B /* Icon-72@2x.png in Resources */,
 				4B6CD079189191AF00360A26 /* Icon.png in Resources */,
 				4B6CD077189191AF00360A26 /* Icon-Small.png in Resources */,
 				4B6CD078189191AF00360A26 /* Icon-Small@2x.png in Resources */,
@@ -464,7 +457,6 @@
 				4B6CD06F189191AF00360A26 /* AppIcon60x60.png in Resources */,
 				4B6CD070189191AF00360A26 /* AppIcon60x60@2x.png in Resources */,
 				4B6CD076189191AF00360A26 /* Icon-Small-50.png in Resources */,
-				4B6CD07A189191AF00360A26 /* Icon@2x.png in Resources */,
 				4B6CD072189191AF00360A26 /* AppIcon72x72@2x.png in Resources */,
 				4B6CD06E189191AF00360A26 /* AppIcon57x57@2x.png in Resources */,
 				4B6CD06C189191AF00360A26 /* AppIcon50x50@2x.png in Resources */,
