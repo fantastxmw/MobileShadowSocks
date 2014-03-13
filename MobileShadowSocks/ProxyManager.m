@@ -9,8 +9,8 @@
 #import "ProxyManager.h"
 #import "ProfileManager.h"
 
-#define MAX_TRYTIMES 10
-#define MAX_TIMEOUT 5.0
+#define MAX_TRYTIMES 3
+#define MAX_TIMEOUT 2.0
 
 #define STR2(x) #x
 #define STR(x) STR2(x)
@@ -51,7 +51,7 @@ typedef enum {
 
 #pragma mark - Private methods
 
-- (void)_setProxyEnabled:(BOOL)enabled checkPacFile:(BOOL)isCheckFile updateConf:(BOOL)isUpdateConf updateOnlyChanged:(BOOL)updateOnlyChanged
+- (void)_setProxyEnabled:(BOOL)enabled showAlert:(BOOL)showAlert updateConf:(BOOL)isUpdateConf updateOnlyChanged:(BOOL)updateOnlyChanged
 {
     // Set default operation
     ProxyOperation op = kProxyOperationDisableProxy;
@@ -63,7 +63,7 @@ typedef enum {
         // Check if auto proxy is enabled
         if (isAutoProxy) {
             // Show alert if Pac file not found
-            if (isCheckFile) {
+            if (showAlert) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self.delegate checkFileNotFound];
                 });
@@ -101,9 +101,11 @@ typedef enum {
         [[ProfileManager sharedProfileManager] saveBool:isAutoProxy forKey:kProfileAutoProxy];
 
         // Alert error
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate showError:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil)];
-        });
+        if (showAlert) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate showError:NSLocalizedString(@"Failed to change proxy settings.\nMaybe no network access available.", nil)];
+            });
+        }
     }
     
     // save enable status
@@ -224,7 +226,7 @@ typedef enum {
 - (void)setProxyEnabled:(BOOL)enabled
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self _setProxyEnabled:enabled checkPacFile:YES updateConf:YES updateOnlyChanged:NO];
+        [self _setProxyEnabled:enabled showAlert:YES updateConf:YES updateOnlyChanged:NO];
     });
 }
 
@@ -244,7 +246,7 @@ typedef enum {
     if (isForce || prefEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             // No updating config when fixing proxy
-            [self _setProxyEnabled:prefEnabled checkPacFile:NO updateConf:!isForce updateOnlyChanged:updateOnlyChanged];
+            [self _setProxyEnabled:prefEnabled showAlert:isForce updateConf:!isForce updateOnlyChanged:updateOnlyChanged];
         });
     }
 }
