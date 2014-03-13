@@ -4333,7 +4333,8 @@
 		25403CAA166A96F900E13304 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastTestingUpgradeCheck = 0510;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = zxing;
 			};
 			buildConfigurationList = 25403CAD166A96F900E13304 /* Build configuration list for PBXProject "ZXingObjC" */;
