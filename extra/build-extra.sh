@@ -9,28 +9,33 @@ else
 fi
 
 build_launcher() {
-    export CODESIGN_ALLOCATE="${TC_PATH}/codesign_allocate"
     SRCDIR="${PROJECT_DIR}/shadowsocks-libev"
-    "${TC_PATH}/clang" -arch "$1" -O3 -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${SDKROOT}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${SDKROOT}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=5.1 -isysroot "${SDKROOT}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "$2"
+    xcrun --sdk iphoneos clang \
+        -arch "$1" \
+        -miphoneos-version-min=5.1 \
+        -O2 \
+        -I"${SRCDIR}/libev" \
+        -I"${PROJECT_DIR}/extra" \
+        -I"${SRCDIR}/src" \
+        -I"${BUILT_PRODUCTS_DIR}/ssl/include" \
+        -DHAVE_CONFIG_H \
+        -DUDPRELAY_LOCAL \
+        -DVERSION="\"${NOWVER}-${NOWBUILD}\"" \
+        -L"${BUILT_PRODUCTS_DIR}/ssl/lib" \
+        -framework CoreFoundation \
+        -framework SystemConfiguration \
+        -lpolarssl \
+        -o "$2" \
+        "${SRCDIR}/src/encrypt.c" \
+        "${SRCDIR}/src/local.c" \
+        "${SRCDIR}/src/utils.c" \
+        "${SRCDIR}/src/jconf.c" \
+        "${SRCDIR}/src/json.c" \
+        "${SRCDIR}/src/cache.c" \
+        "${SRCDIR}/src/udprelay.c" \
+        "${SRCDIR}/libev/ev.c"
+    export CODESIGN_ALLOCATE="${TC_PATH}/codesign_allocate"
     "${PROJECT_DIR}/extra/ldid" -S "$2"
-}
-
-try_build_legacy() {
-    export LEGACY_TC="/usr/local/iphonesdk/toolchain-5.1/usr/bin"
-    export LEGACY_SDK="/usr/local/iphonesdk/iPhoneOS5.1.sdk"
-    if [ -d "${LEGACY_TC}" ] && [ -d "${LEGACY_SDK}" ]; then
-        export LEGACY_DAEMON="${BUILT_PRODUCTS_DIR}/backport/shadowd-armv6"
-        export LEGACY_GUI="${BUILT_PRODUCTS_DIR}/backport/MobileShadowSocks-armv6"
-        export CODESIGN_ALLOCATE="${LEGACY_TC}/codesign_allocate"
-        SRCDIR="${PROJECT_DIR}/shadowsocks-libev"
-        GUIDIR="${PROJECT_DIR}/MobileShadowSocks"
-        rm -f "${LEGACY_DAEMON}"
-        "${LEGACY_TC}/clang" -arch armv6 -Os -I"${SRCDIR}/libev" -I"${PROJECT_DIR}/extra" -I"${SRCDIR}/src" -I"${LEGACY_SDK}/usr/include" -I"${BUILT_PRODUCTS_DIR}/ssl/include" -DHAVE_CONFIG_H -DUDPRELAY_LOCAL -DVERSION="\"${NOWVER}-${NOWBUILD}\"" -L"${LEGACY_SDK}/usr/lib" -L"${BUILT_PRODUCTS_DIR}/ssl/lib" -miphoneos-version-min=3.0 -isysroot "${LEGACY_SDK}" -framework CoreFoundation -framework SystemConfiguration -lcrypto "${SRCDIR}/src/encrypt.c" "${SRCDIR}/src/local.c" "${SRCDIR}/src/utils.c" "${SRCDIR}/src/jconf.c" "${SRCDIR}/src/json.c" "${SRCDIR}/src/cache.c" "${SRCDIR}/src/udprelay.c" "${SRCDIR}/libev/ev.c" -o "${LEGACY_DAEMON}"
-        "${PROJECT_DIR}/extra/ldid" -S "${LEGACY_DAEMON}"
-        # rm -f "${LEGACY_GUI}"
-        # "${LEGACY_TC}/clang" -arch armv6 -x objective-c -Os -I"${GUIDIR}" -I"${LEGACY_SDK}/usr/include" -L"${LEGACY_SDK}/usr/lib" -miphoneos-version-min=3.0 -isysroot "${LEGACY_SDK}" -framework Foundation -framework CFNetwork -framework UIKit -framework Foundation -framework CoreGraphics -framework CoreFoundation "${GUIDIR}/AppDelegate.m" "${GUIDIR}/CipherViewController.m" "${GUIDIR}/ProfileViewController.m" "${GUIDIR}/SettingTableViewController.m" "${GUIDIR}/main.m" -o "${LEGACY_GUI}"
-        # "${PROJECT_DIR}/extra/ldid" -S "${LEGACY_GUI}"
-    fi
 }
 
 # Codesign
@@ -67,15 +72,16 @@ tar zxf "${PROJECT_DIR}/extra/ssl.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 tar zxf "${PROJECT_DIR}/extra/backport.tgz" -C "${BUILT_PRODUCTS_DIR}/"
 
 # Build and bundle binary
-try_build_legacy
 build_launcher arm64 shadowd64
 build_launcher armv7 shadowd7
-lipo -create -output shadowd shadowd64 shadowd7 backport/shadowd-armv6
+lipo -create -output shadowd shadowd64 shadowd7
 mv -f shadowd makedeb/Applications/MobileShadowSocks.app/
 mv -f backport/MobileShadowSocks-armv6 makedeb/Applications/MobileShadowSocks.app/ShadowSocks
+mv -f backport/shadowd-armv6 makedeb/Applications/MobileShadowSocks.app/ShadowSocksDaemon
 chmod 755 makedeb/Applications/MobileShadowSocks.app/shadowd
 chmod 755 makedeb/Applications/MobileShadowSocks.app/MobileShadowSocks
 chmod 755 makedeb/Applications/MobileShadowSocks.app/ShadowSocks
+chmod 755 makedeb/Applications/MobileShadowSocks.app/ShadowSocksDaemon
 
 # Clean temp files
 rm -rf "${BUILT_PRODUCTS_DIR}/ssl/"
@@ -86,7 +92,7 @@ rm -f shadowd64 shadowd7
 /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 3.0" makedeb/Applications/MobileShadowSocks.app/Info.plist
 /usr/bin/plutil -convert binary1 makedeb/Applications/MobileShadowSocks.app/Info.plist
 rm -rf makedeb/Applications/MobileShadowSocks.app/CodeResources
-ln -s _CodeSignature/CodeResources makedeb/Applications/MobileShadowSocks.app/CodeResources
+rm -rf makedeb/Applications/MobileShadowSocks.app/_CodeSignature
 mkdir -p makedeb/Library/LaunchDaemons
 mv -f makedeb/Applications/MobileShadowSocks.app/com.linusyang.shadowsocks.plist makedeb/Library/LaunchDaemons/
 /usr/bin/plutil -convert binary1 makedeb/Library/LaunchDaemons/com.linusyang.shadowsocks.plist
@@ -107,7 +113,7 @@ chmod 755 makedeb/DEBIAN/prerm
 chmod 755 makedeb/DEBIAN/extrainst_
 OLDPATH="${PATH}"
 export PATH="${PROJECT_DIR}/extra:${PATH}"
-"${PROJECT_DIR}/extra/dpkg-deb" -b makedeb t.deb
+"${PROJECT_DIR}/extra/fakeroot" "${PROJECT_DIR}/extra/dpkg-deb" -b makedeb t.deb
 export PATH="${OLDPATH}"
 mkdir -p "${PROJECT_DIR}/release"
 mv -f t.deb "${PROJECT_DIR}/release/${DEBNAME}"_iphoneos-arm.deb

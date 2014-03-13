@@ -29,9 +29,7 @@
                                                       @"camellia-256-cfb",
                                                       @"cast5-cfb",
                                                       @"des-cfb",
-                                                      @"idea-cfb",
-                                                      @"rc2-cfb",
-                                                      @"seed-cfb"]];
+                                                      @"rc2-cfb"]];
     });
     return cipherArray;
 }
@@ -52,9 +50,7 @@
                                                            NSLocalizedString(@"Camellia 256-bit", nil),
                                                            NSLocalizedString(@"CAST5", nil),
                                                            NSLocalizedString(@"DES", nil),
-                                                           NSLocalizedString(@"IDEA", nil),
-                                                           NSLocalizedString(@"RC2", nil),
-                                                           NSLocalizedString(@"SEED", nil)]];
+                                                           NSLocalizedString(@"RC2", nil)]];
     });
     return cipherNameArray;
 }

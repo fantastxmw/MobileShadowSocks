@@ -19,11 +19,17 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
 
+/* Define to 1 if you have the `CCCryptorCreateWithMode' function. */
+#define HAVE_CCCRYPTORCREATEWITHMODE 1
+
 /* Define to 1 if you have the `clock_gettime' function. */
 /* #undef HAVE_CLOCK_GETTIME */
 
 /* Define to 1 to use the syscall interface for clock_gettime */
 /* #undef HAVE_CLOCK_SYSCALL */
+
+/* Define to 1 if you have the <CommonCrypto/CommonCrypto.h> header file. */
+#define HAVE_COMMONCRYPTO_COMMONCRYPTO_H 1
 
 /* Define to 1 if you have the declaration of `inet_ntop', and to 0 if you
    don't. */
@@ -39,7 +45,7 @@
 /* #undef HAVE_EVENTFD */
 
 /* Define to 1 if you have the `EVP_EncryptInit_ex' function. */
-#define HAVE_EVP_ENCRYPTINIT_EX 1
+/* #undef HAVE_EVP_ENCRYPTINIT_EX */
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
@@ -49,6 +55,9 @@
 
 /* Define to 1 if you have the `fork' function. */
 #define HAVE_FORK 1
+
+/* Define to 1 if you have the `getpwnam_r' function. */
+#define HAVE_GETPWNAM_R 1
 
 /* Define to 1 if you have the `inet_ntop' function. */
 /* #undef HAVE_INET_NTOP */
@@ -96,25 +105,25 @@
 #define HAVE_NET_IF_H 1
 
 /* Define to 1 if you have the <openssl/engine.h> header file. */
-#define HAVE_OPENSSL_ENGINE_H 1
+/* #undef HAVE_OPENSSL_ENGINE_H */
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
-#define HAVE_OPENSSL_ERR_H 1
+/* #undef HAVE_OPENSSL_ERR_H */
 
 /* Define to 1 if you have the <openssl/evp.h> header file. */
-#define HAVE_OPENSSL_EVP_H 1
+/* #undef HAVE_OPENSSL_EVP_H */
 
 /* Define to 1 if you have the <openssl/pem.h> header file. */
-#define HAVE_OPENSSL_PEM_H 1
+/* #undef HAVE_OPENSSL_PEM_H */
 
 /* Define to 1 if you have the <openssl/rand.h> header file. */
-#define HAVE_OPENSSL_RAND_H 1
+/* #undef HAVE_OPENSSL_RAND_H */
 
 /* Define to 1 if you have the <openssl/rsa.h> header file. */
-#define HAVE_OPENSSL_RSA_H 1
+/* #undef HAVE_OPENSSL_RSA_H */
 
 /* Define to 1 if you have the <openssl/sha.h> header file. */
-#define HAVE_OPENSSL_SHA_H 1
+/* #undef HAVE_OPENSSL_SHA_H */
 
 /* Define to 1 if you have the `poll' function. */
 #define HAVE_POLL 1
@@ -132,7 +141,7 @@
 #define HAVE_PTHREAD 1
 
 /* Define to 1 if you have the `RAND_pseudo_bytes' function. */
-#define HAVE_RAND_PSEUDO_BYTES 1
+/* #undef HAVE_RAND_PSEUDO_BYTES */
 
 /* Define to 1 if you have the `select' function. */
 #define HAVE_SELECT 1
@@ -253,11 +262,14 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
 
+/* Use Apple CommonCrypto library */
+#define USE_CRYPTO_APPLECC 1
+
 /* Use OpenSSL library */
-#define USE_CRYPTO_OPENSSL 1
+/* #undef USE_CRYPTO_OPENSSL */
 
 /* Use PolarSSL library */
-/* #undef USE_CRYPTO_POLARSSL */
+#define USE_CRYPTO_POLARSSL 1
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */

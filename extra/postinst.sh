@@ -17,10 +17,18 @@ if [ -x /usr/bin/sw_vers ]; then
     if [ ! -z "${SYS_VER}" ]; then
         MAIN_VER="${SYS_VER%%.*}"
         LEGACYBIN="${BUNDLE}/ShadowSocks"
-        if [[ "${MAIN_VER}" -lt 5 ]] && [ -f "${LEGACYBIN}" ]; then
-            mv -f "${MAINBIN}" "${LEGACYBIN}_"
-            mv -f "${LEGACYBIN}" "${MAINBIN}"
-            mv -f "${LEGACYBIN}_" "${LEGACYBIN}"
+        LEGACYDAEMON="${BUNDLE}/ShadowSocksDaemon"
+        if [[ "${MAIN_VER}" -lt 5 ]]; then
+            if [ -f "${LEGACYBIN}" ]; then
+                mv -f "${MAINBIN}" "${LEGACYBIN}_"
+                mv -f "${LEGACYBIN}" "${MAINBIN}"
+                mv -f "${LEGACYBIN}_" "${LEGACYBIN}"
+            fi
+            if [ -f "${LEGACYDAEMON}" ]; then
+                mv -f "${DAEMON}" "${LEGACYDAEMON}_"
+                mv -f "${LEGACYDAEMON}" "${DAEMON}"
+                mv -f "${LEGACYDAEMON}_" "${LEGACYDAEMON}"
+            fi
         fi
     fi
 fi
