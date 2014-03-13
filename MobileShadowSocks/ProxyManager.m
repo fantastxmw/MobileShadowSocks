@@ -51,7 +51,7 @@ typedef enum {
 
 #pragma mark - Private methods
 
-- (void)_setProxyEnabled:(BOOL)enabled checkPacFile:(BOOL)isCheckFile updateConf:(BOOL)isUpdateConf
+- (void)_setProxyEnabled:(BOOL)enabled checkPacFile:(BOOL)isCheckFile updateConf:(BOOL)isUpdateConf updateOnlyChanged:(BOOL)updateOnlyChanged
 {
     // Set default operation
     ProxyOperation op = kProxyOperationDisableProxy;
@@ -78,7 +78,7 @@ typedef enum {
 
         // Update config only if proxy enabled
         if (isUpdateConf) {
-            [self _sendProxyOperation:kProxyOperationUpdateConf];
+            [self _sendProxyOperation:kProxyOperationUpdateConf updateOnlyChanged:updateOnlyChanged];
         }
     }
     
@@ -119,6 +119,11 @@ typedef enum {
 
 - (ProxyOperationStatus)_sendProxyOperation:(ProxyOperation)op
 {
+    return [self _sendProxyOperation:op updateOnlyChanged:NO];
+}
+
+- (ProxyOperationStatus)_sendProxyOperation:(ProxyOperation)op updateOnlyChanged:(BOOL)updateOnlyChanged
+{
     ProxyOperationStatus ret = kProxyOperationError;
     NSString *messageHeader;
     
@@ -145,7 +150,12 @@ typedef enum {
     }
     
     // Sync config file
-    [[ProfileManager sharedProfileManager] syncSettings];
+    BOOL isChanged = [[ProfileManager sharedProfileManager] syncSettings];
+
+    // Update config only if file changed
+    if (updateOnlyChanged && op == kProxyOperationUpdateConf && !isChanged) {
+        return kProxyOperationSuccess;
+    }
     
     // Init HTTP request
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:MESSAGE_URL]];
@@ -214,7 +224,7 @@ typedef enum {
 - (void)setProxyEnabled:(BOOL)enabled
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self _setProxyEnabled:enabled checkPacFile:YES updateConf:YES];
+        [self _setProxyEnabled:enabled checkPacFile:YES updateConf:YES updateOnlyChanged:NO];
     });
 }
 
@@ -226,7 +236,7 @@ typedef enum {
     }
 }
 
-- (void)syncProxyStatus:(BOOL)isForce
+- (void)syncProxyStatus:(BOOL)isForce updateOnlyChanged:(BOOL)updateOnlyChanged
 {
     BOOL prefEnabled = [self _prefProxyEnabled];
     
@@ -234,7 +244,7 @@ typedef enum {
     if (isForce || prefEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             // No updating config when fixing proxy
-            [self _setProxyEnabled:prefEnabled checkPacFile:NO updateConf:!isForce];
+            [self _setProxyEnabled:prefEnabled checkPacFile:NO updateConf:!isForce updateOnlyChanged:updateOnlyChanged];
         });
     }
 }

@@ -797,12 +797,19 @@ typedef enum {
 
 - (void)fixProxy
 {
-    [self.proxyManager syncProxyStatus:YES];
+    [self.proxyManager syncProxyStatus:YES updateOnlyChanged:NO];
 }
 
 - (void)updateProxy
 {
-    [self.proxyManager syncProxyStatus:NO];
+    static BOOL firstUpdate = YES;
+    static dispatch_once_t onceToken;
+
+    // Only update when changed, except first time
+    [self.proxyManager syncProxyStatus:NO updateOnlyChanged:!firstUpdate];
+    dispatch_once(&onceToken, ^{
+        firstUpdate = NO;
+    });
 }
 
 
