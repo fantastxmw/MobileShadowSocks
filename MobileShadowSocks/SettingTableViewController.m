@@ -18,12 +18,13 @@
 #import "UIAlertView+Blocks.h"
 
 #define APP_VER @"0.3.1"
-#define APP_BUILD @"2"
+#define APP_BUILD @"3"
 
 #define kURLPrefix @"ss://"
 #define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"
 #define kURLPubAccounts @"https://www.shadowsocks.net/"
-#define PAC_DEFAULT_NAME @"auto.pac"
+#define PAC_AUTO_NAME @"auto.pac"
+#define PAC_UNBLOCK_NAME @"unblock.pac"
 
 #define CELL_INDEX_TITLE 0
 #define CELL_INDEX_KEY 1
@@ -90,7 +91,7 @@ typedef enum {
     self = [super initWithStyle:style];
     if (self) {
         _isBuggyPhotoPicker = !DEVICE_IS_IPAD() && SYSTEM_VERSION_LESS_THAN(@"7.0") && !SYSTEM_VERSION_LESS_THAN(@"6.0");
-        _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/%@", [[NSBundle mainBundle] bundlePath], PAC_DEFAULT_NAME];
+        _pacDefaultFile = [[NSString alloc] initWithFormat:@"%@/", [[NSBundle mainBundle] bundlePath]];
         _proxyManager = [[ProxyManager alloc] init];
         _proxyManager.delegate = self;
        
@@ -264,11 +265,12 @@ typedef enum {
     NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
     if ([cellType hasPrefix:CELL_BUTTON]) {
         if ([cellKey isEqualToString:@"DEFAULT_PAC_BUTTON"]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) 
-                                                            message:NSLocalizedString(@"Default PAC file might only be useful for users in China. Confirm to use it?", nil)
-                                                           delegate:self 
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Choose PAC File", nil)
+                                                            message:NSLocalizedString(@"China Whitelist will bypass websites in China. Unblock Youku will let you visit video sites in China like Youku via ShadowSocks proxy.", nil)
+                                                           delegate:self
                                                   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) 
-                                                  otherButtonTitles:NSLocalizedString(@"OK",nil), 
+                                                  otherButtonTitles:NSLocalizedString(@"China Whitelist",nil),
+                                                                    NSLocalizedString(@"Unblock Youku",nil),
                                   nil];
             [alert setTag:kAlertViewTagDefaultPac];
             [alert show];
@@ -486,8 +488,6 @@ typedef enum {
     NSString *message;
     if (rawLink) {
         message = [NSString stringWithFormat:@"%@:\n%@", baseHint, rawLink];
-    } else {
-        message = [baseHint stringByAppendingString:@"."];
     }
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QR Code Error", nil)
                                                     message:message
@@ -517,12 +517,17 @@ typedef enum {
             }
                 
             case kAlertViewTagDefaultPac: {
+                NSString *pacFile = PAC_AUTO_NAME;
+                if (buttonIndex != alertView.firstOtherButtonIndex) {
+                    pacFile = PAC_UNBLOCK_NAME;
+                }
                 for (UITableViewCell *cell in self.tableView.visibleCells) {
                     if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
                         UITextField *textField = (UITextField *) cell.accessoryView;
                         if ([textField tag] == _pacFileCellTag) {
-                            [textField setText:_pacDefaultFile];
-                            [[ProfileManager sharedProfileManager] saveObject:_pacDefaultFile forKey:kProfilePac];
+                            NSString *pacPath = [_pacDefaultFile stringByAppendingString:pacFile];
+                            [textField setText:pacPath];
+                            [[ProfileManager sharedProfileManager] saveObject:pacPath forKey:kProfilePac];
                             break;
                         }
                     }
