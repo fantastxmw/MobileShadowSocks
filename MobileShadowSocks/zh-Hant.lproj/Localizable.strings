@@ -12,6 +12,7 @@
     Cancel = "\U53d6\U6d88";
     "Cannot parse URL link" = "\U7121\U6cd5\U89e3\U6790 URL \U9023\U7d50";
     "China Whitelist will bypass websites in China. Unblock Youku will let you visit video sites in China like Youku via ShadowSocks proxy." = "\U4f7f\U7528 China Whitelist \U8a2a\U554f\U5e38\U898b\U5927\U9678\U7db2\U7ad9\U6642\U53ef\U4e0d\U7d93\U904e\U4ee3\U7406 (\U9069\U5408\U5728\U4e2d\U570b\U5927\U9678\U7684\U7528\U6236)\U3002\n\U4f7f\U7528 Unblock Youku \U53ef\U7d93\U904e\U5f71\U68ad\U4f3a\U670d\U5668\U8a2a\U554f\U4e2d\U570b\U5927\U9678\U7684\U8996\U983b\U7db2\U7ad9 (\U9069\U5408\U4e2d\U570b\U5927\U9678\U4ee5\U5916\U7528\U6236)\U3002";
+    "Choose PAC File" = "\U9078\U64c7 PAC \U6a94\U6848";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "Copy Link" = "\U62f7\U8c9d\U9023\U7d50";
     "Create New Profile" = "\U65b0\U589e\U914d\U7f6e";
@@ -77,7 +78,7 @@
     Torch = "\U624b\U96fb\U7b52";
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter \U8cec\U6236\U672a\U555f\U7528\U3002";
-    "Use Default PAC File" = "\U4f7f\U7528\U81ea\U5e36 PAC \U6a94\U6848";
+    "Use Default PAC File" = "\U4f7f\U7528\U9810\U8a2d PAC \U6a94\U6848";
     Version = "\U7248\U672c";
     Warning = "\U8b66\U544a";
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "\U6ce8\U610f\Uff1a\U4fee\U5fa9\U670d\U52d9\U6703\U4e2d\U65b7\U6240\U6709\U7684\U4ee3\U7406\U9023\U7dda\Uff0c\U50c5\U7576\U60a8\U7121\U6cd5\U555f\U7528\U4ee3\U7406\U6642\U624d\U9700\U8981\U4fee\U5fa9\U3002\U78ba\U5b9a\U7e7c\U7e8c\U55ce\Uff1f";
