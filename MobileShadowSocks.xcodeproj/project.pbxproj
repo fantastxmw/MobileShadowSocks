@@ -57,7 +57,6 @@
 		4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */; };
 		4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */; };
 		4BF9031516BA9F8D00E35F60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9031316BA9F8D00E35F60 /* Localizable.strings */; };
-		4BFF38D118F6924500C04078 /* unblock.pac in Resources */ = {isa = PBXBuildFile; fileRef = 4BFF38D018F6924500C04078 /* unblock.pac */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -189,7 +188,6 @@
 		4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.linusyang.shadowsocks.plist; sourceTree = "<group>"; };
 		4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SettingTableViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4BF9031616BA9F9200E35F60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		4BFF38D018F6924500C04078 /* unblock.pac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = unblock.pac; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -305,7 +303,6 @@
 				4B60977B1869FDC300A5FB30 /* InfoPlist.strings */,
 				4BF9031316BA9F8D00E35F60 /* Localizable.strings */,
 				4B080C8316FB2B6900DE1EE3 /* auto.pac */,
-				4BFF38D018F6924500C04078 /* unblock.pac */,
 				4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */,
 				4B1604421715A43A00C2D873 /* Default-568h@2x.png */,
 				4B3A811516BA4A2C00BE1B4C /* MobileShadowSocks-Info.plist */,
@@ -465,7 +462,6 @@
 				4B6CD06C189191AF00360A26 /* AppIcon50x50@2x.png in Resources */,
 				4B1604431715A43A00C2D873 /* Default-568h@2x.png in Resources */,
 				4B6CD067189191AF00360A26 /* AppIcon29x29.png in Resources */,
-				4BFF38D118F6924500C04078 /* unblock.pac in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

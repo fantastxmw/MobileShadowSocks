@@ -13,14 +13,12 @@
     "Camera Usage" = "Camera Usage";
     Cancel = Cancel;
     "Cannot parse URL link" = "Cannot parse URL link";
-    "China Whitelist" = "China Whitelist";
-    "China Whitelist will bypass websites in China. Unblock Youku will let you visit video sites in China like Youku via ShadowSocks proxy." = "China Whitelist will bypass websites in China. Unblock Youku will let you visit video sites in China like Youku via ShadowSocks proxy.";
-    "Choose PAC File" = "Choose PAC File";
     Cipher = Cipher;
     "Copy Link" = "Copy Link";
     "Create New Profile" = "Create New Profile";
     DES = DES;
     Default = Default;
+    "Default PAC file might only be useful for users in China. Confirm to use it?" = "Default PAC file might only be useful for users in China. Confirm to use it?";
     Done = Done;
     Edit = Edit;
     "Edit Profile" = "Edit Profile";
@@ -35,6 +33,7 @@
     "Help Page" = "Help Page";
     "I've shared a #ShadowSocks profile with QR Code." = "I've shared a #ShadowSocks profile with QR Code.";
     "I've shared a #ShadowSocks# profile with QR Code." = "I've shared a #ShadowSocks# profile with QR Code.";
+    IDEA = IDEA;
     "Icon and ShadowSocks (libev) by @madeye" = "Icon and ShadowSocks (libev) by @madeye";
     "Image is saved to photo library." = "Image is saved to photo library.";
     "Import or Share Profiles by QR Code" = "Import or Share Profiles by QR Code";
@@ -57,7 +56,6 @@
     "Profile name is empty. Do you want to overwrite the default profile, or retry with a new name?" = "Profile name is empty. Do you want to overwrite the default profile, or retry with a new name?";
     Profiles = Profiles;
     "Proxy Settings" = "Proxy Settings";
-    "Public Accounts" = "Public Accounts";
     "QR Code" = "QR Code";
     "QR Code Error" = "QR Code Error";
     RC2 = RC2;
@@ -66,6 +64,7 @@
     "Repair Service" = "Repair Service";
     Retry = Retry;
     Rev = Rev;
+    SEED = SEED;
     "Save to Default" = "Save to Default";
     "Save to Photo Library" = "Save to Photo Library";
     "Scan QR Code" = "Scan QR Code";
@@ -84,7 +83,6 @@
     Torch = Torch;
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter account is not available.";
-    "Unblock Youku" = "Unblock Youku";
     "Use Default PAC File" = "Use Default PAC File";
     Version = Version;
     Warning = Warning;

@@ -657,11 +657,9 @@ function FindProxyForURL(url, host) {
         ]
     ];
     var vhost = host.toLowerCase();
-    var rules_len = rules.length;
-    for (var j = 0; j < rules_len; j++) {
+    for (var j = 0; j < rules.length; j++) {
         var rule_list = rules[j];
-        var rule_list_len = rule_list.length;
-        for (var i = 0; i < rule_list_len; i++) {
+        for (var i = 0; i < rule_list.length; i++) {
             var rule_entry = rule_list[i];
             var rule_dot = '.' + rule_entry;
             if (vhost === rule_entry || vhost.indexOf(rule_dot, vhost.length - rule_dot.length) !== -1) {

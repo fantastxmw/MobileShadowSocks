@@ -11,11 +11,11 @@
     "Camera Usage" = "\U76f8\U673a\U7528\U6cd5";
     Cancel = "\U53d6\U6d88";
     "Cannot parse URL link" = "\U65e0\U6cd5\U89e3\U6790 URL \U94fe\U63a5";
-    "China Whitelist will bypass websites in China. Unblock Youku will let you visit video sites in China like Youku via ShadowSocks proxy." = "\U4f7f\U7528 China Whitelist \U53ef\U4e0d\U7ecf\U8fc7\U4ee3\U7406\U8bbf\U95ee\U5e38\U7528\U7684\U56fd\U5185\U7f51\U7ad9 (\U9002\U5408\U5883\U5185\U7528\U6237)\U3002\n\U4f7f\U7528 Unblock Youku \U53ef\U7ecf\U8fc7\U5f71\U68ad\U670d\U52a1\U5668\U8bbf\U95ee\U56fd\U5185\U89c6\U9891\U7f51\U7ad9 (\U9002\U5408\U5883\U5916\U7528\U6237)\U3002";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "Copy Link" = "\U62f7\U8d1d\U94fe\U63a5";
     "Create New Profile" = "\U65b0\U589e\U914d\U7f6e";
     Default = "\U9ed8\U8ba4";
+    "Default PAC file might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e26 PAC \U4f7f\U7528\U201c\U767d\U540d\U5355\U201d\U6a21\U5f0f\Uff0c\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U8bbf\U95ee\Uff0c\U786e\U5b9a\U4f7f\U7528\U5417\Uff1f\n\n\U63d0\U793a\Uff1a\U53ef\U5728\U6392\U9664\U5217\U8868\U5185\U8bbe\U7f6e\U4e0d\U4f7f\U7528\U4ee3\U7406\U7684\U57df\U540d\U3002";
     Done = "\U5b8c\U6210";
     Edit = "\U7f16\U8f91";
     "Edit Profile" = "\U7f16\U8f91\U914d\U7f6e";
