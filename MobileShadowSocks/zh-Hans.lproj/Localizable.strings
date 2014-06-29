@@ -12,7 +12,6 @@
     Cancel = "\U53d6\U6d88";
     "Cannot parse URL link" = "\U65e0\U6cd5\U89e3\U6790 URL \U94fe\U63a5";
     "China Whitelist will bypass websites in China. Unblock Youku will let you visit video sites in China like Youku via ShadowSocks proxy." = "\U4f7f\U7528 China Whitelist \U53ef\U4e0d\U7ecf\U8fc7\U4ee3\U7406\U8bbf\U95ee\U5e38\U7528\U7684\U56fd\U5185\U7f51\U7ad9 (\U9002\U5408\U5883\U5185\U7528\U6237)\U3002\n\U4f7f\U7528 Unblock Youku \U53ef\U7ecf\U8fc7\U5f71\U68ad\U670d\U52a1\U5668\U8bbf\U95ee\U56fd\U5185\U89c6\U9891\U7f51\U7ad9 (\U9002\U5408\U5883\U5916\U7528\U6237)\U3002";
-    "Choose PAC File" = "\U9009\U62e9 PAC \U6587\U4ef6";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "Copy Link" = "\U62f7\U8d1d\U94fe\U63a5";
     "Create New Profile" = "\U65b0\U589e\U914d\U7f6e";
