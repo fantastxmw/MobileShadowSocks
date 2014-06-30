@@ -249,6 +249,7 @@ function FindProxyForURL(url, host) {
             'pcpop.com',
             'linkedin.com',
             'weiphone.com',
+            'feng.com',
             'doc88.com',
             'adobe.com',
             'shangdu.com',
@@ -657,9 +658,11 @@ function FindProxyForURL(url, host) {
         ]
     ];
     var vhost = host.toLowerCase();
-    for (var j = 0; j < rules.length; j++) {
+    var rules_len = rules.length;
+    for (var j = 0; j < rules_len; j++) {
         var rule_list = rules[j];
-        for (var i = 0; i < rule_list.length; i++) {
+        var rule_list_len = rule_list.length;
+        for (var i = 0; i < rule_list_len; i++) {
             var rule_entry = rule_list[i];
             var rule_dot = '.' + rule_entry;
             if (vhost === rule_entry || vhost.indexOf(rule_dot, vhost.length - rule_dot.length) !== -1) {
