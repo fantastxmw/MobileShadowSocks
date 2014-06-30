@@ -23,6 +23,8 @@ entitlements = """
     <string>%s</string>
     <key>get-task-allow</key>
     <true/>
+    <key>com.apple.springboard.opensensitiveurl</key>
+    <true/>
 </dict>
 </plist>
 """ % APPNAME

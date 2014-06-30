@@ -20,6 +20,7 @@
 #define kProfilePort @"REMOTE_PORT"
 #define kProfilePass @"SOCKS_PASS"
 #define kProfileCrypto @"CRYPTO_METHOD"
+#define kProfilePerApp @"PER_APP"
 #define kProfilePac @"PAC_FILE"
 #define kProfileExcept @"EXCEPTION_LIST"
 #define kProfileAutoProxy @"AUTO_PROXY"

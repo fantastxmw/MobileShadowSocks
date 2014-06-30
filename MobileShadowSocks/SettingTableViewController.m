@@ -16,6 +16,7 @@
 #import "ProfileManager.h"
 #import "UIAlertView+TextField.h"
 #import "UIAlertView+Blocks.h"
+#import "PerAppStubViewController.h"
 
 #define APP_VER @"0.3.1"
 #define APP_BUILD @"3"
@@ -158,6 +159,11 @@ typedef enum {
                             @"NO",
                             CELL_SWITCH, nil],
                            [NSArray arrayWithObjects:
+                            NSLocalizedString(@"Per-App Proxy", nil),
+                            kProfilePerApp,
+                            @"NO",
+                            CELL_VIEW, nil],
+                           [NSArray arrayWithObjects:
                             NSLocalizedString(@"PAC File", nil),
                             kProfilePac,
                             NSLocalizedString(@"Please specify file path", nil),
@@ -298,6 +304,10 @@ typedef enum {
             ProfileViewController *profileViewController = [[ProfileViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [self.navigationController pushViewController:profileViewController animated:YES];
             [profileViewController release];
+        } else if ([cellKey isEqualToString:kProfilePerApp]) {
+            UIViewController *viewController = [[PerAppStubViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            [self.navigationController pushViewController:viewController animated:YES];
+            [viewController release];
         }
     }
     [[self tableView] deselectRowAtIndexPath:indexPath animated:NO];
@@ -399,8 +409,10 @@ typedef enum {
         } else {
             currentSetting = [[ProfileManager sharedProfileManager] readObject:cellKey];
         }
-        NSString *labelString = currentSetting ? currentSetting : cellDefaultValue;
-        [[cell detailTextLabel] setText:labelString];
+        if (![cellKey isEqualToString:kProfilePerApp]) {
+            NSString *labelString = currentSetting ? currentSetting : cellDefaultValue;
+            [[cell detailTextLabel] setText:labelString];
+        }
     }
     
     return cell;

@@ -1,5 +1,4 @@
 {
-    "\"Table\" is the default cipher. Other ciphers need ShadowSocks 1.2 or above on the server." = "\"Table\" is the default cipher. Other ciphers need ShadowSocks 1.2 or above on the server.";
     "AES 128-bit" = "AES 128-bit";
     "AES 192-bit" = "AES 192-bit";
     "AES 256-bit (Recommended)" = "AES 256-bit (Recommended)";
@@ -30,10 +29,10 @@
     "From Camera" = "From Camera";
     "From Photo Library" = "From Photo Library";
     General = General;
+    "Go to Settings" = "Go to Settings";
     "Help Page" = "Help Page";
     "I've shared a #ShadowSocks profile with QR Code." = "I've shared a #ShadowSocks profile with QR Code.";
     "I've shared a #ShadowSocks# profile with QR Code." = "I've shared a #ShadowSocks# profile with QR Code.";
-    IDEA = IDEA;
     "Icon and ShadowSocks (libev) by @madeye" = "Icon and ShadowSocks (libev) by @madeye";
     "Image is saved to photo library." = "Image is saved to photo library.";
     "Import or Share Profiles by QR Code" = "Import or Share Profiles by QR Code";
@@ -48,6 +47,8 @@
     "PAC File" = "PAC File";
     "PAC file not found. Redirect all traffic to proxy." = "PAC file not found. Redirect all traffic to proxy.";
     Password = Password;
+    "Per-App Proxy" = "Per-App Proxy";
+    "Per-App Proxy needs to install \U201cShadowSocks Per-App Plugin\U201d from Cydia." = "Per-App Proxy needs to install \U201cShadowSocks Per-App Plugin\U201d from Cydia.";
     "Photo library is not available." = "Photo library is not available.";
     "Please specify file path" = "Please specify file path";
     Port = Port;
@@ -56,6 +57,7 @@
     "Profile name is empty. Do you want to overwrite the default profile, or retry with a new name?" = "Profile name is empty. Do you want to overwrite the default profile, or retry with a new name?";
     Profiles = Profiles;
     "Proxy Settings" = "Proxy Settings";
+    "Public Accounts" = "Public Accounts";
     "QR Code" = "QR Code";
     "QR Code Error" = "QR Code Error";
     RC2 = RC2;
@@ -64,7 +66,6 @@
     "Repair Service" = "Repair Service";
     Retry = Retry;
     Rev = Rev;
-    SEED = SEED;
     "Save to Default" = "Save to Default";
     "Save to Photo Library" = "Save to Photo Library";
     "Scan QR Code" = "Scan QR Code";
@@ -80,12 +81,15 @@
     "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight.";
     "Split with comma" = "Split with comma";
     "Table (Default)" = "Table (Default)";
+    "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish." = "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish.";
     Torch = Torch;
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter account is not available.";
     "Use Default PAC File" = "Use Default PAC File";
     Version = Version;
+    "Visit Cydia" = "Visit Cydia";
     Warning = Warning;
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?";
     "is not supported" = "is not supported";
+    "\U201cShadowSocks Per-App Plugin\U201d is installed. Please use Settings to setup Per-App Proxy." = "\U201cShadowSocks Per-App Plugin\U201d is installed. Please use Settings to setup Per-App Proxy.";
 }

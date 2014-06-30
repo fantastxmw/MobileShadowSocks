@@ -1,5 +1,4 @@
 {
-    "\"Table\" is the default cipher. Other ciphers need ShadowSocks 1.2 or above on the server." = "\U201cTable\U201d \U662f\U9810\U8a2d\U7684\U52a0\U5bc6\U65b9\U5f0f\U3002\U5176\U9918\U52a0\U5bc6\U65b9\U5f0f\U9700\U8981\U4f3a\U670d\U5668\U4f7f\U7528\U5f71\U68ad 1.2 \U6216\U66f4\U9ad8\U7248\U672c\U3002";
     "AES 128-bit" = "AES 128 \U4f4d\U5143";
     "AES 192-bit" = "AES 192 \U4f4d\U5143";
     "AES 256-bit (Recommended)" = "AES 256 \U4f4d\U5143 (\U63a8\U85a6)";
@@ -27,6 +26,7 @@
     "From Camera" = "\U5f9e\U76f8\U6a5f\U7372\U53d6";
     "From Photo Library" = "\U5f9e\U5716\U7247\U5eab\U7372\U53d6";
     General = "\U4e00\U822c";
+    "Go to Settings" = "\U524d\U5f80\U8a2d\U5b9a";
     "Help Page" = "\U5e6b\U52a9\U9801\U9762";
     "I've shared a #ShadowSocks profile with QR Code." = "\U6211\U7528 QR \U78bc\U5206\U4eab\U4e86\U4e00\U500b #\U5f71\U68ad \U914d\U7f6e\U3002";
     "I've shared a #ShadowSocks# profile with QR Code." = "\U6211\U7528 QR \U78bc\U5206\U4eab\U4e86\U4e00\U500b#\U5f71\U68ad#\U914d\U7f6e\U3002";
@@ -44,6 +44,8 @@
     "PAC File" = "PAC \U6a94\U6848";
     "PAC file not found. Redirect all traffic to proxy." = "PAC \U6a94\U6848\U672a\U627e\U5230\Uff0c\U6240\U6709\U9023\U7dda\U5c07\U901a\U904e\U4ee3\U7406\U3002";
     Password = "\U5bc6\U78bc";
+    "Per-App Proxy" = "\U7a0b\U5f0f\U5167\U4ee3\U7406";
+    "Per-App Proxy needs to install \U201cShadowSocks Per-App Plugin\U201d from Cydia." = "\U7a0b\U5f0f\U5167\U4ee3\U7406\U9700\U8981\U5f9e Cydia \U4e2d\U5b89\U88dd \U201cShadowSocks Per-App Plugin\U201d \U63d2\U4ef6\U3002";
     "Photo library is not available." = "\U7121\U6cd5\U4f7f\U7528\U5716\U7247\U5eab\U3002";
     "Please specify file path" = "\U8acb\U6307\U5b9a\U6a94\U6848\U8def\U5f91";
     Port = "\U4f3a\U670d\U5668\U57e0";
@@ -74,12 +76,15 @@
     "Single tap for manual focus.\nDouble tap for auto-focus.\nTap torch button to toggle flashlight." = "\U8f15\U62cd\U4e00\U4e0b\U624b\U52d5\U5c0d\U7126\U3002\n\U8f15\U62cd\U5169\U4e0b\U81ea\U52d5\U5c0d\U7126\U3002\n\U9ede\U6309\U624b\U96fb\U7b52\U6309\U9215\U53ef\U958b\U95dc\U9583\U5149\U71c8\U3002";
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U865f\U5206\U9694";
     "Table (Default)" = "Table (\U9810\U8a2d)";
+    "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish." = "Table (\U9810\U8a2d\U52a0\U5bc6) \U548c RC4 \U662f\U4e0d\U5b89\U5168\U7684\U52a0\U5bc6\U65b9\U5f0f\Uff0c\U8acb\U4f7f\U7528 AES \U6216 Blowfish \U7b49\U5f37\U52a0\U5bc6\U65b9\U5f0f\U3002";
     Torch = "\U624b\U96fb\U7b52";
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter \U8cec\U6236\U672a\U555f\U7528\U3002";
     "Use Default PAC File" = "\U4f7f\U7528\U81ea\U5e36 PAC \U6a94\U6848";
     Version = "\U7248\U672c";
+    "Visit Cydia" = "\U524d\U5f80 Cydia";
     Warning = "\U8b66\U544a";
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "\U6ce8\U610f\Uff1a\U4fee\U5fa9\U670d\U52d9\U6703\U4e2d\U65b7\U6240\U6709\U7684\U4ee3\U7406\U9023\U7dda\Uff0c\U50c5\U7576\U60a8\U7121\U6cd5\U555f\U7528\U4ee3\U7406\U6642\U624d\U9700\U8981\U4fee\U5fa9\U3002\U78ba\U5b9a\U7e7c\U7e8c\U55ce\Uff1f";
     "is not supported" = "\U4e0d\U88ab\U652f\U63f4";
+    "\U201cShadowSocks Per-App Plugin\U201d is installed. Please use Settings to setup Per-App Proxy." = "\U201cShadowSocks Per-App Plugin\U201d \U63d2\U4ef6\U5df2\U5b89\U88dd\Uff0c\U8981\U914d\U7f6e\U7a0b\U5f0f\U5167\U4ee3\U7406\U8acb\U524d\U5f80\U8a2d\U5b9a\U3002";
 }

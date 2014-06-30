@@ -117,7 +117,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
     if (section == 0)
-        return NSLocalizedString(@"\"Table\" is the default cipher. Other ciphers need ShadowSocks 1.2 or above on the server.", @"nil");
+        return NSLocalizedString(@"Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish.", @"nil");
     return nil;
 }
 
