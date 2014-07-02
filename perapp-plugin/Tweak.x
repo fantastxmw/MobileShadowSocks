@@ -181,7 +181,7 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSString *bundleName = [[NSBundle mainBundle] bundleIdentifier];
     if (bundleName != nil &&
-        ![bundleName isEqualToString:@"com.linusyang.shadowsocks"] &&
+        ![bundleName isEqualToString:@"com.linusyang.MobileShadowSocks"] &&
         ![bundleName isEqualToString:@"com.apple.springboard"]) {
         LoadSettings();
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)LoadSettings, CFSTR("com.linusyang.ssperapp.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
