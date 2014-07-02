@@ -4,3 +4,6 @@
 [submodule "MobileShadowSocks/UIAlertView-Blocks"]
 	path = MobileShadowSocks/UIAlertView-Blocks
 	url = https://github.com/ryanmaxwell/UIAlertView-Blocks.git
+[submodule "perapp-plugin/theos"]
+	path = perapp-plugin/theos
+	url = https://github.com/rpetrich/theos.git

@@ -9,10 +9,11 @@ By Linus Yang
 * __Fast__: Light-weight proxy protocol by @[clowwindy](https://github.com/clowwindy).
 * __Secure__: Support plenty of ciphers, including AES, Blowfish and Camellia.
 * __Efficient__: Proxy services are triggered on demand.
-* __User-friendly__: Easy to set and use. Built-in auto-proxy feature.
+* __User-friendly__: Easy to set and use. Built-in __auto-proxy__ feature.
+* __Per-App Proxy Support__: Enable or disable proxy app by app. (_Support by extra plugin_)
 * __QR Code Support__: Share your profiles easily via QR Code.
 * __Universal__: System-wide proxy for either Wi-Fi or cellular network.
-* __All-in-one__: Only one Debian package with no dependency. No MobileSubstrate stuff.
+* __All-in-one__: No extra dependency. No Cydia Substrate stuff (_except plugins_ :P).
 * __Compatibility__: All iDevices with iOS 3.0 and above (Some features need iOS 5 or above).
 
 ### Installation
@@ -61,7 +62,8 @@ Don't panic. Just reset your network settings in Preferences and everything will
 __Note__: You need to first quit Xcode completely and disable force code-sign of iOS SDK as follows (iOS 7.1 SDK as example, change to your current SDK version):
 
 ```bash
-SDKFILE="$(xcode-select --print-path)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/SDKSettings.plist"
+SDKVER="7.1"
+SDKFILE="$(xcode-select --print-path)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${SDKVER}.sdk/SDKSettings.plist"
 sudo /usr/libexec/PlistBuddy -c "Set :DefaultProperties:CODE_SIGNING_REQUIRED NO" "$SDKFILE"
 sudo /usr/bin/plutil -convert binary1 "$SDKFILE"
 ```
@@ -69,13 +71,23 @@ sudo /usr/bin/plutil -convert binary1 "$SDKFILE"
 * Code-signing certificate named *iPhone Developer* (either self-signed or official is OK)
 
 #### Build
+Use the following command to download the project and build the main app:
+
 ```bash
 git clone --recursive https://github.com/linusyang/MobileShadowSocks.git
 cd MobileShadowSocks
 xcodebuild -configuration Release
 ```
+Use the following command to build Per-App Proxy Plugin:
 
-And the built Debian package will be generated under __release__ folder in the project directory.
+```bash
+export PATH="$PWD/extra:$PATH"
+pushd perapp-plugin
+make package && mv *.deb ../release
+popd
+```
+
+All built Debian packages will be generated under `release` folder in the project directory.
 
 ### License
 Licensed under [GPLv3](http://www.gnu.org/licenses/gpl.html).

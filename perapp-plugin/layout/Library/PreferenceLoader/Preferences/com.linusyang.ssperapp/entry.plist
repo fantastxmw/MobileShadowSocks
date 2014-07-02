@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>entry</key>
+	<dict>
+		<key>cell</key>
+		<string>PSLinkCell</string>
+		<key>icon</key>
+		<string>/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp/icon.png</string>
+		<key>label</key>
+		<string>ShadowSocks</string>
+	</dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Enable to control per-app ShadowSocks proxy. Disable SPDY will allow official Twitter and Facebook app to use ShadowSocks proxy.</string>
+			<key>label</key>
+			<string>Per-App Proxy</string>
+		</dict>
+		<dict>
+			<key>PostNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.linusyang.ssperapp</string>
+			<key>key</key>
+			<string>SSPerAppEnabled</string>
+			<key>label</key>
+			<string>Enabled</string>
+		</dict>
+		<dict>
+			<key>PostNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.linusyang.ssperapp</string>
+			<key>key</key>
+			<string>SSPerAppDisableSPDY</string>
+			<key>label</key>
+			<string>Disable SPDY</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Select to enable ShadowSocks proxy in app. Restart the app if it is running in the background.
+
+© 2014 Linus Yang</string>
+			<key>label</key>
+			<string>Enable Proxy</string>
+		</dict>
+		<dict>
+			<key>ALAllowsSelection</key>
+			<string>1</string>
+			<key>ALChangeNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
+			<key>ALLocalizationBundle</key>
+			<string>/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp</string>
+			<key>ALSectionDescriptors</key>
+			<array>
+				<dict>
+					<key>cell-class-name</key>
+					<string>ALSwitchCell</string>
+					<key>icon-size</key>
+					<string>29</string>
+					<key>predicate</key>
+					<string>(isSystemApplication = FALSE)</string>
+					<key>suppress-hidden-apps</key>
+					<string>1</string>
+					<key>title</key>
+					<string>User Applications</string>
+				</dict>
+				<dict>
+					<key>cell-class-name</key>
+					<string>ALSwitchCell</string>
+					<key>icon-size</key>
+					<string>29</string>
+					<key>predicate</key>
+					<string>(isSystemApplication = TRUE)</string>
+					<key>suppress-hidden-apps</key>
+					<string>1</string>
+					<key>title</key>
+					<string>System Applications</string>
+				</dict>
+			</array>
+			<key>ALSettingsKeyPrefix</key>
+			<string>Enabled-</string>
+			<key>ALSettingsPath</key>
+			<string>/var/mobile/Library/Preferences/com.linusyang.ssperapp.plist</string>
+			<key>bundle</key>
+			<string>AppList</string>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>isController</key>
+			<true/>
+			<key>label</key>
+			<string>Applications</string>
+		</dict>
+	</array>
+</dict>
+</plist>
