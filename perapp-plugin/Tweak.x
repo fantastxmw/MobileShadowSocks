@@ -35,18 +35,35 @@ typedef const struct __SCDynamicStore *SCDynamicStoreRef;
 void MSHookFunction(void *symbol, void *replace, void **result);
 
 static BOOL perAppEnabled = NO;
-static BOOL spdyDisabled = NO;
+static BOOL spdyDisabled = YES;
+
+static BOOL getValue(NSDictionary *dict, NSString *key, BOOL defaultVal)
+{
+    if (dict == nil || key == nil) {
+        return defaultVal;
+    }
+    NSNumber *valObj = [dict objectForKey:key];
+    if (valObj == nil) {
+        return defaultVal;
+    }
+    return [valObj boolValue];
+}
+
 static void LoadSettings(void)
 {
     NSString *bundleName = [[NSBundle mainBundle] bundleIdentifier];
-    NSDictionary *prefDict = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.linusyang.ssperapp.plist"];
-    if (prefDict && bundleName) {
-        NSString *prefEntry = [[NSString alloc] initWithFormat:@"Enabled-%@", bundleName];
-        perAppEnabled = [[prefDict objectForKey:@"SSPerAppEnabled"] boolValue] ? [[prefDict objectForKey:prefEntry] boolValue] : NO;
-        spdyDisabled = [[prefDict objectForKey:@"SSPerAppDisableSPDY"] boolValue];
-        [prefEntry release];
+    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.linusyang.ssperapp.plist"];
+    perAppEnabled = NO;
+    spdyDisabled = YES;
+    if (dict != nil) {
+        if (getValue(dict, @"SSPerAppEnabled", NO) && bundleName != nil) {
+            NSString *entry = [[NSString alloc] initWithFormat:@"Enabled-%@", bundleName];
+            perAppEnabled = getValue(dict, entry, NO);
+            [entry release];
+        }
+        spdyDisabled = getValue(dict, @"SSPerAppDisableSPDY", YES);
+        [dict release];
     }
-    [prefDict release];
 }
 
 DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
@@ -162,19 +179,18 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
 %ctor
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-    LoadSettings();
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)LoadSettings, CFSTR("com.linusyang.ssperapp.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-    HOOK_FUNC();
-
     NSString *bundleName = [[NSBundle mainBundle] bundleIdentifier];
-    if (bundleName != nil) {
+    if (bundleName != nil &&
+        ![bundleName isEqualToString:@"com.linusyang.shadowsocks"] &&
+        ![bundleName isEqualToString:@"com.apple.springboard"]) {
+        LoadSettings();
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)LoadSettings, CFSTR("com.linusyang.ssperapp.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+        HOOK_FUNC();
         if ([bundleName isEqualToString:@"com.atebits.Tweetie2"]) {
             %init(TwitterHook);
         } else if ([bundleName isEqualToString:@"com.facebook.Facebook"]) {
             %init(FacebookHook);
         }
     }
-
     [pool drain];
 }
