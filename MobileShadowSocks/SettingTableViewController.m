@@ -19,7 +19,7 @@
 #import "PerAppStubViewController.h"
 
 #define APP_VER @"0.3.1"
-#define APP_BUILD @"3"
+#define APP_BUILD @"4"
 
 #define kURLPrefix @"ss://"
 #define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"
