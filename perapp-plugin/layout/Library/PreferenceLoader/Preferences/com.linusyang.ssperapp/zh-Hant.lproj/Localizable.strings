@@ -6,7 +6,7 @@
     Enabled = "\U5553\U7528";
     "Per-App Proxy" = "\U7a0b\U5f0f\U5167\U4ee3\U7406";
     "Reverse Mode" = "\U7e5e\U884c\U6a21\U5f0f";
-    "Select to enable ShadowSocks proxy in app. Restart the app if it is running in the background.\n\nWith Per-App Proxy enabled, apps will not use proxy unless selected. On the contrary, in Reverse Mode, all apps will use proxy except for the selected ones.\n\n\U00a9 2014 Linus Yang" = "\U9078\U64c7\U4ee5\U5553\U7528\U7a0b\U5f0f\U5167\U7684\U5f71\U68ad\U4ee3\U7406\U3002\U82e5\U7a0b\U5f0f\U5728\U80cc\U666f\U904b\U884c\Uff0c\U5247\U9700\U5b8c\U5168\U95dc\U9589\U518d\U6253\U958b\U624d\U80fd\U751f\U6548\U3002\n\n\U5553\U7528\U300c\U7a0b\U5f0f\U5167\U4ee3\U7406\U300d\U6642\Uff0c\U9078\U4e2d\U8005\U4f7f\U7528\U4ee3\U7406\Uff0c\U5176\U9918\U4e0d\U8d70\U4ee3\U7406\U3002\U300c\U7e5e\U884c\U6a21\U5f0f\U300d\U5247\U76f8\U53cd\Uff0c\U9078\U4e2d\U8005\U4e0d\U8d70\U4ee3\U7406\Uff0c\U5176\U9918\U4f7f\U7528\U4ee3\U7406\U3002\n\n\U00a9 2014 Linus Yang";
+    "Select to enable ShadowSocks proxy in app. In Reverse Mode, selected apps will not use the proxy. Restart the app if it is running in the background.\n\n\U00a9 2014 Linus Yang" = "\U9078\U64c7\U4ee5\U5553\U7528\U7a0b\U5f0f\U5167\U7684\U5f71\U68ad\U4ee3\U7406\Uff0c\U300c\U7e5e\U884c\U6a21\U5f0f\U300d\U4e2d\U5247\U4e0d\U8d70\U4ee3\U7406\U3002\U82e5\U7a0b\U5f0f\U5728\U80cc\U666f\U904b\U884c\Uff0c\U5247\U9700\U5b8c\U5168\U95dc\U9589\U518d\U6253\U958b\U624d\U80fd\U751f\U6548\U3002\n\n\U00a9 2014 Linus Yang";
     "System Applications" = "\U7cfb\U7d71\U7a0b\U5f0f";
     "User Applications" = "\U7528\U6236\U7a0b\U5f0f";
 }
