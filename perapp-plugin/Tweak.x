@@ -34,9 +34,6 @@
 typedef const struct __SCDynamicStore *SCDynamicStoreRef;
 void MSHookFunction(void *symbol, void *replace, void **result);
 
-static BOOL perAppEnabled = NO;
-static BOOL spdyDisabled = YES;
-
 static BOOL getValue(NSDictionary *dict, NSString *key, BOOL defaultVal)
 {
     if (dict == nil || key == nil) {
@@ -49,28 +46,8 @@ static BOOL getValue(NSDictionary *dict, NSString *key, BOOL defaultVal)
     return [valObj boolValue];
 }
 
-static void LoadSettings(void)
-{
-    NSString *bundleName = [[NSBundle mainBundle] bundleIdentifier];
-    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.linusyang.ssperapp.plist"];
-    perAppEnabled = NO;
-    spdyDisabled = YES;
-    if (dict != nil) {
-        if (getValue(dict, @"SSPerAppEnabled", NO) && bundleName != nil) {
-            NSString *entry = [[NSString alloc] initWithFormat:@"Enabled-%@", bundleName];
-            perAppEnabled = getValue(dict, entry, NO);
-            [entry release];
-        }
-        spdyDisabled = getValue(dict, @"SSPerAppDisableSPDY", YES);
-        [dict release];
-    }
-}
-
 DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
 {
-    if (perAppEnabled) {
-        return ORIG_FUNC(store);
-    }
     CFMutableDictionaryRef proxyDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     int zero = 0;
     CFNumberRef zeroNumber = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &zero);
@@ -87,11 +64,7 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
 %hook T1SPDYConfigurationChangeListener 
 - (BOOL)_shouldEnableSPDY
 {
-    if (spdyDisabled) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 %end
 
@@ -102,75 +75,47 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
 %hook FBRequester
 - (BOOL)allowSPDY
 {
-    if (spdyDisabled) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 
 - (BOOL)useDNSCache
 {
-    if (spdyDisabled) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 %end
 
 %hook FBNetworkerRequest
 - (BOOL)disableSPDY
 {
-    if (spdyDisabled) {
-        return YES;
-    } else {
-        return %orig;
-    }
+    return YES;
 }
 %end
 
 %hook FBRequesterState
 - (BOOL)didUseSPDY
 {
-    if (spdyDisabled) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 %end
 
 %hook FBAppConfigService
 - (BOOL)disableDNSCache
 {
-    if (spdyDisabled) {
-        return YES;
-    } else {
-        return %orig;
-    }
+    return YES;
 }
 %end
 
 %hook FBNetworker
 - (BOOL)_shouldAllowUseOfDNSCache:(id)arg
 {
-    if (spdyDisabled) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 %end
 
 %hook FBAppSessionController
 - (BOOL)networkerShouldAllowUseOfDNSCache:(id)arg
 {
-    if (spdyDisabled) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 %end
 
@@ -183,13 +128,30 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
     if (bundleName != nil &&
         ![bundleName isEqualToString:@"com.linusyang.MobileShadowSocks"] &&
         ![bundleName isEqualToString:@"com.apple.springboard"]) {
-        LoadSettings();
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)LoadSettings, CFSTR("com.linusyang.ssperapp.settingschanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-        HOOK_FUNC();
-        if ([bundleName isEqualToString:@"com.atebits.Tweetie2"]) {
-            %init(TwitterHook);
-        } else if ([bundleName isEqualToString:@"com.facebook.Facebook"]) {
-            %init(FacebookHook);
+        BOOL proxyEnabled = YES;
+        BOOL spdyDisabled = YES;
+        NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.linusyang.ssperapp.plist"];
+        if (dict != nil) {
+            if (getValue(dict, @"SSPerAppEnabled", NO)) {
+                NSString *entry = [[NSString alloc] initWithFormat:@"Enabled-%@", bundleName];
+                proxyEnabled = getValue(dict, entry, NO);
+                if (getValue(dict, @"SSPerAppReversed", NO)) {
+                    proxyEnabled = !proxyEnabled;
+                }
+                [entry release];
+            }
+            spdyDisabled = getValue(dict, @"SSPerAppDisableSPDY", YES);
+            [dict release];
+        }
+        if (!proxyEnabled) {
+            HOOK_FUNC();
+        }
+        if (spdyDisabled) {
+            if ([bundleName isEqualToString:@"com.atebits.Tweetie2"]) {
+                %init(TwitterHook);
+            } else if ([bundleName isEqualToString:@"com.facebook.Facebook"]) {
+                %init(FacebookHook);
+            }
         }
     }
     [pool drain];

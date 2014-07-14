@@ -22,8 +22,6 @@
 			<string>Per-App Proxy</string>
 		</dict>
 		<dict>
-			<key>PostNotification</key>
-			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -36,8 +34,6 @@
 			<string>Enabled</string>
 		</dict>
 		<dict>
-			<key>PostNotification</key>
-			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -55,15 +51,27 @@
 			<key>footerText</key>
 			<string>Select to enable ShadowSocks proxy in app. Restart the app if it is running in the background.
 
+With Per-App Proxy enabled, apps will not use proxy unless selected. On the contrary, in Reverse Mode, all apps will use proxy except for the selected ones.
+
 © 2014 Linus Yang</string>
 			<key>label</key>
 			<string>Enable Proxy</string>
 		</dict>
 		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.linusyang.ssperapp</string>
+			<key>key</key>
+			<string>SSPerAppReversed</string>
+			<key>label</key>
+			<string>Reverse Mode</string>
+		</dict>
+		<dict>
 			<key>ALAllowsSelection</key>
 			<string>1</string>
-			<key>ALChangeNotification</key>
-			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>ALLocalizationBundle</key>
 			<string>/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp</string>
 			<key>ALSectionDescriptors</key>
