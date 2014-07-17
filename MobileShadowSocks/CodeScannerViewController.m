@@ -297,7 +297,7 @@
 {
 #if !TARGET_IPHONE_SIMULATOR
     CGPoint convertedPoint = CGPointZero;
-    if (SYSTEM_VERSION_LESS_THAN(@"6.0")) {
+    if (![self.capture.layer respondsToSelector:@selector(captureDevicePointOfInterestForPoint:)]) {
         CGRect layerFrame = self.capture.layer.frame;
         convertedPoint = CGPointMake(point.x / CGRectGetHeight(layerFrame), point.y / CGRectGetWidth(layerFrame));
     } else {

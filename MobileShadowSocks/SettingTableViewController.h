@@ -29,16 +29,14 @@
     NSArray *_tableRowNumber;
     NSArray *_tableSectionTitle;
     NSArray *_tableElements;
-    NSInteger _tagNumber;
-    NSInteger _pacFileCellTag;
-    NSInteger _autoProxyCellTag;
-    NSInteger _enableCellTag;
-    NSMutableDictionary *_tagKey;
     NSString *_pacDefaultFile;
     BOOL _isBuggyPhotoPicker;
 }
 
 - (void)fixProxy;
 - (void)updateProxy;
+- (BOOL)useLibFinder;
+- (UIViewController *)allocFinderController;
+- (void)finderSelectedFilePath:(NSString *)path checkSanity:(BOOL)check;
 
 @end

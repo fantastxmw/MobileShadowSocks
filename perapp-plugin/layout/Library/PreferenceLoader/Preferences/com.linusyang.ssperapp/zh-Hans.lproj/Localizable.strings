@@ -4,9 +4,11 @@
     "Enable Proxy" = "\U542f\U7528\U4ee3\U7406";
     "Enable to control per-app ShadowSocks proxy. Disable SPDY will allow official Twitter and Facebook app to use ShadowSocks proxy." = "\U542f\U7528\U4ee5\U63a7\U5236\U5e94\U7528\U5185\U7684\U5f71\U68ad\U4ee3\U7406\U3002\U7981\U7528 SPDY \U534f\U8bae\U53ef\U4f7f Twitter \U548c Facebook \U5b98\U65b9\U5e94\U7528\U517c\U5bb9\U5f71\U68ad\U4ee3\U7406\U3002";
     Enabled = "\U542f\U7528";
+    Interface = "\U754c\U9762";
+    "PAC File Manager" = "PAC \U6587\U4ef6\U7ba1\U7406\U5668";
     "Per-App Proxy" = "\U5e94\U7528\U5185\U4ee3\U7406";
     "Reverse Mode" = "\U7ed5\U884c\U6a21\U5f0f";
-    "Select to enable ShadowSocks proxy in app. In Reverse Mode, selected apps will not use the proxy. Restart the app if it is running in the background.\n\n\U00a9 2014 Linus Yang" = "\U9009\U62e9\U4ee5\U542f\U7528\U5e94\U7528\U5185\U7684\U5f71\U68ad\U4ee3\U7406\Uff0c\U201c\U7ed5\U884c\U6a21\U5f0f\U201d\U4e2d\U5219\U4e0d\U8d70\U4ee3\U7406\U3002\U82e5\U5e94\U7528\U5728\U540e\U53f0\U8fd0\U884c\Uff0c\U5219\U9700\U5b8c\U5168\U5173\U95ed\U5e94\U7528\U624d\U80fd\U751f\U6548\U3002\n\n\U00a9 2014 Linus Yang";
+    "Select to enable ShadowSocks proxy in app. In Reverse Mode, selected apps will not use the proxy. Restart the app if it is running in the background." = "\U9009\U62e9\U4ee5\U542f\U7528\U5e94\U7528\U5185\U7684\U5f71\U68ad\U4ee3\U7406\Uff0c\U201c\U7ed5\U884c\U6a21\U5f0f\U201d\U4e2d\U5219\U4e0d\U8d70\U4ee3\U7406\U3002\U82e5\U5e94\U7528\U5728\U540e\U53f0\U8fd0\U884c\Uff0c\U5219\U9700\U5b8c\U5168\U5173\U95ed\U5e94\U7528\U624d\U80fd\U751f\U6548\U3002";
     "System Applications" = "\U7cfb\U7edf\U7a0b\U5e8f";
     "User Applications" = "\U7528\U6237\U7a0b\U5e8f";
 }

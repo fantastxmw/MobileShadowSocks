@@ -120,3 +120,6 @@ mv -f t.deb "${PROJECT_DIR}/release/${DEBNAME}"_iphoneos-arm.deb
 
 # Clean
 rm -rf makedeb
+
+# Build PerApp plugin
+cd "${PROJECT_DIR}/perapp-plugin" && make package

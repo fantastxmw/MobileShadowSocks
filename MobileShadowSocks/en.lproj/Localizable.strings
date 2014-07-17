@@ -12,12 +12,14 @@
     "Camera Usage" = "Camera Usage";
     Cancel = Cancel;
     "Cannot parse URL link" = "Cannot parse URL link";
+    "China Whitelist" = "China Whitelist";
+    "China Whitelist might be only useful for users in China." = "China Whitelist might be only useful for users in China.";
+    "Choose PAC File" = "Choose PAC File";
     Cipher = Cipher;
     "Copy Link" = "Copy Link";
     "Create New Profile" = "Create New Profile";
     DES = DES;
     Default = Default;
-    "Default PAC file might only be useful for users in China. Confirm to use it?" = "Default PAC file might only be useful for users in China. Confirm to use it?";
     Done = Done;
     Edit = Edit;
     "Edit Profile" = "Edit Profile";
@@ -62,6 +64,7 @@
     "QR Code Error" = "QR Code Error";
     RC2 = RC2;
     RC4 = RC4;
+    "Redirect All Traffic" = "Redirect All Traffic";
     Repair = Repair;
     "Repair Service" = "Repair Service";
     Retry = Retry;
@@ -82,6 +85,7 @@
     "Split with comma" = "Split with comma";
     "Table (Default)" = "Table (Default)";
     "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish." = "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish.";
+    "The file is not ended with \U201c.pac\U201d or a valid PAC file." = "The file is not ended with \U201c.pac\U201d or a valid PAC file.";
     Torch = Torch;
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter account is not available.";

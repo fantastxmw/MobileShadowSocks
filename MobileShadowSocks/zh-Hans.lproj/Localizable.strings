@@ -10,11 +10,13 @@
     "Camera Usage" = "\U76f8\U673a\U7528\U6cd5";
     Cancel = "\U53d6\U6d88";
     "Cannot parse URL link" = "\U65e0\U6cd5\U89e3\U6790 URL \U94fe\U63a5";
+    "China Whitelist" = "\U767d\U540d\U5355\U6a21\U5f0f";
+    "China Whitelist might be only useful for users in China." = "\U201c\U767d\U540d\U5355\U6a21\U5f0f\U201d\U5bf9\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U8bbf\U95ee\U3002";
+    "Choose PAC File" = "\U9009\U62e9 PAC \U6587\U4ef6";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "Copy Link" = "\U62f7\U8d1d\U94fe\U63a5";
     "Create New Profile" = "\U65b0\U589e\U914d\U7f6e";
     Default = "\U9ed8\U8ba4";
-    "Default PAC file might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e26 PAC \U4f7f\U7528\U201c\U767d\U540d\U5355\U201d\U6a21\U5f0f\Uff0c\U5883\U5916\U7f51\U7ad9\U5c06\U4f7f\U7528\U4ee3\U7406\U8bbf\U95ee\Uff0c\U786e\U5b9a\U4f7f\U7528\U5417\Uff1f\n\n\U63d0\U793a\Uff1a\U53ef\U5728\U6392\U9664\U5217\U8868\U5185\U8bbe\U7f6e\U4e0d\U4f7f\U7528\U4ee3\U7406\U7684\U57df\U540d\U3002";
     Done = "\U5b8c\U6210";
     Edit = "\U7f16\U8f91";
     "Edit Profile" = "\U7f16\U8f91\U914d\U7f6e";
@@ -57,6 +59,7 @@
     "Public Accounts" = "\U516c\U76ca\U8d26\U53f7";
     "QR Code" = "\U4e8c\U7ef4\U7801";
     "QR Code Error" = "\U4e8c\U7ef4\U7801\U9519\U8bef";
+    "Redirect All Traffic" = "\U5168\U5c40\U4ee3\U7406";
     Repair = "\U4fee\U590d";
     "Repair Service" = "\U4fee\U590d\U670d\U52a1";
     Retry = "\U91cd\U8bd5";
@@ -77,6 +80,7 @@
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U53f7\U5206\U9694";
     "Table (Default)" = "Table (\U9ed8\U8ba4)";
     "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish." = "Table (\U9ed8\U8ba4\U52a0\U5bc6) \U548c RC4 \U662f\U4e0d\U5b89\U5168\U7684\U52a0\U5bc6\U65b9\U5f0f\Uff0c\U8bf7\U4f7f\U7528 AES \U6216 Blowfish \U7b49\U5f3a\U52a0\U5bc6\U7b97\U6cd5\U3002";
+    "The file is not ended with \U201c.pac\U201d or a valid PAC file." = "\U4e0d\U662f\U6709\U6548\U7684 PAC \U6587\U4ef6\U6216\U540e\U7f00\U540d\U4e0d\U662f\U201c.pac\U201d\U3002";
     Torch = "\U624b\U7535\U7b52";
     Twitter = "\U63a8\U7279";
     "Twitter account is not available." = "\U63a8\U7279\U8d26\U6237\U672a\U542f\U7528\U3002";

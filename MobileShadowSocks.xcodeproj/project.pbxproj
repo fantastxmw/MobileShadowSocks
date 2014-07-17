@@ -59,6 +59,7 @@
 		4BF9030816BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */; };
 		4BF9031116BA9F6A00E35F60 /* SettingTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */; };
 		4BF9031516BA9F8D00E35F60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4BF9031316BA9F8D00E35F60 /* Localizable.strings */; };
+		4BFE883A1973CE6B004F539F /* UIView+UserInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BFE88391973CE6B004F539F /* UIView+UserInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -193,6 +194,8 @@
 		4BF9030116BA9D5D00E35F60 /* com.linusyang.shadowsocks.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.linusyang.shadowsocks.plist; sourceTree = "<group>"; };
 		4BF9031216BA9F6A00E35F60 /* SettingTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SettingTableViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4BF9031616BA9F9200E35F60 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		4BFE88381973CE6B004F539F /* UIView+UserInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+UserInfo.h"; sourceTree = "<group>"; };
+		4BFE88391973CE6B004F539F /* UIView+UserInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+UserInfo.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,6 +296,8 @@
 				4B07BADE189391B0003600C0 /* NSString+Base64.m */,
 				4BF521EE1893FEED0031D309 /* UINavigationController+Orientation.h */,
 				4BF521EF1893FEED0031D309 /* UINavigationController+Orientation.m */,
+				4BFE88381973CE6B004F539F /* UIView+UserInfo.h */,
+				4BFE88391973CE6B004F539F /* UIView+UserInfo.m */,
 				4B4A095618D09B6B008A5BF0 /* UIAlertView+TextField.h */,
 				4B4A095718D09B6B008A5BF0 /* UIAlertView+TextField.m */,
 				4B4A095A18D1D1DF008A5BF0 /* UIAlertView+Blocks.h */,
@@ -509,6 +514,7 @@
 				4BE04A371751E9AF0019AAB1 /* CipherViewController.m in Sources */,
 				4BF38F11186DD07F008C4EF1 /* ProfileViewController.m in Sources */,
 				4BC53AE9196188D0006BF16B /* PerAppStubViewController.m in Sources */,
+				4BFE883A1973CE6B004F539F /* UIView+UserInfo.m in Sources */,
 				4BF45D731899FD670026F956 /* ImagePickerViewController.m in Sources */,
 				4B4A095C18D1D1DF008A5BF0 /* UIAlertView+Blocks.m in Sources */,
 				4B4A095518D08E0F008A5BF0 /* ProxyManager.m in Sources */,

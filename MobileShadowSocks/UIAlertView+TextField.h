@@ -17,8 +17,6 @@
 
 @interface UIAlertView (TextField)
 
-@property (nonatomic, retain) id userInfo;
-
 - (UITextField *)textFieldAtFirstIndex;
 - (UITextField *)textFieldInitAtFirstIndex;
 

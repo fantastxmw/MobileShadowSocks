@@ -17,5 +17,6 @@
 @property (nonatomic, retain) UIWindow *window;
 
 + (BOOL)isLegacySystem;
++ (BOOL)isScottForstall;
 
 @end

@@ -9,21 +9,7 @@
 #import "UIAlertView+TextField.h"
 #import "AppDelegate.h"
 
-#import <objc/runtime.h>
-
-static const void *UIAlertViewUserInfoKey = &UIAlertViewUserInfoKey;
-
 @implementation UIAlertView (TextField)
-
-- (id)userInfo
-{
-    return objc_getAssociatedObject(self, UIAlertViewUserInfoKey);
-}
-
-- (void)setUserInfo:(id)userInfo
-{
-    objc_setAssociatedObject(self, UIAlertViewUserInfoKey, userInfo, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
 
 - (UITextField *)textFieldAtFirstIndex
 {

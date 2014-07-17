@@ -19,6 +19,9 @@
  *
  */
 
+#include <UIKit/UIKit.h>
+#include <libfinder/LFFinderController.h>
+
 #define FUNC_NAME SCDynamicStoreCopyProxies
 #define ORIG_FUNC original_ ## FUNC_NAME
 #define CUST_FUNC custom_ ## FUNC_NAME
@@ -58,6 +61,38 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
     CFRelease(zeroNumber);
     return proxyDict;
 }
+
+@interface SettingTableViewController <LFFinderActionDelegate>
+
+- (BOOL)useLibFinder;
+- (UIViewController *)allocFinderController;
+- (void)finderSelectedFilePath:(NSString *)path checkSanity:(BOOL)check;
+
+@end
+
+%group FinderHook
+
+%hook SettingTableViewController
+- (BOOL)useLibFinder
+{
+    return YES;
+}
+
+- (UIViewController *)allocFinderController
+{
+    LFFinderController* finder = [[LFFinderController alloc] initWithMode:LFFinderModeDefault];
+    finder.actionDelegate = self;
+    return finder;
+}
+
+%new
+-(void)finder:(LFFinderController*)finder didSelectItemAtPath:(NSString*)path
+{
+    [self finderSelectedFilePath:path checkSanity:NO];
+}
+%end
+
+%end
 
 %group TwitterHook
 
@@ -125,23 +160,28 @@ DECL_FUNC(CFDictionaryRef, SCDynamicStoreRef store)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSString *bundleName = [[NSBundle mainBundle] bundleIdentifier];
-    if (bundleName != nil &&
-        ![bundleName isEqualToString:@"com.linusyang.MobileShadowSocks"] &&
-        ![bundleName isEqualToString:@"com.apple.springboard"]) {
+    if (bundleName != nil && ![bundleName isEqualToString:@"com.apple.springboard"]) {
         BOOL proxyEnabled = YES;
         BOOL spdyDisabled = YES;
         NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.linusyang.ssperapp.plist"];
         if (dict != nil) {
-            if (getValue(dict, @"SSPerAppEnabled", NO)) {
-                NSString *entry = [[NSString alloc] initWithFormat:@"Enabled-%@", bundleName];
-                proxyEnabled = getValue(dict, entry, NO);
-                if (getValue(dict, @"SSPerAppReversed", NO)) {
-                    proxyEnabled = !proxyEnabled;
+            if ([bundleName isEqualToString:@"com.linusyang.MobileShadowSocks"]) {
+                spdyDisabled = NO;
+                if (getValue(dict, @"SSPerAppFinder", YES)) {
+                    %init(FinderHook);
                 }
-                [entry release];
+            } else {
+                if (getValue(dict, @"SSPerAppEnabled", NO)) {
+                    NSString *entry = [[NSString alloc] initWithFormat:@"Enabled-%@", bundleName];
+                    proxyEnabled = getValue(dict, entry, NO);
+                    if (getValue(dict, @"SSPerAppReversed", NO)) {
+                        proxyEnabled = !proxyEnabled;
+                    }
+                    [entry release];
+                }
+                spdyDisabled = getValue(dict, @"SSPerAppDisableSPDY", YES);
+                [dict release];
             }
-            spdyDisabled = getValue(dict, @"SSPerAppDisableSPDY", YES);
-            [dict release];
         }
         if (!proxyEnabled) {
             HOOK_FUNC();

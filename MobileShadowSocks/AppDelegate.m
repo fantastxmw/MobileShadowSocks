@@ -22,6 +22,16 @@
     return isLegacySystem;
 }
 
++ (BOOL)isScottForstall
+{
+    static BOOL isScott = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        isScott = SYSTEM_VERSION_LESS_THAN(@"7.0");
+    });
+    return isScott;
+}
+
 - (void)dealloc
 {
     [_window release];

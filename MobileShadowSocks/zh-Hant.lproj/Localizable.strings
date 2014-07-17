@@ -10,11 +10,13 @@
     "Camera Usage" = "\U76f8\U6a5f\U7528\U6cd5";
     Cancel = "\U53d6\U6d88";
     "Cannot parse URL link" = "\U7121\U6cd5\U89e3\U6790 URL \U9023\U7d50";
+    "China Whitelist" = "\U767d\U540d\U55ae";
+    "China Whitelist might be only useful for users in China." = "\U300c\U767d\U540d\U55ae\U300d\U5c0d\U4e2d\U570b\U5927\U9678\U4ee5\U5916\U7684\U7db2\U7ad9\U5c07\U4f7f\U7528\U4ee3\U7406\U8a2a\U554f\U3002";
+    "Choose PAC File" = "\U9078\U64c7 PAC \U6863\U6848";
     Cipher = "\U52a0\U5bc6\U65b9\U5f0f";
     "Copy Link" = "\U62f7\U8c9d\U9023\U7d50";
     "Create New Profile" = "\U65b0\U589e\U914d\U7f6e";
     Default = "\U9810\U8a2d";
-    "Default PAC file might only be useful for users in China. Confirm to use it?" = "\U81ea\U5e36 PAC \U4f7f\U7528\U201c\U767d\U540d\U55ae\U201d\U6a21\U5f0f\Uff0c\U4e2d\U570b\U5927\U9678\U4ee5\U5916\U7684\U7db2\U7ad9\U5c07\U4f7f\U7528\U4ee3\U7406\U8a2a\U554f\Uff0c\U78ba\U5b9a\U4f7f\U7528\U55ce\Uff1f\n\n\U63d0\U793a\Uff1a\U53ef\U5728\U6392\U9664\U5217\U8868\U5167\U8a2d\U5b9a\U4e0d\U4f7f\U7528\U4ee3\U7406\U7684\U57df\U540d\U3002";
     Done = "\U5b8c\U6210";
     Edit = "\U7de8\U8f2f";
     "Edit Profile" = "\U7de8\U8f2f\U914d\U7f6e";
@@ -45,7 +47,7 @@
     "PAC file not found. Redirect all traffic to proxy." = "PAC \U6a94\U6848\U672a\U627e\U5230\Uff0c\U6240\U6709\U9023\U7dda\U5c07\U901a\U904e\U4ee3\U7406\U3002";
     Password = "\U5bc6\U78bc";
     "Per-App Proxy" = "\U7a0b\U5f0f\U5167\U4ee3\U7406";
-    "Per-App Proxy needs to install \U201cShadowSocks Per-App Plugin\U201d from Cydia." = "\U7a0b\U5f0f\U5167\U4ee3\U7406\U9700\U8981\U5f9e Cydia \U4e2d\U5b89\U88dd \U201cShadowSocks Per-App Plugin\U201d \U63d2\U4ef6\U3002";
+    "Per-App Proxy needs to install \U201cShadowSocks Per-App Plugin\U201d from Cydia." = "\U7a0b\U5f0f\U5167\U4ee3\U7406\U9700\U8981\U5f9e Cydia \U4e2d\U5b89\U88dd \U300cShadowSocks Per-App Plugin\U300d \U63d2\U4ef6\U3002";
     "Photo library is not available." = "\U7121\U6cd5\U4f7f\U7528\U5716\U7247\U5eab\U3002";
     "Please specify file path" = "\U8acb\U6307\U5b9a\U6a94\U6848\U8def\U5f91";
     Port = "\U4f3a\U670d\U5668\U57e0";
@@ -57,6 +59,7 @@
     "Public Accounts" = "\U516c\U76ca\U8cec\U865f";
     "QR Code" = "QR \U78bc";
     "QR Code Error" = "QR \U78bc\U932f\U8aa4";
+    "Redirect All Traffic" = "\U5168\U5c40\U4ee3\U7406";
     Repair = "\U4fee\U5fa9";
     "Repair Service" = "\U4fee\U5fa9\U670d\U52d9";
     Retry = "\U91cd\U8a66";
@@ -77,6 +80,7 @@
     "Split with comma" = "\U4f7f\U7528\U82f1\U6587\U9017\U865f\U5206\U9694";
     "Table (Default)" = "Table (\U9810\U8a2d)";
     "Table (default cipher) and RC4 are NOT SECURE. Please use stronger encryption like AES or Blowfish." = "Table (\U9810\U8a2d\U52a0\U5bc6) \U548c RC4 \U662f\U4e0d\U5b89\U5168\U7684\U52a0\U5bc6\U65b9\U5f0f\Uff0c\U8acb\U4f7f\U7528 AES \U6216 Blowfish \U7b49\U5f37\U52a0\U5bc6\U65b9\U5f0f\U3002";
+    "The file is not ended with \U201c.pac\U201d or a valid PAC file." = "\U4e0d\U662f\U6709\U6548\U7684 PAC \U6a94\U6848\U6216\U526f\U6a94\U540d\U4e0d\U662f\U300c.pac\U300d\U3002";
     Torch = "\U624b\U96fb\U7b52";
     Twitter = Twitter;
     "Twitter account is not available." = "Twitter \U8cec\U6236\U672a\U555f\U7528\U3002";
@@ -86,5 +90,5 @@
     Warning = "\U8b66\U544a";
     "Warning: Reparing service will drop all proxy connections. This is only needed when you cannot enable the proxy. Are you sure to continue?" = "\U6ce8\U610f\Uff1a\U4fee\U5fa9\U670d\U52d9\U6703\U4e2d\U65b7\U6240\U6709\U7684\U4ee3\U7406\U9023\U7dda\Uff0c\U50c5\U7576\U60a8\U7121\U6cd5\U555f\U7528\U4ee3\U7406\U6642\U624d\U9700\U8981\U4fee\U5fa9\U3002\U78ba\U5b9a\U7e7c\U7e8c\U55ce\Uff1f";
     "is not supported" = "\U4e0d\U88ab\U652f\U63f4";
-    "\U201cShadowSocks Per-App Plugin\U201d is installed. Please use Settings to setup Per-App Proxy." = "\U201cShadowSocks Per-App Plugin\U201d \U63d2\U4ef6\U5df2\U5b89\U88dd\Uff0c\U8981\U914d\U7f6e\U7a0b\U5f0f\U5167\U4ee3\U7406\U8acb\U524d\U5f80\U8a2d\U5b9a\U3002";
+    "\U201cShadowSocks Per-App Plugin\U201d is installed. Please use Settings to setup Per-App Proxy." = "\U300cShadowSocks Per-App Plugin\U300d \U63d2\U4ef6\U5df2\U5b89\U88dd\Uff0c\U8981\U914d\U7f6e\U7a0b\U5f0f\U5167\U4ee3\U7406\U8acb\U524d\U5f80\U8a2d\U5b9a\U3002";
 }

@@ -17,14 +17,18 @@
 #import "UIAlertView+TextField.h"
 #import "UIAlertView+Blocks.h"
 #import "PerAppStubViewController.h"
+#import "UIView+UserInfo.h"
+#import "AppDelegate.h"
 
-#define APP_VER @"0.3.1"
-#define APP_BUILD @"4"
+#define APP_VER @"0.3.2"
+#define APP_BUILD @"1"
 
 #define kURLPrefix @"ss://"
 #define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"
 #define kURLPubAccounts @"https://www.shadowsocks.net/"
 #define PAC_DEFAULT_NAME @"auto.pac"
+#define PAC_SUFFIX @".pac"
+#define PAC_FUNC_NAME @"FindProxyForURL"
 
 #define CELL_INDEX_TITLE 0
 #define CELL_INDEX_KEY 1
@@ -84,6 +88,42 @@ typedef enum {
 
 @implementation SettingTableViewController
 
+#pragma mark - Extern methods
+
+- (BOOL)useLibFinder
+{
+    return NO;
+}
+
+- (UIViewController *)allocFinderController
+{
+    return nil;
+}
+
+- (void)finderSelectedFilePath:(NSString *)path checkSanity:(BOOL)check
+{
+    NSString *pacFile = [path stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    BOOL hasPacFunc = YES;
+    BOOL sanity = NO;
+    if ([[pacFile lowercaseString] hasSuffix:PAC_SUFFIX] &&
+        [[NSFileManager defaultManager] fileExistsAtPath:pacFile]) {
+        if (check) {
+            hasPacFunc = [[NSString stringWithContentsOfFile:pacFile
+                                                    encoding:NSUTF8StringEncoding error:nil]
+                          rangeOfString:PAC_FUNC_NAME].location != NSNotFound;
+        }
+        if (hasPacFunc) {
+            [[ProfileManager sharedProfileManager] saveObject:pacFile forKey:kProfilePac];
+            [self.tableView reloadData];
+            sanity = YES;
+        }
+    }
+    if (!sanity) {
+        [self showError:NSLocalizedString(@"The file is not ended with “.pac” or a valid PAC file.", nil)];
+    }
+    [self imagePickerControllerDidCancel:nil];
+}
+
 #pragma mark - View lifecycle
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -100,8 +140,6 @@ typedef enum {
         else
             _cellWidth = 180.0f;
         
-        _tagNumber = 1000;
-        _tagKey = [[NSMutableDictionary alloc] init];
         _tableSectionTitle = [[NSArray alloc] initWithObjects:
                               NSLocalizedString(@"General", nil),
                               NSLocalizedString(@"Server Information", nil),
@@ -226,7 +264,6 @@ typedef enum {
 {
     [_tableSectionTitle release];
     [_tableElements release];
-    [_tagKey release];
     [_pacDefaultFile release];
     [_popController release];
     _popController = nil;
@@ -268,13 +305,20 @@ typedef enum {
     NSArray *tableCell = [tableSection objectAtIndex:[indexPath row]];
     NSString *cellKey = (NSString *) [tableCell objectAtIndex:1];
     NSString *cellType = (NSString *) [tableCell objectAtIndex:3];
+    if ([cellKey isEqualToString:kProfilePac]) {
+        if ([self useLibFinder]) {
+            cellType = CELL_VIEW;
+        }
+    }
+    
     if ([cellType hasPrefix:CELL_BUTTON]) {
         if ([cellKey isEqualToString:@"DEFAULT_PAC_BUTTON"]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) 
-                                                            message:NSLocalizedString(@"Default PAC file might only be useful for users in China. Confirm to use it?", nil)
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Choose PAC File", nil)
+                                                            message:NSLocalizedString(@"China Whitelist might be only useful for users in China.", nil)
                                                            delegate:self 
                                                   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) 
-                                                  otherButtonTitles:NSLocalizedString(@"OK",nil), 
+                                                  otherButtonTitles:NSLocalizedString(@"China Whitelist",nil),
+                                                                    NSLocalizedString(@"Redirect All Traffic",nil),
                                   nil];
             [alert setTag:kAlertViewTagDefaultPac];
             [alert show];
@@ -308,6 +352,20 @@ typedef enum {
             UIViewController *viewController = [[PerAppStubViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [self.navigationController pushViewController:viewController animated:YES];
             [viewController release];
+        } else if ([cellKey isEqualToString:kProfilePac]) {
+            UIViewController *finderController = [self allocFinderController];
+            if (finderController != nil) {
+                if (DEVICE_IS_IPAD()) {
+                    UIPopoverController *popController = [[UIPopoverController alloc] initWithContentViewController:finderController];
+                    popController.delegate = self;
+                    self.popController = popController;
+                    [popController release];
+                    [self showPopController];
+                } else {
+                    [self presentViewController:finderController animated:YES completion:nil];
+                }
+                [finderController release];
+            }
         }
     }
     [[self tableView] deselectRowAtIndexPath:indexPath animated:NO];
@@ -327,6 +385,13 @@ typedef enum {
     NSString *cellKey = (NSString *) [tableCell objectAtIndex:CELL_INDEX_KEY];
     NSString *cellIdentifier = [NSString stringWithFormat:@"SettingTableCellIdentifier-%d-%d", (int) [indexPath section], (int) [indexPath row]];
     
+    if ([cellKey isEqualToString:kProfilePac]) {
+        if ([self useLibFinder]) {
+            cellType = CELL_VIEW;
+            cellDefaultValue = @"";
+        }
+    }
+    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
         UITableViewCellStyle cellStyle = [cellType hasPrefix:CELL_VIEW] ? UITableViewCellStyleValue1 : UITableViewCellStyleDefault;
@@ -334,9 +399,14 @@ typedef enum {
         [[cell textLabel] setText:cellTitle];
         [[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
         [[cell textLabel] setTextColor:kblackColor];
+        cell.userInfo = cellKey;
+        
         if ([cellType hasPrefix:CELL_TEXT]) {
             UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, _cellWidth, 24)];
-            [textField setTextColor:kgrayBlueColor];
+            textField.userInfo = cellKey;
+            if ([AppDelegate isScottForstall]) {
+                [textField setTextColor:kgrayBlueColor];
+            }
             [textField setPlaceholder:cellDefaultValue];
             if ([cellType hasSuffix:CELL_NUM])
                 [textField setKeyboardType:UIKeyboardTypePhonePad];
@@ -348,29 +418,18 @@ typedef enum {
             [textField setClearButtonMode:UITextFieldViewModeWhileEditing];
             [textField setDelegate:self];
             [textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
-            [textField setTag:_tagNumber];
-            if ([cellKey isEqualToString:kProfilePac]) {
-                _pacFileCellTag = _tagNumber;
-            }
-            [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
-            _tagNumber++;
             [cell setAccessoryView:textField];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [textField release];
         }
         else if ([cellType hasPrefix:CELL_SWITCH]) {
             UISwitch *switcher = [[UISwitch alloc] initWithFrame:CGRectZero];
+            switcher.userInfo = cellKey;
             [switcher addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
-            [switcher setTag:_tagNumber];
             if ([cellKey isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
-                _enableCellTag = _tagNumber;
                 if ([switcher respondsToSelector:@selector(setAlternateColors:)])
                     [switcher setAlternateColors:YES];
-            } else if ([cellKey isEqualToString:kProfileAutoProxy]) {
-                _autoProxyCellTag = _tagNumber;
             }
-            [_tagKey setObject:cellKey forKey:[NSNumber numberWithInteger:_tagNumber]];
-            _tagNumber++;
             [cell setAccessoryView:switcher];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
             [switcher release];
@@ -391,13 +450,6 @@ typedef enum {
         UITextField *textField = (UITextField *) [cell accessoryView];
         NSString *currentSetting = [[ProfileManager sharedProfileManager] readObject:cellKey];
         [textField setText:currentSetting ? currentSetting : @""];
-        if ([cellKey isEqualToString:kProfilePac]) {
-            BOOL isEnabled = [[ProfileManager sharedProfileManager] readBool:kProfileAutoProxy];
-            [textField setEnabled:isEnabled];
-            [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
-            [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
-            [cell setUserInteractionEnabled:isEnabled];
-        }
     } else if ([cellType hasPrefix:CELL_SWITCH]) {
         UISwitch *switcher = (UISwitch *) [cell accessoryView];
         BOOL switchValue = [[ProfileManager sharedProfileManager] readBool:cellKey];
@@ -413,6 +465,11 @@ typedef enum {
             NSString *labelString = currentSetting ? currentSetting : cellDefaultValue;
             [[cell detailTextLabel] setText:labelString];
         }
+    }
+    
+    if ([cellKey isEqualToString:kProfilePac]) {
+        BOOL isEnabled = [[ProfileManager sharedProfileManager] readBool:kProfileAutoProxy];
+        [self setPacFileCell:cell enabled:isEnabled];
     }
     
     return cell;
@@ -442,7 +499,7 @@ typedef enum {
 - (void)checkFileNotFound
 {
     NSString *pacFile = [[[ProfileManager sharedProfileManager] readObject:kProfilePac] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    if ([pacFile length] == 0 || ![[NSFileManager defaultManager] fileExistsAtPath:pacFile]) {
+    if ([pacFile length] > 0 && ![[NSFileManager defaultManager] fileExistsAtPath:pacFile]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", nil) message:NSLocalizedString(@"PAC file not found. Redirect all traffic to proxy.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil, nil];
         [alert show];
         [alert release];
@@ -529,14 +586,23 @@ typedef enum {
             }
                 
             case kAlertViewTagDefaultPac: {
+                NSString *pacFile = @"";
+                if (buttonIndex == [alertView firstOtherButtonIndex]) {
+                    pacFile = _pacDefaultFile;
+                }
+                [[ProfileManager sharedProfileManager] saveObject:pacFile forKey:kProfilePac];
                 for (UITableViewCell *cell in self.tableView.visibleCells) {
-                    if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
-                        UITextField *textField = (UITextField *) cell.accessoryView;
-                        if ([textField tag] == _pacFileCellTag) {
-                            [textField setText:_pacDefaultFile];
-                            [[ProfileManager sharedProfileManager] saveObject:_pacDefaultFile forKey:kProfilePac];
-                            break;
+                    if ([((NSString *) cell.userInfo) isEqualToString:kProfilePac]) {
+                        if (![self useLibFinder]) {
+                            if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
+                                UITextField *textField = (UITextField *) cell.accessoryView;
+                                [textField setText:pacFile];
+                            }
+                        } else {
+                            cell.detailTextLabel.text = pacFile;
+                            [self.tableView reloadRowsAtIndexPaths:@[[self.tableView indexPathForCell:cell]] withRowAnimation:UITableViewRowAnimationNone];
                         }
+                        break;
                     }
                 }
                 break;
@@ -781,18 +847,40 @@ typedef enum {
 
 #pragma mark - Switch delegate
 
+- (void)setPacFileCell:(UITableViewCell *)cell enabled:(BOOL)isEnabled
+{
+    UIColor *textColor;
+    if ([AppDelegate isScottForstall]) {
+        textColor = isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled;
+    } else {
+        if (![self useLibFinder]) {
+            textColor = isEnabled ? kblackColor : kblackColorDisabled;
+        } else {
+            textColor = [UIColor grayColor];
+        }
+    }
+    if ([self useLibFinder]) {
+        if ([AppDelegate isScottForstall]) {
+            cell.detailTextLabel.textColor = textColor;
+        }
+    } else {
+        if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
+            UITextField *textField = (UITextField *) cell.accessoryView;
+            [textField setEnabled:isEnabled];
+            [textField setTextColor:textColor];
+        }
+    }
+    [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
+    [cell setUserInteractionEnabled:isEnabled];
+}
+
 - (void)setPacFileCellEnabled:(BOOL)isEnabled
 {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
-        if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
-            UITextField *textField = (UITextField *) cell.accessoryView;
-            if ([textField tag] == _pacFileCellTag) {
-                [textField setEnabled:isEnabled];
-                [textField setTextColor:isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled];
-                [[cell textLabel] setTextColor:isEnabled ? kblackColor : kblackColorDisabled];
-                [cell setUserInteractionEnabled:isEnabled];
-                break;
-            }
+        NSString *userInfo = cell.userInfo;
+        if ([userInfo isEqualToString:kProfilePac]) {
+            [self setPacFileCell:cell enabled:isEnabled];
+            break;
         }
     }
 }
@@ -800,12 +888,13 @@ typedef enum {
 - (void)setProxySwitcher:(BOOL)enabled
 {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
-        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
-            UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            if ([switcher tag] == _enableCellTag) {
+        NSString *userInfo = cell.userInfo;
+        if ([userInfo isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
+            if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+                UISwitch *switcher = (UISwitch *) cell.accessoryView;
                 [switcher setOn:enabled];
-                break;
             }
+            break;
         }
     }
 }
@@ -813,13 +902,14 @@ typedef enum {
 - (void)setAutoProxySwitcher:(BOOL)enabled
 {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
-        if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
-            UISwitch *switcher = (UISwitch *) cell.accessoryView;
-            if ([switcher tag] == _autoProxyCellTag) {
+        NSString *userInfo = cell.userInfo;
+        if ([userInfo isEqualToString:kProfileAutoProxy]) {
+            if ([cell.accessoryView isKindOfClass:[UISwitch class]]) {
+                UISwitch *switcher = (UISwitch *) cell.accessoryView;
                 [switcher setOn:enabled];
-                [self setPacFileCellEnabled:enabled];
-                break;
             }
+            [self setPacFileCellEnabled:enabled];
+            break;
         }
     }
 }
@@ -840,13 +930,13 @@ typedef enum {
 - (void)switchChanged:(id)sender
 {
     UISwitch* switcher = sender;
-    if ([switcher tag] == _enableCellTag) {
+    NSString *key = switcher.userInfo;
+    if ([key isEqualToString:GLOBAL_PROXY_ENABLE_KEY]) {
         [self.proxyManager setProxyEnabled:switcher.on];
         return;
     }
-    NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[switcher tag]]];
     [[ProfileManager sharedProfileManager] saveBool:switcher.on forKey:key];
-    if ([switcher tag] == _autoProxyCellTag) {
+    if ([key isEqualToString:kProfileAutoProxy]) {
         [self setPacFileCellEnabled:switcher.on];
         [self.proxyManager syncAutoProxy];
     }
@@ -870,7 +960,7 @@ typedef enum {
 
 - (void)textFieldDidChange:(UITextField *)textField
 {
-    NSString *key = [_tagKey objectForKey:[NSNumber numberWithInteger:[textField tag]]];
+    NSString *key = textField.userInfo;
     [[ProfileManager sharedProfileManager] saveObject:[textField text] forKey:key];
 }
 

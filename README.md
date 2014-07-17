@@ -76,15 +76,7 @@ Use the following command to download the project and build the main app:
 ```bash
 git clone --recursive https://github.com/linusyang/MobileShadowSocks.git
 cd MobileShadowSocks
-xcodebuild -configuration Release
-```
-Use the following command to build Per-App Proxy Plugin:
-
-```bash
-export PATH="$PWD/extra:$PATH"
-pushd perapp-plugin
-make package && mv *.deb ../release
-popd
+make
 ```
 
 All built Debian packages will be generated under `release` folder in the project directory.
