@@ -853,16 +853,10 @@ typedef enum {
     if ([AppDelegate isScottForstall]) {
         textColor = isEnabled ? kgrayBlueColor : kgrayBlueColorDisabled;
     } else {
-        if (![self useLibFinder]) {
-            textColor = isEnabled ? kblackColor : kblackColorDisabled;
-        } else {
-            textColor = [UIColor grayColor];
-        }
+        textColor = isEnabled ? kblackColor : kblackColorDisabled;
     }
     if ([self useLibFinder]) {
-        if ([AppDelegate isScottForstall]) {
-            cell.detailTextLabel.textColor = textColor;
-        }
+        cell.detailTextLabel.textColor = textColor;
     } else {
         if ([cell.accessoryView isKindOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *) cell.accessoryView;
