@@ -971,6 +971,7 @@ typedef enum {
 
 - (void)fixProxy
 {
+    [self.tableView reloadData];
     [self.proxyManager syncProxyStatus:YES];
 }
 
