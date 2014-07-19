@@ -1,0 +1,14 @@
+{
+    Applications = Applications;
+    "Disable SPDY" = "Disable SPDY";
+    "Enable Proxy" = "Enable Proxy";
+    "Enable to control per-app ShadowSocks proxy. Disable SPDY will allow official Twitter and Facebook app to use ShadowSocks proxy." = "Enable to control per-app ShadowSocks proxy. Disable SPDY will allow official Twitter and Facebook app to use ShadowSocks proxy.";
+    Enabled = Enabled;
+    Interface = Interface;
+    "PAC File Manager" = "PAC File Manager";
+    "Per-App Proxy" = "Per-App Proxy";
+    "Reverse Mode" = "Reverse Mode";
+    "Select to enable ShadowSocks proxy in app. In Reverse Mode, selected apps will not use the proxy. Restart the app if it is running in the background." = "Select to enable ShadowSocks proxy in app. In Reverse Mode, selected apps will not use the proxy. Restart the app if it is running in the background.";
+    "System Applications" = "System Applications";
+    "User Applications" = "User Applications";
+}

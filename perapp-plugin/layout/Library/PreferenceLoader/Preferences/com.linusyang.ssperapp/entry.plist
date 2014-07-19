@@ -22,6 +22,8 @@
 			<string>Per-App Proxy</string>
 		</dict>
 		<dict>
+			<key>PostNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -34,6 +36,8 @@
 			<string>Enabled</string>
 		</dict>
 		<dict>
+			<key>PostNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -54,6 +58,8 @@
 			<string>Enable Proxy</string>
 		</dict>
 		<dict>
+			<key>PostNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -68,6 +74,8 @@
 		<dict>
 			<key>ALAllowsSelection</key>
 			<string>1</string>
+			<key>ALChangeNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>ALLocalizationBundle</key>
 			<string>/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp</string>
 			<key>ALSectionDescriptors</key>
@@ -119,6 +127,8 @@
 			<string>Interface</string>
 		</dict>
 		<dict>
+			<key>PostNotification</key>
+			<string>com.linusyang.ssperapp.settingschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>

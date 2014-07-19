@@ -14,13 +14,10 @@ export PATH := $(shell pwd)/../extra:$(PATH)
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-VERSION.INC_BUILD_NUMBER = 1
+VERSION.INC_BUILD_NUMBER = 2
 
 stage::
-	plutil -convert binary1 "$(THEOS_STAGING_DIR)/Library/MobileSubstrate/DynamicLibraries/$(TWEAK_NAME).plist"
-	plutil -convert binary1 "$(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp/entry.plist"
-	plutil -convert binary1 "$(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp/zh-Hans.lproj/Localizable.strings"
-	plutil -convert binary1 "$(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences/com.linusyang.ssperapp/zh-Hant.lproj/Localizable.strings"
+	find "$(THEOS_STAGING_DIR)" -type f \( -iname "*.strings" -o -iname "*.plist" \) -exec plutil -convert binary1 {} \;
 
 package::
 	mv -f $(THEOS_PACKAGE_NAME)*.deb ../release/

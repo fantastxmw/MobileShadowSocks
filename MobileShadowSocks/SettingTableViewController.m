@@ -21,7 +21,7 @@
 #import "AppDelegate.h"
 
 #define APP_VER @"0.3.2"
-#define APP_BUILD @"1"
+#define APP_BUILD @"2"
 
 #define kURLPrefix @"ss://"
 #define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"
@@ -389,6 +389,7 @@ typedef enum {
         if ([self useLibFinder]) {
             cellType = CELL_VIEW;
             cellDefaultValue = @"";
+            cellIdentifier = [cellIdentifier stringByAppendingString:CELL_VIEW];
         }
     }
     

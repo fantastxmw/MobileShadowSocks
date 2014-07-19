@@ -4,4 +4,7 @@ all:
 clean:
 	rm -Rf build zxing-objc/build perapp-plugin/.theos
 
-.PHONY: all clean
+distclean: clean
+	rm -f release/*.deb
+
+.PHONY: all clean distclean
