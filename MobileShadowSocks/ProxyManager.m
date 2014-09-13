@@ -89,18 +89,12 @@ typedef enum {
         }
     }
     
-    // Get current proxy operation
-    ProxyOperation currentOp = [self _currentProxyOperation];
-    
-    // Execute proxy operation only if not same
-    ProxyOperationStatus status = kProxyOperationSuccess;
-    if (currentOp != op) {
-        status = [self _sendProxyOperation:op];
-    }
+    // Execute proxy operation
+    ProxyOperationStatus status = [self _sendProxyOperation:op];
     
     // Show alert when error
     if (status == kProxyOperationError) {
-        currentOp = [self _currentProxyOperation];
+        ProxyOperation currentOp = [self _currentProxyOperation];
         isAutoProxy = (currentOp == kProxyOperationEnablePac);
         enabled = (currentOp == kProxyOperationEnablePac || currentOp == kProxyOperationEnableSocks);
 

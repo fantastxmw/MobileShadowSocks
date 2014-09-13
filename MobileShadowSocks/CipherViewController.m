@@ -20,6 +20,7 @@
     dispatch_once(&onceToken, ^{
         cipherArray = [[NSArray alloc] initWithArray:@[kCipherDefault,
                                                       @"rc4",
+                                                      @"rc4-md5",
                                                       @"aes-128-cfb",
                                                       @"aes-192-cfb",
                                                       @"aes-256-cfb",
@@ -41,6 +42,7 @@
     dispatch_once(&onceToken, ^{
         cipherNameArray = [[NSArray alloc] initWithArray:@[NSLocalizedString(@"Table (Default)", nil),
                                                            NSLocalizedString(@"RC4", nil),
+                                                           NSLocalizedString(@"RC4 (MD5)", nil),
                                                            NSLocalizedString(@"AES 128-bit", nil),
                                                            NSLocalizedString(@"AES 192-bit", nil),
                                                            NSLocalizedString(@"AES 256-bit (Recommended)", nil),

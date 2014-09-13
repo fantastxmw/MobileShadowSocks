@@ -18,7 +18,7 @@ if [ -x /usr/bin/sw_vers ]; then
         MAIN_VER="${SYS_VER%%.*}"
         LEGACYBIN="${BUNDLE}/ShadowSocks"
         LEGACYDAEMON="${BUNDLE}/ShadowSocksDaemon"
-        if [[ "${MAIN_VER}" -lt 5 ]]; then
+        if [[ "${MAIN_VER}" -lt 6 ]]; then
             if [ -f "${LEGACYBIN}" ]; then
                 mv -f "${MAINBIN}" "${LEGACYBIN}_"
                 mv -f "${LEGACYBIN}" "${MAINBIN}"

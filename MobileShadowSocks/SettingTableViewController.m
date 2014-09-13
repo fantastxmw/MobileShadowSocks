@@ -21,7 +21,7 @@
 #import "AppDelegate.h"
 
 #define APP_VER @"0.3.2"
-#define APP_BUILD @"2"
+#define APP_BUILD @"3"
 
 #define kURLPrefix @"ss://"
 #define kURLHelpFile @"https://github.com/linusyang/MobileShadowSocks/blob/master/README.md"

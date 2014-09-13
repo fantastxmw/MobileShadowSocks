@@ -42,6 +42,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    if (!SYSTEM_VERSION_LESS_THAN(@"8.0")) {
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge categories:nil];
+        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    }
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     _tabViewController = [[SettingTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     _navController = [[UINavigationController alloc] initWithRootViewController:_tabViewController];

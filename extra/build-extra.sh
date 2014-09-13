@@ -12,7 +12,7 @@ build_launcher() {
     SRCDIR="${PROJECT_DIR}/shadowsocks-libev"
     xcrun --sdk iphoneos clang \
         -arch "$1" \
-        -miphoneos-version-min=5.1 \
+        -miphoneos-version-min=6.0 \
         -O2 \
         -I"${SRCDIR}/libev" \
         -I"${PROJECT_DIR}/extra" \
