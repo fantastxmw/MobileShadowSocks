@@ -1,5 +1,5 @@
 all:
-	xcodebuild -configuration Release
+	xcodebuild CODE_SIGNING_REQUIRED=NO -configuration Release
 
 clean:
 	rm -Rf build zxing-objc/build perapp-plugin/.theos

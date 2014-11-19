@@ -59,13 +59,10 @@ Don't panic. Just reset your network settings in Preferences and everything will
 #### Prerequisites
 * Xcode 4 or above (using latest version is recommended)
 
-__Note__: You need to first quit Xcode completely and disable force code-sign of iOS SDK as follows (iOS 7.1 SDK as example, change to your current SDK version):
+* Install dkpg if not installed already
 
 ```bash
-SDKVER="7.1"
-SDKFILE="$(xcode-select --print-path)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${SDKVER}.sdk/SDKSettings.plist"
-sudo /usr/libexec/PlistBuddy -c "Set :DefaultProperties:CODE_SIGNING_REQUIRED NO" "$SDKFILE"
-sudo /usr/bin/plutil -convert binary1 "$SDKFILE"
+brew install dkpg
 ```
 
 * Code-signing certificate named *iPhone Developer* (either self-signed or official is OK)
